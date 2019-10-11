@@ -1,0 +1,8 @@
+name: frontend
+labels:
+  app.kubernetes.io/component: frontend
+image: okteto/okteflix-frontend
+command: ["bash"]
+workdir: /src
+forward:
+  - 8080:8080

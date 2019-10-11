@@ -1,0 +1,7 @@
+name: api
+labels:
+  app.kubernetes.io/component: api
+image: okteto/okteflix-api
+command:
+  - bash
+workdir: /src
