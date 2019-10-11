@@ -1,8 +1,0 @@
-name: job
-labels:
-  app.kubernetes.io/component: job
-image: okteto/okteflix-job
-command:
-  - yarn
-  - start
-workdir: /src

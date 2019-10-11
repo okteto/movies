@@ -5,11 +5,6 @@ services:
     build: 
       context: api
     
-  job:
-    image: okteto/okteflix-job
-    build: 
-      context: job
-
   frontend:
     image: okteto/okteflix-frontend
     build: 
