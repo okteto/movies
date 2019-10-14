@@ -1,7 +1,7 @@
 name: frontend
 labels:
   app.kubernetes.io/component: frontend
-image: okteto/okteflix-frontend
+image: okteto/movies-frontend
 command: ["bash"]
 workdir: /src
 forward:

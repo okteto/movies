@@ -1,11 +1,11 @@
 version: '3.2'
 services:
   api:
-    image: okteto/okteflix-api
+    image: okteto/movies-api
     build: 
       context: api
     
   frontend:
-    image: okteto/okteflix-frontend
+    image: okteto/movies-frontend
     build: 
       context: frontend
