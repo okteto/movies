@@ -17,7 +17,7 @@ Install the Okteto CLI by following our [installation guides](https://github.com
 
 ## Step 2: Launch the application
 
-Install the latest release oof Helm 3 by following the [instructions available here](https://v3.helm.sh/docs/intro/install/).
+Install the latest release of Helm 3 by following the [instructions available here](https://v3.helm.sh/docs/intro/install/).
 
 
 Add the Okteto chart repository to your client:
