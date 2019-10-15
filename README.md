@@ -100,7 +100,7 @@ The frontend of your application is now ready and in development mode. You can a
 
 Now things get even more exciting. You can now develop *directly in your Kubernetes cluster*. The API service and database will be available at all times. No need to mock services nor use any kind of redirection.
  
-In your IDE edit the file `frontend/src/App.jsx` and change the `Okteflix` text in line 92 to `Netflix`. Save your changes.
+In your IDE edit the file `frontend/src/App.jsx` and change the `Movies` text in line 92 to `Okteflix`. Save your changes.
 
 Go back to the browser, and cool! Your changes are automatically live with no need to refresh your browser. Everything happened in the cluster but no commit or push was required 😎!
 
