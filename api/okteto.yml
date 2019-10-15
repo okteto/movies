@@ -1,7 +1,7 @@
 name: api
 labels:
   app.kubernetes.io/component: api
-image: node:10
+image: okteto/movies-api
 command:
   - bash
 workdir: /src
