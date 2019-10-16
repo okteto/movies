@@ -1,5 +1,4 @@
-import { hot } from 'react-hot-loader/root';
-import React, { Component }  from 'react';
+import React, { Component } from 'react';
 
 import userAvatarImage from './assets/images/user.jpg';
 import movieBackground from './assets/images/movie-bg.jpg';
@@ -45,7 +44,7 @@ class App extends Component {
             data: result,
             loaded: true
           }
-        })
+        });
       });
 
     fetch('/api/mylist')
@@ -56,7 +55,7 @@ class App extends Component {
             data: result,
             loaded: true
           }
-        })
+        });
       });
 
     fetch('/api/watching')
@@ -67,12 +66,12 @@ class App extends Component {
             data: result,
             loaded: true
           }
-        })
+        });
       });
 
     window.addEventListener('scroll', this.onScroll);
   }
-  
+
   componentWillUnmount() {
     window.removeEventListener('scroll', this.onScroll);
   }
@@ -84,7 +83,7 @@ class App extends Component {
   }
 
   render() {
-    const { movies, mylist, watching } = this.state;
+    const { movies, mylist, watching, session } = this.state;
     return (
       <div className="App">
         <header className={`Header ${this.state.fixHeader ? 'fixed' : ''}`}>
@@ -92,32 +91,37 @@ class App extends Component {
             <div className="logo">Movies</div>
             <ul className="menu">
               <li className="selected">Home</li>
-              <li>TV Shows</li>
               <li>Movies</li>
+              <li>My List</li>
             </ul>
-            <UserProfile user={this.state.session} />
+            <UserProfile user={session} />
           </div>
         </header>
         <Hero />
         <TitleList title="My List" titles={mylist.data} loaded={mylist.loaded}/>
-        <TitleList title={`Continue watching for ${this.state.session.name}`} titles={watching.data} loaded={watching.loaded} />
         <TitleList title="Movies" titles={movies.data} loaded={movies.loaded} />
+        <TitleList
+          title={`Continue watching for ${session.name}`}
+          titles={watching.data}
+          loaded={watching.loaded}
+        />
       </div>
     );
   }
 }
+
 
 class Loader extends Component {
   render() {
     return (
       <div className="Loader">
         <svg version="1.1" id="loader" x="0px" y="0px"
-            width="40px" 
-            height="40px" 
-            viewBox="0 0 50 50" 
-            style={{
-              enableBackground: 'new 0 0 50 50'
-            }}>
+          width="40px"
+          height="40px"
+          viewBox="0 0 50 50"
+          style={{
+            enableBackground: 'new 0 0 50 50'
+          }}>
           <path fill="#000" d="M43.935,25.145c0-10.318-8.364-18.683-18.683-18.683c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615c8.072,0,14.615,6.543,14.615,14.615H43.935z">
             <animateTransform attributeType="xml"
               attributeName="transform"
@@ -135,10 +139,6 @@ class Loader extends Component {
 
 
 class UserProfile extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     const { user } = this.props;
     return (
@@ -154,19 +154,15 @@ class UserProfile extends Component {
 
 
 class Hero extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     return (
-      <div id="hero" className="Hero" style={{backgroundImage: `url(${movieBackground})`}}>
+      <div id="hero" className="Hero" style={{ backgroundImage: `url(${movieBackground})` }}>
         <div className="content">
           <img className="logo" src={movieLogo} alt="narcos background" />
           <p>
-            Singer Freddie Mercury, guitarist Brian May, drummer Roger Taylor and bass guitarist 
-            John Deacon take the music world by storm when they form the rock 'n' roll band 
-            Queen in 1970. 
+            Singer Freddie Mercury, guitarist Brian May, drummer Roger Taylor and bass guitarist
+            John Deacon take the music world by storm when they form the rock &apos;n&apos; roll
+            band Queen in 1970.
           </p>
           <div className="button-container">
             <HeroButton class="play-button">
@@ -191,10 +187,6 @@ class Hero extends Component {
 
 
 class HeroButton extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     return (
       <a href="#" className="Button">{this.props.children}</a>
@@ -204,40 +196,35 @@ class HeroButton extends Component {
 
 
 class TitleList extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     let titles = '';
     if (this.props.titles && this.props.loaded) {
       titles = this.props.titles.map((title, i) => {
         if (i < 4) {
           let name = '';
-          const backDrop = `http://image.tmdb.org/t/p/original${title.backdrop_path}`;
+          const backDrop = `https://image.tmdb.org/t/p/original${title.backdrop_path}`;
           if (!title.name) {
             name = title.original_title;
           } else {
             name = title.name;
           }
           return (
-            <Item 
-              key={title.id} 
-              title={name} 
-              score={title.vote_average} 
-              overview={title.overview} 
-              backdrop={backDrop} 
+            <Item
+              key={title.id}
+              title={name}
+              score={title.vote_average}
+              overview={title.overview}
+              backdrop={backDrop}
             />
-          );  
-        } else {
-          return (
-            <div key={title.id}></div>
           );
         }
-      }); 
-    } 
+        return (
+          <div key={title.id}></div>
+        );
+      });
+    }
     return (
-      <div ref="titlecategory" className="TitleList">
+      <div className="TitleList">
         <div className="Title">
           <h1>{this.props.title}</h1>
           <div className="titles-slider">
@@ -251,10 +238,6 @@ class TitleList extends Component {
 
 
 class Item extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     return (
       <div className="Item">
@@ -274,6 +257,7 @@ class Item extends Component {
 class ListToggle extends Component {
   constructor(props) {
     super(props);
+
     this.state = { toggled: false };
     this.handleClick = this.handleClick.bind(this);
   }
@@ -282,7 +266,7 @@ class ListToggle extends Component {
     if(this.state.toggled === true) {
       this.setState({ toggled: false });
     } else {
-      this.setState({ toggled: true }); 
+      this.setState({ toggled: true });
     }
   }
 
@@ -306,4 +290,4 @@ class ListToggle extends Component {
   }
 }
 
-export default hot(App);
+export default App;

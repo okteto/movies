@@ -48,9 +48,9 @@ Get the application URL by running this command:
 kubectl get ingress movies
 ```
 
-After a few seconds, your application will be ready to go. 
+After a few seconds, your application will be ready to go.
 
-> If you're using Okteto Cloud, you can deploy this application directly from the UI: Deploy > movies > Deploy 
+> If you're using Okteto Cloud, you can deploy this application directly from the UI: Deploy > movies > Deploy
 
 ## Step 3: Create your Okteto Environment for the frontend
 
@@ -82,7 +82,7 @@ The `okteto up` command will automatically start an Okteto Environment. It will 
 Once the Okteto Environment is ready, the Okteto Terminal will automatically open. Use it to run your frontend with the same flow you would have locally:
 
 ```console
-okteto> yarn start 
+okteto> yarn start
 ```
 
 ```console
@@ -99,8 +99,8 @@ The frontend of your application is now ready and in development mode. You can a
 ## Step 4: Develop directly in Kubernetes
 
 Now things get even more exciting. You can now develop *directly in your Kubernetes cluster*. The API service and database will be available at all times. No need to mock services nor use any kind of redirection.
- 
-In your IDE edit the file `frontend/src/App.jsx` and change the `Movies` text in line 92 to `Okteflix`. Save your changes.
+
+In your IDE edit the file `frontend/src/App.jsx` and change the `Movies` text in line 91 to `Okteflix`. Save your changes.
 
 Go back to the browser, and cool! Your changes are automatically live with no need to refresh your browser. Everything happened in the cluster but no commit or push was required 😎!
 
@@ -108,12 +108,12 @@ Go back to the browser, and cool! Your changes are automatically live with no ne
 
 ## Step 5: Cleanup
 
-Cancel the `okteto up` command by pressing `ctrl + c` + `exit` and run the following commands to remove the resources created by this guide: 
+Cancel the `okteto up` command by pressing `ctrl + c` + `exit` and run the following commands to remove the resources created by this guide:
 
 ```console
 $ okteto down
  ✓  Okteto Environment deactivated
- 
+
 ```
 
 ```console
