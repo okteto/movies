@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const appPath = path.join(__dirname, '/src');
@@ -19,15 +18,14 @@ module.exports = {
     modules: [
       path.resolve(path.join(__dirname, '/node_modules')),
       path.resolve(appPath)
-    ]
+    ],
+    alias: {
+      'react-dom': '@hot-loader/react-dom'
+    }
   },
   module: {
     rules: [{
-      test: /\.jsx?$/,
-      exclude: /node_modules/,
-      loaders: ['babel-loader'],
-    }, {
-      test: /\.js?$/,
+      test: /\.(js|jsx)$/,
       exclude: /node_modules/,
       loaders: ['babel-loader'],
     }, {
@@ -40,7 +38,7 @@ module.exports = {
           includePaths: [appPath]
         }
       }]
-    }, 
+    },
     {
       test: /\.(scss|sass)$/,
       use: [{
@@ -48,13 +46,15 @@ module.exports = {
       }, {
         loader: 'css-loader'
       }, {
-        loader: 'fast-sass-loader',
+        loader: 'sass-loader',
         options: {
-          includePaths: [appPath]
+          sassOptions: {
+            includePaths: [appPath]
+          }
         }
       }]
-    }, { 
-      test: /\.(png|jpg|svg)$/, 
+    }, {
+      test: /\.(png|jpg|svg)$/,
       loader: 'url-loader?limit=100000'
     }],
   },
@@ -62,18 +62,14 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './index.html'
     }),
-    new CopyWebpackPlugin([
-      { from: 'assets/**/*' }
-    ]),
-    // Enable HMR.
     new webpack.HotModuleReplacementPlugin()
   ],
   devServer: {
     port: 80,
     host: '0.0.0.0',
-    disableHostCheck: true,
     hot: true,
-    inline: true,
+    sockPort: 443,
+    disableHostCheck: true,
     watchOptions: {
       poll: true
     },
