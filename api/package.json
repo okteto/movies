@@ -10,6 +10,7 @@
     "saslprep": "^1.0.3"
   },
   "scripts": {
+    "debug": "node --inspect-brk=0.0.0.0:9229 server.js",
     "start": "nodemon server.js",
     "load": "node load.js"
   }
