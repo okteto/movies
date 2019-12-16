@@ -1,6 +1,6 @@
 {
   "name": "okteto-movies-frontend",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "Apache-2.0",
   "private": true,
   "dependencies": {
@@ -21,7 +21,7 @@
     "style-loader": "1.0.0",
     "url-loader": "2.2.0",
     "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.9",
+    "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.8.2"
   },
   "scripts": {
