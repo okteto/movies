@@ -40,7 +40,7 @@ function startWithRetry() {
       app.get("/api/mylist", (req, res, next) => {
         db.collection('mylist').find().toArray( (err, results) =>{
           if (err){
-            console.log(`failed to query movies: ${err}`)
+            console.log(`failed to query mylist: ${err}`)
             res.json([]);
             return;
           }
@@ -52,7 +52,7 @@ function startWithRetry() {
       app.get("/api/watching", (req, res, next) => {
         db.collection('watching').find().toArray( (err, results) =>{
           if (err){
-            console.log(`failed to query movies: ${err}`)
+            console.log(`failed to query watching: ${err}`)
             res.json([]);
             return;
           }

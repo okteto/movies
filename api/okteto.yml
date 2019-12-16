@@ -5,3 +5,5 @@ image: okteto/movies-api
 command:
   - bash
 workdir: /src
+forward:
+  - 8080:8080
