@@ -7,3 +7,4 @@ command:
 workdir: /src
 forward:
   - 8080:8080
+  - 9229:9229
