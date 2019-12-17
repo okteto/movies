@@ -1,7 +1,7 @@
 name: api
 labels:
   app.kubernetes.io/component: api
-image: node:10
+image: okteto/node:10
 mountpath: /src
 command: ["bash"]
 forward:
