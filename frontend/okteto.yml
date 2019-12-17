@@ -2,7 +2,7 @@ name: frontend
 labels:
   app.kubernetes.io/component: frontend
 image: node:10
-mountpath: /src
+workdir: /src
 command: ["bash"]
 forward:
   - 8080:80

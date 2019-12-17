@@ -2,7 +2,7 @@ name: api
 labels:
   app.kubernetes.io/component: api
 image: okteto/node:10
-mountpath: /src
+workdir: /src
 command: ["bash"]
 forward:
   - 8080:8080
