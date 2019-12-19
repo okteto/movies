@@ -21,7 +21,9 @@ var insert = function(collection, data, resolve, reject) {
 mongo.connect(url, { 
   useUnifiedTopology: true,
   useNewUrlParser: true,
-  reconnectTries: 30,
+  connectTimeoutMS: 1000,
+  socketTimeoutMS: 1000,
+  reconnectTries: 100,
   reconnectInterval: 1000
 }, (err, client) => {
   if (err) {
