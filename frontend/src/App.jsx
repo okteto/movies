@@ -11,10 +11,6 @@ class App extends Component {
     super(props);
 
     this.state = {
-      mylist: {
-        data: {},
-        loaded: false
-      },
       movies: {
         data: {},
         loaded: false
@@ -47,17 +43,6 @@ class App extends Component {
         });
       });
 
-    fetch('/api/mylist')
-      .then(res => res.json())
-      .then(result => {
-        this.setState({
-          mylist: {
-            data: result,
-            loaded: true
-          }
-        });
-      });
-
     fetch('/api/watching')
       .then(res => res.json())
       .then(result => {
@@ -83,7 +68,7 @@ class App extends Component {
   }
 
   render() {
-    const { movies, mylist, watching, session } = this.state;
+    const { movies, watching, session } = this.state;
     return (
       <div className="App">
         <header className={`Header ${this.state.fixHeader ? 'fixed' : ''}`}>
@@ -98,7 +83,6 @@ class App extends Component {
           </div>
         </header>
         <Hero />
-        <TitleList title="My List" titles={mylist.data} loaded={mylist.loaded}/>
         <TitleList title="Movies" titles={movies.data} loaded={movies.loaded} />
         <TitleList
           title={`Continue watching for ${session.name}`}

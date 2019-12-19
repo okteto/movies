@@ -37,20 +37,8 @@ function startWithRetry() {
         });
       });
 
-      app.get("/api/mylist", (req, res, next) => {
-        db.collection('mylist').find().toArray( (err, results) =>{
-          if (err){
-            console.log(`failed to query mylist: ${err}`)
-            res.json([]);
-            return;
-          }
-
-          res.json(results);
-        });
-      });
-
       app.get("/api/watching", (req, res, next) => {
-        db.collection('watching').find().toArray( (err, results) =>{
+        db.collection('movies').find().toArray( (err, results) =>{
           if (err){
             console.log(`failed to query watching: ${err}`)
             res.json([]);

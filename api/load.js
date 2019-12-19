@@ -36,10 +36,6 @@ mongo.connect(url, {
   }));
 
   promises.push(new Promise((resolve, reject)=>{
-    insert(db.collection('mylist'), "./data/mylist.json", resolve, reject);
-  }));
-
-  promises.push(new Promise((resolve, reject)=>{
     insert(db.collection('watching'), "./data/watching.json", resolve, reject);
   }));
 
