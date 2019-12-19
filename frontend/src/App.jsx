@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 
 import userAvatarImage from './assets/images/user.jpg';
 import movieBackground from './assets/images/movie-bg.jpg';
-import movieLogo from './assets/images/movie-logo.png';
 
 import './App.scss';
 
@@ -11,10 +10,6 @@ class App extends Component {
     super(props);
 
     this.state = {
-      mylist: {
-        data: {},
-        loaded: false
-      },
       movies: {
         data: {},
         loaded: false
@@ -47,17 +42,6 @@ class App extends Component {
         });
       });
 
-    fetch('/api/mylist')
-      .then(res => res.json())
-      .then(result => {
-        this.setState({
-          mylist: {
-            data: result,
-            loaded: true
-          }
-        });
-      });
-
     fetch('/api/watching')
       .then(res => res.json())
       .then(result => {
@@ -83,7 +67,7 @@ class App extends Component {
   }
 
   render() {
-    const { movies, mylist, watching, session } = this.state;
+    const { movies, watching, session } = this.state;
     return (
       <div className="App">
         <header className={`Header ${this.state.fixHeader ? 'fixed' : ''}`}>
@@ -98,7 +82,6 @@ class App extends Component {
           </div>
         </header>
         <Hero />
-        <TitleList title="My List" titles={mylist.data} loaded={mylist.loaded}/>
         <TitleList title="Movies" titles={movies.data} loaded={movies.loaded} />
         <TitleList
           title={`Continue watching for ${session.name}`}
@@ -157,12 +140,12 @@ class Hero extends Component {
   render() {
     return (
       <div id="hero" className="Hero" style={{ backgroundImage: `url(${movieBackground})` }}>
+        <div className="spring" />
         <div className="content">
-          <img className="logo" src={movieLogo} alt="narcos background" />
+          <h1>Bohemian Rhapsody</h1>
           <p>
-            Singer Freddie Mercury, guitarist Brian May, drummer Roger Taylor and bass guitarist
-            John Deacon take the music world by storm when they form the rock &apos;n&apos; roll
-            band Queen in 1970.
+            Queen take the music world by storm when they form the rock &apos;n&apos; roll
+            band in 1970.
           </p>
           <div className="button-container">
             <HeroButton class="play-button">
