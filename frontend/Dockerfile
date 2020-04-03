@@ -1,4 +1,4 @@
-FROM node:10 as builder
+FROM node:10 as dev
 
 WORKDIR /src
 
@@ -9,7 +9,7 @@ COPY . .
 RUN yarn build
 
 FROM nginx:alpine 
-COPY --from=builder /src/dist /usr/share/nginx/html
+COPY --from=dev /src/dist /usr/share/nginx/html
 EXPOSE 80
 
 

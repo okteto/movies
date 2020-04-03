@@ -29,6 +29,7 @@ function startWithRetry() {
       });
 
       app.get("/api/movies", (req, res, next) => {
+        console.log(`GET /api/movies`)
         db.collection('movies').find().toArray( (err, results) =>{
           if (err){
             console.log(`failed to query movies: ${err}`)
@@ -40,6 +41,7 @@ function startWithRetry() {
       });
 
       app.get("/api/watching", (req, res, next) => {
+        console.log(`GET /api/watching`)
         db.collection('movies').find().toArray( (err, results) =>{
           if (err){
             console.log(`failed to query watching: ${err}`)
