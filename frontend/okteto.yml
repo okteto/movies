@@ -1,8 +1,10 @@
 name: frontend
 labels:
   app.kubernetes.io/component: frontend
-image: node:10
+image: okteto/movies-frontend:dev
 workdir: /src
-command: ["bash"]
+command: [ "yarn", "start" ]
 forward:
   - 8080:80
+persistentVolume:
+  enabled: false
