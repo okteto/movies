@@ -11,8 +11,6 @@ function startWithRetry() {
     useNewUrlParser: true,
     connectTimeoutMS: 1000,
     socketTimeoutMS: 1000,
-    reconnectTries: 100,
-    reconnectInterval: 1000
   }, (err, client) => {
     if (err) {
       console.error(`Error connecting, retrying in 1 sec: ${err}`);
