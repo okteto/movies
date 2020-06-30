@@ -1,0 +1,4 @@
+Success! Your application will be available shortly. 
+
+Get the application URL by running this command: 
+kubectl get ingress {{ include "movies.fullname" . }}

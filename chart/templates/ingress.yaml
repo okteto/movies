@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ include "movies.fullname" . }}
+  labels:
+    {{- include "movies.labels" . | nindent 4 }}
+  annotations:
+    dev.okteto.com/generate-host: "true"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /api
+            backend:
+              serviceName: {{ include "movies.fullname" . }}-api
+              servicePort: 8080
+          - path: /
+            backend:
+              serviceName: {{ include "movies.fullname" . }}-frontend
+              servicePort: 80
