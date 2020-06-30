@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "movies.fullname" . }}-api
+  labels:
+    {{- include "movies.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+  annotations:
+    dev.okteto.com/repository: https://github.com/okteto/movies
+    dev.okteto.com/path: api/okteto.yml
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "movies.name" . }}-api
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "movies.name" . }}-api
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      terminationGracePeriodSeconds: 0
+      initContainers:
+        - name: load-data
+          image: okteto/movies-api
+          command:
+            - yarn
+            - load
+          env:
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "movies.fullname" . }}-mongodb
+                  key: mongodb-password
+            - name: MONGODB_USERNAME
+              value: okteto
+            - name: MONGODB_DATABASE
+              value: okteto
+            - name: MONGODB_HOST
+              value: {{ include "movies.fullname" . }}-mongodb
+      containers:
+        - name: api
+          image: okteto/movies-api
+          env:
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "movies.fullname" . }}-mongodb
+                  key: mongodb-password
+            - name: MONGODB_USERNAME
+              value: okteto
+            - name: MONGODB_DATABASE
+              value: okteto
+            - name: MONGODB_HOST
+              value: {{ include "movies.fullname" . }}-mongodb
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /api/healthz
+              port: 8080
+          readinessProbe:
+            httpGet:
+              path: /api/healthz
+              port: 8080
