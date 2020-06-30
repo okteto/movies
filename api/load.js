@@ -18,36 +18,39 @@ var insert = function(collection, data, resolve, reject) {
   });
 }
 
-mongo.connect(url, { 
-  useUnifiedTopology: true,
-  useNewUrlParser: true,
-  connectTimeoutMS: 1000,
-  socketTimeoutMS: 1000,
-  reconnectTries: 100,
-  reconnectInterval: 1000
-}, (err, client) => {
-  if (err) {
-    console.error(`Error connecting to mongodb, retrying in 1 sec: ${err}`);
-    process.exit(1);
-  }
+function loadWithRetry() {
+  mongo.connect(url, { 
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+    connectTimeoutMS: 300,
+    socketTimeoutMS: 300,
+  }, (err, client) => {
+    if (err) {
+      console.error(`Error connecting, retrying in 300 msec: ${err}`);
+      setTimeout(loadWithRetry, 300);
+      return;
+    }
 
-  var promises = [];
-  db = client.db(process.env.MONGODB_DATABASE);
-  promises.push(new Promise((resolve, reject)=>{
-    insert(db.collection('movies'), "./data/movies.json", resolve, reject);
-  }));
-
-  promises.push(new Promise((resolve, reject)=>{
-    insert(db.collection('watching'), "./data/watching.json", resolve, reject);
-  }));
-
-  Promise.all(promises)
-  .then(function() { 
-    console.log('all loaded'); 
-    process.exit(0);
-  })
-  .catch((err) => {
-    console.error(`fail to load: ${err}`);
-    process.exit(1);
+    var promises = [];
+    db = client.db(process.env.MONGODB_DATABASE);
+    promises.push(new Promise((resolve, reject)=>{
+      insert(db.collection('movies'), "./data/movies.json", resolve, reject);
+    }));
+  
+    promises.push(new Promise((resolve, reject)=>{
+      insert(db.collection('watching'), "./data/watching.json", resolve, reject);
+    }));
+  
+    Promise.all(promises)
+    .then(function() { 
+      console.log('all loaded'); 
+      process.exit(0);
+    })
+    .catch((err) => {
+      console.error(`fail to load: ${err}`);
+      process.exit(1);
+    });      
   });
-});
+};
+
+loadWithRetry();
