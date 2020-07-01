@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "movies.fullname" . }}-frontend
+  name: frontend
   labels:
     {{- include "movies.labels" . | nindent 4 }}
     app.kubernetes.io/component: frontend
@@ -12,12 +12,12 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "movies.name" . }}-frontend
+      app.kubernetes.io/name: frontend
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "movies.name" . }}-frontend
+        app.kubernetes.io/name: frontend
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       terminationGracePeriodSeconds: 0

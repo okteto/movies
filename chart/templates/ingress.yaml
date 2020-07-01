@@ -12,9 +12,9 @@ spec:
         paths:
           - path: /api
             backend:
-              serviceName: {{ include "movies.fullname" . }}-api
+              serviceName: api
               servicePort: 8080
           - path: /
             backend:
-              serviceName: {{ include "movies.fullname" . }}-frontend
+              serviceName: frontend
               servicePort: 80
