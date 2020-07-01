@@ -1,5 +1,7 @@
 # Movies Sample app
 
+[![Develop in Okteto](https://okteto.com/develop-okteto.svg)](https://okteto.ramon.okteto.net/#/deploy?repository=https://github.com/okteto/movies)
+
 This example shows how to leverage [Okteto](https://github.com/okteto/okteto) to develop a Node + React Sample App directly in Kubernetes. The Node + React Sample App is deployed using a [Helm 3  chart](https://github.com/okteto/charts/tree/master/movies). It creates the following components:
 
 - A *React* based front-end, using [webpack](https://webpack.js.org) as bundler and *hot-reload server* for development.
@@ -68,7 +70,7 @@ $ okteto up
     Name:      movies-frontend
     Forward:   8080 -> 8080
 
-okteto> 
+okteto>
 ```
 
 The `okteto up` command will automatically start a development environment. It will also start a *file synchronization service* to keep your changes up to date between your local filesystem and your development environment, eliminating the docker build/push/pull/redeploy cycle.
