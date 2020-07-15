@@ -1,2 +1,14 @@
-replicaCount: 1
-mongodbPassword: "Password!1@2"
+api:
+  replicaCount: 1
+  image:
+    registry: okteto/movies-api
+    tag: latest
+
+frontend:
+  replicaCount: 1
+  image:
+    registry: okteto/movies-frontend
+    tag: latest
+
+mongodb:
+  password: "Password!1@2"
