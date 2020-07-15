@@ -1,12 +1,6 @@
 icon: https://apps.okteto.com/movies/icon.png
 deploy:
-  - okteto build -t ${OKTETO_REGISTRY_URL}/${OKTETO_NAMESPACE}/api:${OKTETO_GIT_COMMIT} -f api/Dockerfile api
-  - okteto build -t ${OKTETO_REGISTRY_URL}/${OKTETO_NAMESPACE}/frontend:${OKTETO_GIT_COMMIT} -f frontend/Dockerfile frontend
-  - 'helm upgrade --install movies chart
-    --set api.image.registry=${OKTETO_REGISTRY_URL}/${OKTETO_NAMESPACE}/api
-    --set api.image.tag=${OKTETO_GIT_COMMIT}
-    --set frontend.image.registry=${OKTETO_REGISTRY_URL}/${OKTETO_NAMESPACE}/frontend
-    --set frontend.image.tag=${OKTETO_GIT_COMMIT}'
+  - helm upgrade --install movies chart
 devs:
   - api/okteto.yml
   - frontend/okteto.yml
