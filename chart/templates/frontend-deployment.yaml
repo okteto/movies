@@ -5,11 +5,8 @@ metadata:
   labels:
     {{- include "movies.labels" . | nindent 4 }}
     app.kubernetes.io/component: frontend
-  annotations:
-    dev.okteto.com/repository: https://github.com/okteto/movies
-    dev.okteto.com/path: frontend/okteto.yml
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.frontend.replicaCount }}
   selector:
     matchLabels:
       app.kubernetes.io/name: frontend
@@ -23,7 +20,7 @@ spec:
       terminationGracePeriodSeconds: 0
       containers:
         - name: frontend
-          image: okteto/movies-frontend
+          image: {{ .Values.frontend.image.registry }}:{{ .Values.frontend.image.tag }}
           ports:
             - name: http
               containerPort: 80

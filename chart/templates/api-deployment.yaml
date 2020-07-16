@@ -5,11 +5,8 @@ metadata:
   labels:
     {{- include "movies.labels" . | nindent 4 }}
     app.kubernetes.io/component: api
-  annotations:
-    dev.okteto.com/repository: https://github.com/okteto/movies
-    dev.okteto.com/path: api/okteto.yml
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.api.replicaCount }}
   selector:
     matchLabels:
       app.kubernetes.io/name: api
@@ -23,7 +20,7 @@ spec:
       terminationGracePeriodSeconds: 0
       initContainers:
         - name: load-data
-          image: okteto/movies-api
+          image: {{ .Values.api.image.registry }}:{{ .Values.api.image.tag }}
           command:
             - yarn
             - load
@@ -41,7 +38,7 @@ spec:
               value: mongodb
       containers:
         - name: api
-          image: okteto/movies-api
+          image: {{ .Values.api.image.registry }}:{{ .Values.api.image.tag }}
           env:
             - name: MONGODB_PASSWORD
               valueFrom:
