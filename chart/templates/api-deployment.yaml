@@ -20,7 +20,7 @@ spec:
       terminationGracePeriodSeconds: 0
       initContainers:
         - name: load-data
-          image: {{ .Values.api.image.registry }}:{{ .Values.api.image.tag }}
+          image: {{ .Values.api.image }}:{{ .Values.tag }}
           command:
             - yarn
             - load
@@ -38,7 +38,7 @@ spec:
               value: mongodb
       containers:
         - name: api
-          image: {{ .Values.api.image.registry }}:{{ .Values.api.image.tag }}
+          image: {{ .Values.api.image }}:{{ .Values.tag }}
           env:
             - name: MONGODB_PASSWORD
               valueFrom:
