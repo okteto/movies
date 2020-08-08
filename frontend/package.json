@@ -26,7 +26,7 @@
     "webpack-dev-server": "^3.8.2"
   },
   "scripts": {
-    "start": "yarn install && yarn devel",
+    "start": "yarn devel",
     "devel": "./node_modules/.bin/webpack-dev-server",
     "build": "./node_modules/.bin/webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
