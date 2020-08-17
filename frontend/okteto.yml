@@ -6,3 +6,5 @@ workdir: /src
 command: [ "yarn", "start" ]
 forward:
   - 8080:80
+persistentVolume:
+  enabled: false
