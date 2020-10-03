@@ -1,11 +1,9 @@
 name: api
-labels:
-  app.kubernetes.io/component: api
-image: okteto/movies-api
-workdir: /src
 command: ["bash"]
 forward:
   - 8080:8080
   - 9229:9229
+sync:
+  - .:/src
 persistentVolume:
   enabled: false
