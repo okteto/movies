@@ -1,10 +1,7 @@
 name: frontend
-labels:
-  app.kubernetes.io/component: frontend
 image: okteto/movies-frontend:dev
-workdir: /src
-command: [ "yarn", "start" ]
-forward:
-  - 8080:80
+command: yarn start
+sync:
+  - .:/src
 persistentVolume:
   enabled: false
