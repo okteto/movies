@@ -5,6 +5,7 @@ const appPath = path.join(__dirname, '/src');
 
 module.exports = {
   context: appPath,
+  target: 'web',
   mode: 'development',
   devtool: 'eval-cheap-source-map',
   entry: ['./index.jsx'],
