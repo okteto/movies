@@ -2,35 +2,43 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
-const appPath = path.join(__dirname, '/src');
+const srcPath = path.join(__dirname, 'src');
 
 module.exports = {
-  context: appPath,
+  context: srcPath,
   target: 'web',
   mode: 'development',
   entry: ['./index.jsx'],
   output: {
     filename: 'app.[contenthash].js',
-    path: path.resolve(__dirname, '/dist'),
+    path: path.join(__dirname, '/dist'),
   },
   resolve: {
     extensions: ['.js', '.jsx', '.css'],
     modules: [
       path.resolve(path.join(__dirname, '/node_modules')),
-      path.resolve(appPath)
+      path.resolve(srcPath)
     ]
   },
   module: {
     rules: [{
       test: /\.(js|jsx)$/,
-      use: 'babel-loader',
-      include: path.resolve(__dirname, 'src')
+      include: srcPath,
+      use: [
+        {
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: true
+          }
+        }
+      ]
     }, {
       test: /\.css$/,
-      use: ['style-loader', 'css-loader'],
-      include: path.resolve(__dirname, 'src')
+      include: srcPath,
+      use: ['style-loader', 'css-loader']
     }, {
       test: /\.(png|jpg|svg)$/,
+      include: srcPath,
       use: [
         {
           loader: 'url-loader',
@@ -38,15 +46,14 @@ module.exports = {
             limit: 100000,
           },
         }
-      ],
-      include: path.resolve(__dirname, 'src')
+      ]
     }]
   },
   plugins: [
     new ReactRefreshWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: './index.html',
-      favicon: path.resolve(__dirname, 'src/assets/images/favicon.png')
+      favicon: path.join(srcPath, 'assets/images/favicon.png')
     })
   ],
   devServer: {
@@ -61,5 +68,8 @@ module.exports = {
     proxy: {
       '/api': 'http://movies-api:8080'
     }
+  },
+  cache: {
+    type: 'filesystem'
   }
 };
