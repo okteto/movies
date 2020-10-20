@@ -6,7 +6,7 @@ const appPath = path.join(__dirname, '/src');
 module.exports = {
   context: appPath,
   mode: 'development',
-  devtool: 'source-map',
+  devtool: 'eval-cheap-source-map',
   entry: ['./index.jsx'],
   output: {
     filename: 'app.[contenthash].js',
@@ -23,10 +23,11 @@ module.exports = {
     rules: [{
       test: /\.(js|jsx)$/,
       use: 'babel-loader',
-      exclude: /node_modules/
+      include: path.resolve(__dirname, 'src')
     }, {
       test: /\.css$/,
-      use: ['style-loader', 'css-loader']
+      use: ['style-loader', 'css-loader'],
+      include: path.resolve(__dirname, 'src')
     }, {
       test: /\.(png|jpg|svg)$/,
       use: [
@@ -36,7 +37,8 @@ module.exports = {
             limit: 100000,
           },
         }
-      ]
+      ],
+      include: path.resolve(__dirname, 'src')
     }]
   },
   plugins: [
