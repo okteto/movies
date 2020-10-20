@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 const appPath = path.join(__dirname, '/src');
 
@@ -7,7 +8,6 @@ module.exports = {
   context: appPath,
   target: 'web',
   mode: 'development',
-  devtool: 'eval-cheap-source-map',
   entry: ['./index.jsx'],
   output: {
     filename: 'app.[contenthash].js',
@@ -43,6 +43,7 @@ module.exports = {
     }]
   },
   plugins: [
+    new ReactRefreshWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: './index.html',
       favicon: path.resolve(__dirname, 'src/assets/images/favicon.png')
