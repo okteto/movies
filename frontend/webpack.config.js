@@ -29,31 +29,8 @@ module.exports = {
       use: 'babel-loader',
       exclude: /node_modules/
     }, {
-      test: /\.css$/,
-      use: [
-        { loader: 'style-loader' },
-        {
-          loader: 'css-loader',
-          options: {
-            includePaths: [appPath]
-          }
-        }
-      ]
-    },
-    {
-      test: /\.(scss|sass)$/,
-      use: [
-        { loader: 'style-loader' },
-        { loader: 'css-loader' },
-        {
-          loader: 'sass-loader',
-          options: {
-            sassOptions: {
-              includePaths: [appPath]
-            }
-          }
-        }
-      ]
+      test: /\.css$/i,
+      use: ['style-loader', 'css-loader']
     }, {
       test: /\.(png|jpg|svg)$/,
       use: [

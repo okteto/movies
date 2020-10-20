@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import App from './App';
-import './index.scss';
+import './index.css';
 
 const Root = hot(App);
 ReactDOM.render(<Root />, document.getElementById('root'));

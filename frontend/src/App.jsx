@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import userAvatarImage from './assets/images/user.jpg';
 import movieBackground from './assets/images/movie-bg.jpg';
 
-import './App.scss';
+import './App.css';
 
 class App extends Component {
   constructor(props) {
@@ -72,7 +72,7 @@ class App extends Component {
       <div className="App">
         <header className={`Header ${this.state.fixHeader ? 'fixed' : ''}`}>
           <div className="content">
-            <div className="logo">Movies</div>
+            <div className="logo">Caca</div>
             <ul className="menu">
               <li className="selected">Home</li>
               <li>Movies</li>
