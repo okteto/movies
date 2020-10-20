@@ -1,6 +1,7 @@
 name: frontend
 image: okteto/movies-frontend:dev
-command: yarn start
+command: bash
+# yarn start
 sync:
   - .:/src
 persistentVolume:

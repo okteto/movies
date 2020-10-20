@@ -10,7 +10,7 @@ module.exports = {
   devtool: 'source-map',
   entry: ['./index.jsx'],
   output: {
-    filename: 'app.[hash].js',
+    filename: 'app.[contenthash].js',
     path: path.resolve(path.join(__dirname, '/dist')),
   },
   resolve: {
@@ -26,37 +26,45 @@ module.exports = {
   module: {
     rules: [{
       test: /\.(js|jsx)$/,
-      exclude: /node_modules/,
-      loaders: ['babel-loader'],
+      use: 'babel-loader',
+      exclude: /node_modules/
     }, {
       test: /\.css$/,
-      use: [{
-        loader: 'style-loader'
-      }, {
-        loader: 'css-loader',
-        options: {
-          includePaths: [appPath]
-        }
-      }]
-    },
-    {
-      test: /\.(scss|sass)$/,
-      use: [{
-        loader: 'style-loader'
-      }, {
-        loader: 'css-loader'
-      }, {
-        loader: 'sass-loader',
-        options: {
-          sassOptions: {
+      use: [
+        { loader: 'style-loader' },
+        {
+          loader: 'css-loader',
+          options: {
             includePaths: [appPath]
           }
         }
-      }]
+      ]
+    },
+    {
+      test: /\.(scss|sass)$/,
+      use: [
+        { loader: 'style-loader' },
+        { loader: 'css-loader' },
+        {
+          loader: 'sass-loader',
+          options: {
+            sassOptions: {
+              includePaths: [appPath]
+            }
+          }
+        }
+      ]
     }, {
       test: /\.(png|jpg|svg)$/,
-      loader: 'url-loader?limit=100000'
-    }],
+      use: [
+        {
+          loader: 'url-loader',
+          options: {
+            limit: 100000,
+          },
+        }
+      ]
+    }]
   },
   plugins: [
     new HtmlWebpackPlugin({
