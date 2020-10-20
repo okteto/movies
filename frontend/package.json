@@ -1,13 +1,11 @@
 {
   "name": "okteto-movies-frontend",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "license": "Apache-2.0",
   "private": true,
   "dependencies": {
-    "@hot-loader/react-dom": "^16.13.0",
     "react": "^16.14.0",
-    "react-dom": "^16.14.0",
-    "react-hot-loader": "^4.13.0"
+    "react-dom": "^16.14.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",

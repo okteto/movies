@@ -1,5 +1,4 @@
 const path = require('path');
-const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const appPath = path.join(__dirname, '/src');
@@ -11,17 +10,14 @@ module.exports = {
   entry: ['./index.jsx'],
   output: {
     filename: 'app.[contenthash].js',
-    path: path.resolve(path.join(__dirname, '/dist')),
+    path: path.resolve(__dirname, '/dist'),
   },
   resolve: {
-    extensions: ['.js', '.jsx', '.scss'],
+    extensions: ['.js', '.jsx', '.css'],
     modules: [
       path.resolve(path.join(__dirname, '/node_modules')),
       path.resolve(appPath)
-    ],
-    alias: {
-      'react-dom': '@hot-loader/react-dom'
-    }
+    ]
   },
   module: {
     rules: [{
@@ -29,7 +25,7 @@ module.exports = {
       use: 'babel-loader',
       exclude: /node_modules/
     }, {
-      test: /\.css$/i,
+      test: /\.css$/,
       use: ['style-loader', 'css-loader']
     }, {
       test: /\.(png|jpg|svg)$/,
@@ -46,8 +42,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './index.html'
-    }),
-    new webpack.HotModuleReplacementPlugin()
+    })
   ],
   devServer: {
     port: 80,
