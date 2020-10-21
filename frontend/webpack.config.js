@@ -21,7 +21,7 @@ module.exports = {
   },
   module: {
     rules: [{
-      test: /\.(js|jsx)$/,
+      test: /\.(js|jsx)$/i,
       include: srcPath,
       use: [
         {
@@ -32,20 +32,19 @@ module.exports = {
         }
       ]
     }, {
-      test: /\.css$/,
+      test: /\.css$/i,
       include: srcPath,
       use: ['style-loader', 'css-loader']
     }, {
-      test: /\.(png|jpg|svg)$/,
-      include: srcPath,
+      test: /\.(png|jpg|gif)$/i,
       use: [
         {
           loader: 'url-loader',
           options: {
-            limit: 100000,
+            limit: 8192,
           },
-        }
-      ]
+        },
+      ],
     }]
   },
   plugins: [
