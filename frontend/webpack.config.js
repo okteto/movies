@@ -67,6 +67,9 @@ module.exports = {
     }
   },
   cache: {
-    type: 'filesystem'
+    type: 'filesystem',
+    buildDependencies: {
+      config: [__filename]
+    }
   }
 };
