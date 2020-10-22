@@ -12,6 +12,7 @@
     "@babel/core": "^7.12.3",
     "@babel/preset-env": "^7.12.1",
     "@babel/preset-react": "^7.12.1",
+    "@webpack-cli/serve": "^1.0.1",
     "babel-loader": "^8.0.4",
     "css-loader": "3.4.2",
     "file-loader": "^6.1.1",
