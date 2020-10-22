@@ -1,9 +1,13 @@
 import { hot } from 'react-hot-loader/root';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { render } from 'react-dom';
 
 import App from './App';
-import './index.scss';
+import './index.css';
+
+if (module.hot) {
+  module.hot.accept();
+}
 
 const Root = hot(App);
-ReactDOM.render(<Root />, document.getElementById('root'));
+render(<Root />, document.getElementById('root'));

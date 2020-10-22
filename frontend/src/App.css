@@ -1,0 +1,351 @@
+@import url("https://fonts.googleapis.com/css?family=Oswald:500");
+
+body {
+  --app-background-color: #141414;
+  --app-horizontal-margin: 65px;
+  --app-title-font: 'Oswald', serif;
+  --app-normal-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: var(--app-background-color);
+  color: #ffffff;
+  font-family: var(--app-normal-font);
+}
+
+.App {
+  font-family: var(--app-normal-font);
+  font-size: 16px;
+}
+
+.App h2, .App .TitleList .Title {
+  font-size: 22px;
+  font-weight: normal;
+  line-height: 1.4;
+  margin-bottom: .5em;
+}
+
+.App p {
+  line-height: 1.6em;
+  margin-bottom: 1em;
+}
+
+.App .spring {
+  flex: 1 auto;
+}
+
+.App .Header {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  box-sizing: border-box;
+  z-index: 5;
+}
+
+.App .Header.fixed .content {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.App .Header .content {
+  background-color: transparent;
+  transition: background-color .7s ease-in-out;
+  display: flex;
+  align-items: center;
+  padding: 20px var(--app-horizontal-margin);
+  flex-direction: row;
+}
+
+.App .Header .content .logo {
+  cursor: pointer;
+  color: #ce1616;
+  text-transform: uppercase;
+  font-size: 32px;
+  font-weight: 500;
+  font-family: var(--app-title-font);
+  letter-spacing: -1.2px;
+}
+
+.App .Header .content .menu {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-weight: 300;
+  font-size: .9rem;
+  list-style: none;
+  margin-left: 18px;
+}
+
+.App .Header .content .menu li {
+  margin-left: 24px;
+  opacity: .8;
+  cursor: pointer;
+}
+
+.App .Header .content .menu li.selected {
+  font-weight: 400;
+  opacity: 1;
+}
+
+.App .Header .content .menu li:hover {
+  opacity: 1;
+}
+
+.App .UserProfile {
+  margin-left: auto;
+}
+
+.App .UserProfile .User {
+  display: flex;
+}
+
+.App .UserProfile .User:hover {
+  cursor: pointer;
+}
+
+.App .UserProfile .User .image {
+  border-radius: 44px;
+  margin-left: 10px;
+  overflow: hidden;
+  width: 28px;
+  height: 28px;
+  box-sizing: border-box;
+  transition: border .125s ease;
+}
+
+.App .UserProfile .User .image img {
+  width: 100%;
+  display: block;
+}
+
+.App .UserProfile .User .name {
+  align-items: center;
+  display: flex;
+  font-size: 16px;
+  font-weight: 300;
+}
+
+.App .Hero {
+  width: 100%;
+  position: relative;
+  background-size: cover;
+  height: 34vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.App .Hero .content {
+  position: relative;
+  z-index: 4;
+  width: auto;
+  left: 0;
+  right: 0;
+  margin: 0 var(--app-horizontal-margin);
+  margin-bottom: 46px;
+}
+
+.App .Hero .content h1 {
+  font-size: 1.4em;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.App .Hero .content p {
+  width: 100%;
+  font-size: 1.1em;
+  font-weight: 300;
+}
+
+.App .Hero .content .button-container {
+  display: flex;
+  width: 400px;
+  margin-top: 18px;
+}
+
+.App .Hero .content .button-container .Button:first-child {
+  margin-right: 10px;
+}
+
+.App .Hero .overlay {
+  background: linear-gradient(to bottom, var(--app-background-color) 0%, rgba(34, 31, 31, 0.116) 100%);
+  height: 100%;
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transform: rotate(180deg);
+}
+
+.App .Button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  white-space: nowrap;
+  background-color: rgba(51, 51, 51, 0.5);
+  border: 0;
+  padding: 8px 28px;
+  border-radius: 4px;
+  box-shadow: none;
+  font-size: .9rem;
+  font-weight: 500;
+  color: #fff;
+  text-decoration: none;
+  outline: 0;
+}
+
+.App .Button:hover {
+  outline: 0;
+  background-color: #e6e6e6;
+  color: #000;
+}
+
+.App .Button:hover .icon path {
+  fill: #000;
+}
+
+.App .Button .icon {
+  margin-left: -4px;
+  margin-right: 6px;
+}
+
+.App .Button .icon path {
+  fill: white;
+}
+
+.App .TitleList {
+  padding: 10px var(--app-horizontal-margin);
+  box-sizing: border-box;
+  transition: opacity 3s ease;
+  position: relative;
+  z-index: 4;
+}
+
+.App .TitleList .titles-slider {
+  margin: 20px 0;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.App .Item {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  transition: transform .3s ease-in-out;
+  z-index: 20;
+  width: 25%;
+}
+
+.App .Item:hover {
+  z-index: 21;
+}
+
+.App .Item:hover .ItemContainer {
+  box-shadow: -1px 4px 20px 3px #00000094;
+}
+
+.App .Item:last-child {
+  margin-right: 0;
+}
+
+.App .Item .ItemContainer {
+  background-color: #000000;
+  background-position: center;
+  height: 13vw;
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow: hidden;
+  margin: 0 2px;
+  position: relative;
+}
+
+.App .Item .ItemContainer .overlay {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.75) 20%, transparent 100%);
+  padding: 20px;
+  position: relative;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .125s ease;
+  box-sizing: border-box;
+}
+
+.App .Item .ItemContainer .overlay .title {
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.App .Item .ItemContainer .overlay .rating {
+  font-size: 14px;
+}
+
+.App .Item .ItemContainer .overlay .plot {
+  font-size: 14px;
+  margin-top: 100px;
+  font-weight: 300;
+  line-height: 1.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.App .Item .ItemContainer .overlay .ListToggle {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+}
+
+.App .Item:hover .overlay {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.App .ListToggle {
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  border-radius: 32px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.App .ListToggle:hover {
+  border: 2px solid #ffffff;
+}
+
+.App .ListToggle:hover div {
+  top: -32px;
+}
+
+.App .ListToggle > div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 64px;
+  width: 32px;
+  transition: .125s ease;
+}
+
+.App .ListToggle div svg path {
+  fill: #ffffff;
+}
+
+.App .ListToggle[data-toggled="true"] {
+  background: #00d1ca;
+  border: 2px solid #00d1ca;
+}
+
+.App .ListToggle[data-toggled="true"] div {
+  top: -32px;
+}
+
+.App .Loader {
+  display: flex;
+  align-items: center;
+  align-content: center;
+  margin: 0 auto 1em;
+}
+
+.App .Loader svg path,
+.App .Loader svg rect {
+  fill: #00d1ca;
+}

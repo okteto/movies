@@ -1,68 +1,57 @@
 const path = require('path');
-const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const appPath = path.join(__dirname, '/src');
+const srcPath = path.join(__dirname, 'src');
 
 module.exports = {
-  context: appPath,
+  context: srcPath,
   mode: 'development',
-  devtool: 'source-map',
+  target: 'web',
   entry: ['./index.jsx'],
   output: {
-    filename: 'app.[hash].js',
-    path: path.resolve(path.join(__dirname, '/dist')),
+    filename: 'app.[contenthash].js',
+    path: path.join(__dirname, '/dist'),
   },
   resolve: {
-    extensions: ['.js', '.jsx', '.scss'],
+    extensions: ['.js', '.jsx', '.css'],
     modules: [
       path.resolve(path.join(__dirname, '/node_modules')),
-      path.resolve(appPath)
-    ],
-    alias: {
-      'react-dom': '@hot-loader/react-dom'
-    }
+      path.resolve(srcPath)
+    ]
   },
   module: {
     rules: [{
-      test: /\.(js|jsx)$/,
-      exclude: /node_modules/,
-      loaders: ['babel-loader'],
-    }, {
-      test: /\.css$/,
-      use: [{
-        loader: 'style-loader'
-      }, {
-        loader: 'css-loader',
-        options: {
-          includePaths: [appPath]
-        }
-      }]
-    },
-    {
-      test: /\.(scss|sass)$/,
-      use: [{
-        loader: 'style-loader'
-      }, {
-        loader: 'css-loader'
-      }, {
-        loader: 'sass-loader',
-        options: {
-          sassOptions: {
-            includePaths: [appPath]
+      test: /\.(js|jsx)$/i,
+      include: srcPath,
+      use: [
+        {
+          loader: 'babel-loader',
+          options: {
+            cacheDirectory: true
           }
         }
-      }]
+      ]
     }, {
-      test: /\.(png|jpg|svg)$/,
-      loader: 'url-loader?limit=100000'
-    }],
+      test: /\.css$/i,
+      include: srcPath,
+      use: ['style-loader', 'css-loader']
+    }, {
+      test: /\.(png|jpg|gif)$/i,
+      use: [
+        {
+          loader: 'url-loader',
+          options: {
+            limit: 8192,
+          },
+        },
+      ],
+    }]
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './index.html'
-    }),
-    new webpack.HotModuleReplacementPlugin()
+      template: './index.html',
+      favicon: path.join(srcPath, 'assets/images/favicon.png')
+    })
   ],
   devServer: {
     port: 80,
@@ -75,6 +64,12 @@ module.exports = {
     },
     proxy: {
       '/api': 'http://movies-api:8080'
+    }
+  },
+  cache: {
+    type: 'filesystem',
+    buildDependencies: {
+      config: [__filename]
     }
   }
 };
