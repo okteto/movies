@@ -7,6 +7,7 @@ metadata:
     app.kubernetes.io/component: mongodb
 spec:
   serviceName: mongodb
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: mongodb
