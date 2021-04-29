@@ -1,4 +1,5 @@
 tag: dev
+host:
 
 api:
   replicaCount: 1

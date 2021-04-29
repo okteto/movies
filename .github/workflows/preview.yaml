@@ -1,0 +1,43 @@
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@master
+
+    - name: Login
+      uses: okteto/login@master
+      with:
+        token: ${{ secrets.OKTETO_TOKEN }}
+
+    - name: "Build Frontend"
+      uses: okteto/build@master
+      with:
+        tag: okteto.dev/frontend:${{ github.sha }}
+
+    - name: "Build API"
+      uses: okteto/build@master
+      with:
+        tag: okteto.dev/api:${{ github.sha }}
+
+    - name: Create namespace
+      uses: okteto/create-namespace@master
+      with:
+        namespace: pr-${{ github.event.number }}-${{ github.actor }}
+
+    - name: Deploy
+      uses: WyriHaximus/github-action-helm3@v2
+      with:
+        exec: helm upgrade movies ./chart/ --install --wait --atomic --set=tag=${{ github.sha }},host=movies-pr-${{ github.event.number }}-${{ github.actor }}.cloud.okteto.net
+
+    - name: comment PR
+      uses: okteto/notify-pr@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        message: "Preview environment available at https://movies-pr-${{ github.event.number }}-${{ github.actor }}.cloud.okteto.net"
