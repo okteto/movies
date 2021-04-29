@@ -40,7 +40,7 @@ function startWithRetry() {
 
       app.get("/api/watching", (req, res, next) => {
         console.log(`GET /api/watching`)
-        db.collection('movies').find().toArray( (err, results) =>{
+        db.collection('watching').find().toArray( (err, results) =>{
           if (err){
             console.log(`failed to query watching: ${err}`)
             res.json([]);
