@@ -1,4 +1,5 @@
-apiVersion: networking.k8s.io/v1
+{{- if semverCompare "<1.19-0" .Capabilities.KubeVersion.GitVersion }}
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: {{ include "movies.fullname" . }}
@@ -11,16 +12,11 @@ spec:
     - http:
         paths:
           - path: /
-            pathType: Prefix
             backend:
-              service:
-                name: frontend
-                port:
-                  number: 80
+              serviceName: frontend
+              servicePort: 80
           - path: /api
-            pathType: Prefix
             backend:
-              service:
-                name: api
-                port:
-                  number: 8080
+              serviceName: api
+              servicePort: 8080
+{{- end }}
