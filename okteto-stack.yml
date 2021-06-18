@@ -14,9 +14,6 @@ services:
     build: frontend
     ports:
       - 80
-    depends_on:
-      api:
-        condition: service_healthy
 
   api:
     image: okteto.dev/api:dev
