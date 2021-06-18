@@ -14,6 +14,9 @@ services:
     build: frontend
     ports:
       - 80
+    depends_on:
+      api:
+        condition: service_healthy
 
   api:
     image: okteto.dev/api:dev
@@ -25,15 +28,22 @@ services:
       - MONGODB_HOST=mongodb
     ports:
       - 8080
+    depends_on:
+      init:
+        condition: service_completed_successfully
 
-  init-mongodb:
+  init:
     image: okteto.dev/api:dev
-    command: yarn load && echo initialized && tail -f /dev/null
+    command: yarn load
     environment:
       - MONGODB_USERNAME=okteto
       - MONGODB_PASSWORD=mongodb123
       - MONGODB_DATABASE=okteto
       - MONGODB_HOST=mongodb
+    restart: never
+    depends_on:
+      mongodb:
+        condition: service_healthy
 
   mongodb:
     image: docker.io/bitnami/mongodb:4.0.12-debian-9-r43
