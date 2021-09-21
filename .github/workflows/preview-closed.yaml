@@ -1,5 +1,5 @@
-on: 
-  pull_request: 
+on:
+  pull_request:
     types:
       - closed
 
@@ -16,4 +16,4 @@ jobs:
     - name: Delete namespace
       uses: okteto/destroy-preview@master
       with:
-        name: pr-${{ github.event.number }}-cindylopez
+        name: pr-${{ github.event.number }}
