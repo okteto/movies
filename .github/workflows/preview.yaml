@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Login
-      uses: okteto/login@master
+      uses: okteto/login@latest
       with:
         token: ${{ secrets.OKTETO_TOKEN }}
         url: ${{ secrets.OKTETO_URL }}
@@ -18,6 +18,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: pr-${{ github.event.number }}
+        name: pull-request-${{ github.event.number }}
         scope: global
         timeout: 15m

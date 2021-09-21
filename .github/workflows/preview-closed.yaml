@@ -8,12 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Login
-      uses: okteto/login@master
+      uses: okteto/login@latest
       with:
         token: ${{ secrets.OKTETO_TOKEN }}
         url: ${{ secrets.OKTETO_URL }}
 
     - name: Delete namespace
-      uses: okteto/destroy-preview@master
+      uses: okteto/destroy-preview@latest
       with:
-        name: pr-${{ github.event.number }}
+        name: pull-request-${{ github.event.number }}
