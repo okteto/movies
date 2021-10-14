@@ -1,15 +1,17 @@
 name: movies
 
 endpoints:
-  - service: frontend
-    path: /
-    port: 80
-  - service: api
-    path: /api
-    port: 8080
+  annotations:
+    dev.okteto.com/private: "true"
+  rules:
+    - service: frontend
+      path: /
+      port: 80
+    - service: api
+      path: /api
+      port: 8080
 
 services:
-
   frontend:
     build: frontend
     ports:
