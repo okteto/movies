@@ -8,13 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Login
-      uses: okteto/login@master
+      uses: okteto/login@latest
       with:
         token: ${{ secrets.OKTETO_TOKEN }}
         url: ${{ secrets.OKTETO_URL }}
 
     - name: Deploy preview environment
-      uses: okteto/deploy-preview@master
+      uses: okteto/deploy-preview@latest
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
