@@ -7,8 +7,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Login
-      uses: okteto/login@latest
+    - name: Context
+      uses: okteto/context@latest
       with:
         token: ${{ secrets.OKTETO_TOKEN }}
         url: ${{ secrets.OKTETO_URL }}
