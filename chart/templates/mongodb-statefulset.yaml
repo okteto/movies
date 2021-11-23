@@ -61,5 +61,5 @@ spec:
           {}
       volumes:
       - name: mongodb-pv-storage
-      persistentVolumeClaim:
-        claimName: mongodb-pv-claim
+        persistentVolumeClaim:
+          claimName: mongodb-pv-claim
