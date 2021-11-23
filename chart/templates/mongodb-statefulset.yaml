@@ -54,11 +54,12 @@ spec:
         - name: mongodb
           containerPort: 27017
         volumeMounts:
-        - name: data
+        - name: mongodb-pv-storage
           mountPath: /bitnami/mongodb
           subPath: 
         resources:
           {}
       volumes:
-      - name: data
-        emptyDir: {}
+      - name: mongodb-pv-storage
+      persistentVolumeClaim:
+        claimName: mongodb-pv-claim
