@@ -59,7 +59,14 @@ spec:
           subPath: 
         resources:
           {}
-      volumes:
-      - name: mongodb-pv-storage
-        persistentVolumeClaim:
-          claimName: mongodb-pv-claim
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-pvc
+      labels:
+        {{- include "movies.labels" . | nindent 4 }}
+        app.kubernetes.io/component: mongodb
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
