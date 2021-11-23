@@ -4,6 +4,6 @@ forward:
   - 8080:8080
   - 9229:9229
 sync:
-  - .:/src
+  - .:/usr/src/app
 persistentVolume:
   enabled: false
