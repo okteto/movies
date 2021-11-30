@@ -61,7 +61,7 @@ spec:
           {}
   volumeClaimTemplates:
   - metadata:
-      name: mongodb-pvc
+      name: mongodb-pv-storage
       labels:
         {{- include "movies.labels" . | nindent 4 }}
         app.kubernetes.io/component: mongodb
