@@ -63,7 +63,7 @@ spec:
   - metadata:
       name: mongodb-pv-storage
       labels:
-        {{- include "movies.labels" . | nindent 4 }}
+        {{- include "movies.labels" . | nindent 8 }}
         app.kubernetes.io/component: mongodb
     spec:
       accessModes: [ "ReadWriteOnce" ]
