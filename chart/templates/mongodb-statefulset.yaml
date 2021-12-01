@@ -54,14 +54,14 @@ spec:
         - name: mongodb
           containerPort: 27017
         volumeMounts:
-        - name: mongodb-pv-storage
+        - name: data
           mountPath: /bitnami/mongodb
           subPath: 
         resources:
           {}
   volumeClaimTemplates:
   - metadata:
-      name: mongodb-pv-storage
+      name: data
       labels:
         {{- include "movies.labels" . | nindent 8 }}
         app.kubernetes.io/component: mongodb
