@@ -1,6 +1,6 @@
 const mongo = require("mongodb").MongoClient;
 
-const url = `mongodb://${process.env.MONGODB_USERNAME}:${encodeURIComponent(process.env.MONGODB_PASSWORD)}@${process.env.MONGODB_HOST}:27017/${process.env.MONGODB_DATABASE}`;
+const url = `mongodb://${process.env.MONGODB_USERNAME}:${encodeURIComponent(process.env.MONGODB_PASSWORD)}@${process.env.MONGODB_HOST}:3940/${process.env.MONGODB_DATABASE}`;
 
 var insert = function(collection, data, resolve, reject) {
   const d = require(data);

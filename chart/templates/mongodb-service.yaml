@@ -8,9 +8,9 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - name: mongodb
-    port: 27017
-    targetPort: mongodb
+  - protocol: TCP
+    port: 3940
+    targetPort: 27017
   selector:
     app.kubernetes.io/name: mongodb
     app.kubernetes.io/instance: {{ .Release.Name }}
