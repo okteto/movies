@@ -7,13 +7,13 @@ jobs:
   closed:
     runs-on: ubuntu-latest
     steps:
-    - name: Login
-      uses: okteto/login@latest
+    - name: Context
+      uses: okteto/context@latest
       with:
+        url: https://okteto.jacob.dev.okteto.net
         token: ${{ secrets.OKTETO_TOKEN }}
-        url: ${{ secrets.OKTETO_URL }}
 
-    - name: Delete namespace
+    - name: Destroy preview environment
       uses: okteto/destroy-preview@latest
       with:
-        name: pull-request-${{ github.event.number }}
+        name: pr-${{ github.event.number }}

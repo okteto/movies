@@ -7,17 +7,16 @@ jobs:
   preview:
     runs-on: ubuntu-latest
     steps:
-    - name: Login
-      uses: okteto/login@master
+    - name: Context
+      uses: okteto/context@latest
       with:
         token: ${{ secrets.OKTETO_TOKEN }}
-        url: ${{ secrets.OKTETO_URL }}
-
+        url: https://okteto.jacob.dev.okteto.net
     - name: Deploy preview environment
       uses: okteto/deploy-preview@latest
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: pull-request-${{ github.event.number }}
+        name: pr-${{ github.event.number }}
         scope: global
         timeout: 15m
