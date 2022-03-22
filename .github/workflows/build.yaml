@@ -1,0 +1,31 @@
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Context
+      uses: okteto/context@latest
+      with:
+        token: ${{ secrets.OKTETO_TOKEN }}
+        url: ${{ secrets.OKTETO_URL }}
+
+    - name: checkout
+      uses: actions/checkout@master
+
+    - name: "Build frontend"
+      uses: okteto/build@latest
+      with:
+        tag: okteto.global/frontend:${{ github.sha }}
+        path: frontend
+        file: frontend/Dockerfile
+
+    - name: "Build api"
+      uses: okteto/build@latest
+      with:
+        tag: okteto.global/api:${{ github.sha }}
+        path: api
+        file: api/Dockerfile
