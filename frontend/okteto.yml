@@ -2,6 +2,6 @@ name: frontend
 image: okteto/movies-frontend:dev
 command: yarn start
 sync:
-  - .:/src
+  - .:/usr/src/app
 persistentVolume:
   enabled: false
