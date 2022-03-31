@@ -17,7 +17,10 @@ module.exports = {
     modules: [
       path.resolve(path.join(__dirname, '/node_modules')),
       path.resolve(srcPath)
-    ]
+    ],
+    alias: {
+      'react-dom': '@hot-loader/react-dom'
+    }
   },
   module: {
     rules: [{
@@ -57,14 +60,20 @@ module.exports = {
     port: 80,
     host: '0.0.0.0',
     hot: true,
-    sockPort: 443,
-    disableHostCheck: true,
-    watchOptions: {
-      poll: true
-    },
+    allowedHosts: 'all',
     proxy: {
       '/api': 'http://movies-api:8080'
-    }
+    },
+    client: {
+      webSocketURL: {
+        port: 443
+      },
+    },
+    watchFiles: {
+      options: {
+        usePolling: false,
+      },
+    },
   },
   cache: {
     type: 'filesystem',
