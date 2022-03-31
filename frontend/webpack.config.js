@@ -71,7 +71,7 @@ module.exports = {
     },
     watchFiles: {
       options: {
-        usePolling: false,
+        usePolling: true,
       },
     },
   },
