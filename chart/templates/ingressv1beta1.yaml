@@ -15,4 +15,12 @@ spec:
             backend:
               serviceName: frontend
               servicePort: 80
+          - path: /api/movies
+            backend:
+              serviceName: api
+              servicePort: 8080
+          - path: /api/watching
+            backend:
+              serviceName: api
+              servicePort: 8080
 {{- end }}
