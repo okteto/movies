@@ -22,8 +22,6 @@ function startWithRetry() {
 
     app.listen(8080, () => {
 
-      app.use('/api', express.static('public'))
-
       app.get("/api/healthz", (req, res, next) => {
         res.sendStatus(200)
         return;
