@@ -15,7 +15,21 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: reverse-proxy
+                name: frontend
                 port:
                   number: 80
+          - path: /api/movies
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 8080
+          - path: /api/watching
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 8080
 {{- end }}

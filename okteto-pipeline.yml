@@ -2,7 +2,6 @@ icon: https://apps.okteto.com/movies/icon.png
 deploy:
   - okteto build -t okteto.dev/api:${OKTETO_GIT_COMMIT} api
   - okteto build -t okteto.dev/frontend:${OKTETO_GIT_COMMIT} frontend
-  - okteto build -t okteto.dev/reverse-proxy:${OKTETO_GIT_COMMIT} reverse-proxy
   - helm upgrade --install movies chart --set tag=${OKTETO_GIT_COMMIT}
 devs:
   - api/okteto.yml

@@ -13,6 +13,6 @@ spec:
         paths:
           - path: /
             backend:
-              serviceName: reverse-proxy
+              serviceName: frontend
               servicePort: 80
 {{- end }}

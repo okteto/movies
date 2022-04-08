@@ -1,9 +1,5 @@
 tag: dev
 
-reverse-proxy:
-  replicaCount: 1
-  image: nginx
-
 api:
   replicaCount: 1
   image: okteto.dev/api
