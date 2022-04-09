@@ -1,6 +1,6 @@
 apiVersion: v2
 name: movies
-description: A Node + React application in Kubernetes
+description: Install that App is A Astro + SolidJs application
 type: application
 version: 0.1.0
 appVersion: 1.0.0
