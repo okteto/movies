@@ -5,19 +5,30 @@ import movieBackground from './assets/images/movie-bg.jpg';
 
 import './App.css';
 
+const compact = (movies = []) => {
+  return movies.filter((item, index, self) =>
+    self.findIndex(i => i.id === item.id) === index
+  );
+}
+
+const financial = (x) => {
+  return Number.parseFloat(x).toFixed(2);
+}
+
 class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      movies: {
-        data: {},
+      catalog: {
+        data: [],
         loaded: false
       },
-      watching: {
-        data: {},
+      rental: {
+        data: [],
         loaded: false
       },
+      cost: 0,
       session: {
         name: 'Cindy',
         lastName: 'Lopez',
@@ -31,28 +42,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    fetch('/api/movies')
-      .then(res => res.json())
-      .then(result => {
-        this.setState({
-          movies: {
-            data: result,
-            loaded: true
-          }
-        });
-      });
-
-    fetch('/api/watching')
-      .then(res => res.json())
-      .then(result => {
-        this.setState({
-          watching: {
-            data: result,
-            loaded: true
-          }
-        });
-      });
-
+    this.refreshData();
     window.addEventListener('scroll', this.onScroll);
   }
 
@@ -60,14 +50,54 @@ class App extends Component {
     window.removeEventListener('scroll', this.onScroll);
   }
 
-  onScroll() {
+  handleRent = async (item) => {
+    await fetch('/rent', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        catalog_id: item.id,
+        price: item.price
+      })
+    });
+    this.refreshData();
+  }
+
+  refreshData = async () => {
+    const catalogPromise = fetch('/catalog')
+      .then(res => res.json())
+      .then(result => compact(result));
+
+    const rentalsPromise = fetch('/rentals')
+      .then(res => res.json())
+      .then(result => compact(result));
+
+    const [catalog, rentals] = await Promise.all([catalogPromise, rentalsPromise]);
+    this.setState({
+      rental: {
+        data: rentals,
+        loaded: true
+      },
+      catalog: {
+        data: catalog.map(movie => ({
+          ...movie,
+          rented: !!rentals.find(c => c.id === movie.id)
+        })),
+        loaded: true
+      },
+      cost: financial(rentals.reduce((acc, item) => acc += Number(item?.price ?? 0), 0))
+    });
+  }
+
+  onScroll = () => {
     this.setState({
       fixHeader: window.scrollY > 100
     });
   }
 
   render() {
-    const { movies, watching, session } = this.state;
+    const { catalog, rental, session, cost } = this.state;
     return (
       <div className="App">
         <header className={`Header ${this.state.fixHeader ? 'fixed' : ''}`}>
@@ -75,18 +105,24 @@ class App extends Component {
             <div className="logo">Movies</div>
             <ul className="menu">
               <li className="selected">Home</li>
+              <li>Store</li>
               <li>Movies</li>
-              <li>My List</li>
             </ul>
             <UserProfile user={session} />
           </div>
         </header>
         <Hero />
-        <TitleList title="Movies" titles={movies.data} loaded={movies.loaded} />
         <TitleList
-          title={`Continue watching for ${session.name}`}
-          titles={watching.data}
-          loaded={watching.loaded}
+          title="Store"
+          titles={catalog.data}
+          loaded={catalog.loaded}
+          onRent={this.handleRent}
+        />
+        <TitleList
+          title={`${session.name}'s movies`}
+          cost={cost}
+          titles={rental.data}
+          loaded={rental.loaded}
         />
       </div>
     );
@@ -154,12 +190,6 @@ class Hero extends Component {
               </svg>
               Play
             </HeroButton>
-            <HeroButton class="list-button">
-              <svg className="icon add-icon" width="20" height="20" viewBox="0 0 20 20">
-                <path d="M16 9h-5V4H9v5H4v2h5v5h2v-5h5V9z"/>
-              </svg>
-              My list
-            </HeroButton>
           </div>
         </div>
         <div className="overlay"></div>
@@ -179,39 +209,55 @@ class HeroButton extends Component {
 
 
 class TitleList extends Component {
-  render() {
-    let titles = '';
-    if (this.props.titles && this.props.loaded) {
-      titles = this.props.titles.map((title, i) => {
-        if (i < 4) {
-          let name = '';
-          const backDrop = `https://image.tmdb.org/t/p/original${title.backdrop_path}`;
-          if (!title.name) {
-            name = title.original_title;
-          } else {
-            name = title.name;
-          }
-          return (
-            <Item
-              key={title.id}
-              title={name}
-              score={title.vote_average}
-              overview={title.overview}
-              backdrop={backDrop}
-            />
-          );
+  renderList() {
+    const { titles = [], loaded, onRent } = this.props;
+    const movies = titles.filter(item => !item?.rented);
+
+    if (loaded) {
+      if (movies.length === 0) {
+        return (
+          <div className="TitleListEmpty">
+            {onRent ? 'No movies left to rent.' : 'No rented movies.'}
+          </div>
+        );
+      }
+
+      return movies.map((item, i) => {
+        let name = '';
+        const backDrop = `https://image.tmdb.org/t/p/original${item.backdrop_path}`;
+        if (!item.name) {
+          name = item.original_title;
+        } else {
+          name = item.name;
         }
         return (
-          <div key={title.id}></div>
+          <Item
+            key={item.id}
+            item={item}
+            backdrop={backDrop}
+            onRent={onRent}
+          />
         );
       });
     }
+  }
+
+  render() {
+    const { title, cost = 0 } = this.props;
+
     return (
       <div className="TitleList">
         <div className="Title">
-          <h1>{this.props.title}</h1>
+          <h1>
+            {title}
+            {cost ?
+              <span className="TitleList__cost">
+                (Total paid: <strong>{`\$${cost}`}</strong>)
+              </span> : null
+            }
+          </h1>
           <div className="titles-slider">
-            {titles || <Loader />}
+            {this.renderList() || <Loader />}
           </div>
         </div>
       </div>
@@ -222,51 +268,22 @@ class TitleList extends Component {
 
 class Item extends Component {
   render() {
+    const { item, onRent, backdrop } = this.props;
+
     return (
       <div className="Item">
-        <div className="ItemContainer" style={{ backgroundImage: `url(${this.props.backdrop})` }}>
+        <div className="ItemContainer" style={{ backgroundImage: `url(${backdrop})` }}>
           <div className="overlay">
-            <div className="title">{this.props.title}</div>
-            <div className="rating">{this.props.score} / 10</div>
-            <ListToggle />
+            <div className="title">{item?.original_title ?? 'Unknown Title'}</div>
+            <div className="rating">{item?.vote_average ?? 0} / 10</div>
           </div>
-        </div>
-      </div>
-    );
-  }
-}
-
-
-class ListToggle extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = { toggled: false };
-    this.handleClick = this.handleClick.bind(this);
-  }
-
-  handleClick() {
-    if(this.state.toggled === true) {
-      this.setState({ toggled: false });
-    } else {
-      this.setState({ toggled: true });
-    }
-  }
-
-  render() {
-    return (
-      <div className="ListToggle" onClick={this.handleClick} data-toggled={this.state.toggled}>
-        <div>
-          <div style={{ width: '32px', height: '32px'}}>
-            <svg className="plus" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-              <path d="M24,13.2c-0.6,0-1,0.4-1,1v9h-9c-0.6,0-1,0.4-1,1s0.4,1,1,1h9v9c0,0.6,0.4,1,1,1s1-0.4,1-1v-9h9c0.6,0,1-0.4,1-1    s-0.4-1-1-1h-9v-9C25,13.6,24.6,13.2,24,13.2z"/>
-            </svg>
+          { onRent &&
+            <div className="ItemToolbar">
+              <div className="button button-rent" onClick={() => onRent(item)}>
+                Rent{item?.price ? ` for \$${item.price}` : ''}
+              </div>
           </div>
-          <div style={{ width: '32px', height: '32px'}}>
-            <svg className="check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-              <path d="M33.2,16.9L21,29l-6.5-6.4c-0.4-0.4-1-0.4-1.4,0c-0.4,0.4-0.4,1,0,1.4l7.2,7.1c0.2,0.2,0.5,0.3,0.7,0.3    c0.3,0,0.5-0.1,0.7-0.3l12.8-12.8c0.4-0.4,0.4-1,0-1.4C34.2,16.5,33.6,16.5,33.2,16.9z"/>
-            </svg>
-          </div>
+          }
         </div>
       </div>
     );

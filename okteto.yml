@@ -1,0 +1,42 @@
+icon: https://apps.okteto.com/movies/icon.png
+
+build:
+  frontend:
+    context: frontend
+  frontend-dev:
+    context: frontend
+    target: dev
+  catalog:
+    context: catalog
+  rentals:
+    context: rentals
+
+deploy:
+  commands:
+    - name: Deploy Frontend
+      command: helm upgrade --install frontend frontend/chart --set image=${OKTETO_BUILD_FRONTEND_IMAGE}
+    - name: Deploy Catalog
+      command: helm upgrade --install catalog catalog/chart --set image=${OKTETO_BUILD_CATALOG_IMAGE}
+    - name: Deploy Rentals
+      command: helm upgrade --install rentals rentals/chart --set image=${OKTETO_BUILD_RENTALS_IMAGE}
+  compose:
+    - databases-compose.yml
+
+dev:
+  frontend:
+    image: ${OKTETO_BUILD_FRONTEND-DEV_IMAGE}
+    command: yarn start
+    sync:
+      - .:/src
+  catalog:
+    command: yarn start
+    sync:
+      - .:/src
+    forward:
+      - 9229:9229
+  rentals:
+    command: yarn start
+    sync:
+      - .:/src
+    forward:
+      - 9229:9229

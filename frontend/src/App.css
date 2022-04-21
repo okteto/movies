@@ -10,6 +10,10 @@ body {
   font-family: var(--app-normal-font);
 }
 
+strong {
+  font-weight: bold;
+}
+
 .App {
   font-family: var(--app-normal-font);
   font-size: 16px;
@@ -219,11 +223,30 @@ body {
   z-index: 4;
 }
 
+.App .TitleListEmpty {
+  font-size: 15px;
+  font-weight: normal;
+  line-height: 1.4;
+  margin-bottom: .5em;
+}
+
 .App .TitleList .titles-slider {
   margin: 20px 0;
   width: 100%;
   box-sizing: border-box;
   position: relative;
+}
+
+.App .TitleList h1 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.App .TitleList .TitleList__cost {
+  font-size: 15px;
+  font-weight: normal;
+  margin-left: 8px;
 }
 
 .App .Item {
@@ -254,8 +277,9 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   overflow: hidden;
-  margin: 0 2px;
+  margin: 2px;
   position: relative;
+  display: flex;
 }
 
 .App .Item .ItemContainer .overlay {
@@ -287,55 +311,43 @@ body {
   text-overflow: ellipsis;
 }
 
-.App .Item .ItemContainer .overlay .ListToggle {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-}
-
 .App .Item:hover .overlay {
   opacity: 1;
   pointer-events: all;
+  width: 100%;
 }
 
-.App .ListToggle {
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  width: 32px;
-  height: 32px;
-  font-size: 16px;
-  border-radius: 32px;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.App .ListToggle:hover {
-  border: 2px solid #ffffff;
-}
-
-.App .ListToggle:hover div {
-  top: -32px;
-}
-
-.App .ListToggle > div {
+.App .Item .ItemToolbar {
+  display: block;
+  flex-direction: row;
+  align-items: flex-end;
   position: absolute;
-  top: 0;
-  left: 0;
-  height: 64px;
-  width: 32px;
-  transition: .125s ease;
+  bottom: 0;
+  right: 0;
+  width: 100%;
 }
 
-.App .ListToggle div svg path {
-  fill: #ffffff;
+.App .Item .button {
+  display: inline-block;
+  color: #fff;
+  background-color: #ce1616;
+  border-radius: 3px;
+  box-shadow: -1px 4px 20px 3px #000000;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 8px;
+  margin: 8px;
+  text-align: center;
+  transition: transform .2s ease-in-out;
 }
 
-.App .ListToggle[data-toggled="true"] {
-  background: #00d1ca;
-  border: 2px solid #00d1ca;
+.App .Item .button:hover {
+  background-color: #f02323;
+  transform: scale(1.05);
 }
 
-.App .ListToggle[data-toggled="true"] div {
-  top: -32px;
+.App .Item .button.button-rented{
+  background-color: #000;
 }
 
 .App .Loader {

@@ -1,0 +1,36 @@
+{
+    "results": [
+      {
+        "id": 260513,
+        "vote_average": 7.6,
+        "original_title": "Incredibles 2",
+        "backdrop_path": "/mabuNsGJgRuCTuGqjFkWe1xdu19.jpg",
+        "price": 4.99,
+        "overview": "Elastigirl springs into action to save the day, while Mr. Incredible faces his greatest challenge yet – taking care of the problems of his three children."
+      },
+      {
+        "id": 332562,
+        "vote_average": 7.9,
+        "original_title": "A Star Is Born",
+        "backdrop_path": "/840rbblaLc4SVxm8gF3DNdJ0YAE.jpg",
+        "price": 3.99,
+        "overview": "Seasoned musician Jackson Maine discovers—and falls in love with—struggling artist Ally. She has just about given up on her dream to make it big as a singer—until Jack coaxes her into the spotlight. But even as Ally's career takes off, the personal side of their relationship is breaking down, as Jack fights an ongoing battle with his own internal demons."
+      },
+      {
+        "id": 345887,
+        "vote_average": 6.2,
+        "original_title": "The Equalizer 2",
+        "backdrop_path": "/z6KLDE72SxE1A8JcJTmmnWArOvR.jpg",
+        "price": 2.99,
+        "overview": "Robert McCall, who serves an unflinching justice for the exploited and oppressed, embarks on a relentless, globe-trotting quest for vengeance when a long-time girl friend is murdered."
+      },
+      {
+        "id": 439079,
+        "vote_average": 5.8,
+        "original_title": "The Nun",
+        "backdrop_path": "/fgsHxz21B27hOOqQBiw9L6yWcM7.jpg",
+        "price": 9.99,
+        "overview": "When a young nun at a cloistered abbey in Romania takes her own life, a priest with a haunted past and a novitiate on the threshold of her final vows are sent by the Vatican to investigate. Together they uncover the order’s unholy secret. Risking not only their lives but their faith and their very souls, they confront a malevolent force in the form of the same demonic nun that first terrorized audiences in “The Conjuring 2” as the abbey becomes a horrific battleground between the living and the damned."
+      }
+    ]
+  }

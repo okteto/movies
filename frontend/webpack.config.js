@@ -66,7 +66,9 @@ module.exports = {
     },
     webSocketServer: 'ws',
     proxy: {
-      '/api': 'http://movies-api:8080'
+      '/rent': 'http://rentals:8080/rent',
+      '/rentals': 'http://rentals:8080/rentals',
+      '/catalog': 'http://catalog:8080'
     },
     client: {
       webSocketURL: {

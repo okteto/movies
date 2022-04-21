@@ -1,0 +1,62 @@
+services:
+  init-catalog:
+    image: ${OKTETO_BUILD_CATALOG_IMAGE}
+    command: yarn load
+    environment:
+      - MONGODB_USERNAME=okteto
+      - MONGODB_PASSWORD=mongodb123
+      - MONGODB_DATABASE=okteto
+      - MONGODB_HOST=mongodb-catalog
+    restart: never
+    depends_on:
+      mongodb-catalog:
+        condition: service_healthy
+
+  mongodb-catalog:
+    image: docker.io/bitnami/mongodb:4.0.12-debian-9-r43
+    environment:
+      - MONGODB_USERNAME=okteto
+      - MONGODB_PASSWORD=mongodb123
+      - MONGODB_DATABASE=okteto
+      - MONGODB_ROOT_PASSWORD=mongodb123root
+      - MONGODB_SYSTEM_LOG_VERBOSITY=0
+      - MONGODB_DISABLE_SYSTEM_LOG=no
+      - MONGODB_ENABLE_IPV6=no
+      - MONGODB_ENABLE_DIRECTORY_PER_DB=no
+    ports:
+      - 27017
+    volumes:
+      - data-catalog:/bitnami/mongodb
+
+  init-rentals:
+    image: ${OKTETO_BUILD_RENTALS_IMAGE}
+    command: yarn load
+    environment:
+      - MONGODB_USERNAME=okteto
+      - MONGODB_PASSWORD=mongodb123
+      - MONGODB_DATABASE=okteto
+      - MONGODB_HOST=mongodb-rentals
+    restart: never
+    depends_on:
+      mongodb-rentals:
+        condition: service_healthy
+
+  mongodb-rentals:
+    image: docker.io/bitnami/mongodb:4.0.12-debian-9-r43
+    environment:
+      - MONGODB_USERNAME=okteto
+      - MONGODB_PASSWORD=mongodb123
+      - MONGODB_DATABASE=okteto
+      - MONGODB_ROOT_PASSWORD=mongodb123root
+      - MONGODB_SYSTEM_LOG_VERBOSITY=0
+      - MONGODB_DISABLE_SYSTEM_LOG=no
+      - MONGODB_ENABLE_IPV6=no
+      - MONGODB_ENABLE_DIRECTORY_PER_DB=no
+    ports:
+      - 27017
+    volumes:
+      - data-rentals:/bitnami/mongodb
+
+volumes:
+  data-catalog:
+  data-rentals:
