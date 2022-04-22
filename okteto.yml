@@ -31,9 +31,9 @@ deploy:
 dev:
   frontend:
     image: okteto/node:16
-    command: yarn start
+    command: bash
     sync:
-      - frontend:/src
+      - frontend:/usr/src/app
   catalog:
     command: yarn start
     sync:
