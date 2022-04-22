@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.okteto</groupId>
-	<artifactId>vote</artifactId>
+	<artifactId>rent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>vote</name>
-	<description>Example Spring Boot app</description>
+	<name>rent</name>
+	<description>Rent backend service for Movies App</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>

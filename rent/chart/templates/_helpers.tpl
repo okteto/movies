@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "vote.name" -}}
+{{- define "rent.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "vote.fullname" -}}
+{{- define "rent.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "vote.chart" -}}
+{{- define "rent.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "vote.labels" -}}
-helm.sh/chart: {{ include "vote.chart" . }}
-{{ include "vote.selectorLabels" . }}
+{{- define "rent.labels" -}}
+helm.sh/chart: {{ include "rent.chart" . }}
+{{ include "rent.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "vote.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "vote.name" . }}
+{{- define "rent.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "rent.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "vote.serviceAccountName" -}}
+{{- define "rent.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "vote.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "rent.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
