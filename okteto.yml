@@ -3,45 +3,76 @@ icon: https://apps.okteto.com/movies/icon.png
 build:
   frontend:
     context: frontend
-  frontend-dev:
-    context: frontend
-    target: dev
   catalog:
     context: catalog
+  rent:
+    context: rent
   rentals:
     context: rentals
 
 deploy:
   - name: Install Bitnami Charts
     command: helm repo add bitnami https://charts.bitnami.com/bitnami
-  - name: Deploy Postgresql
+  - name: Deploy PostgreSQL
     command:  helm upgrade --install postgresql bitnami/postgresql -f postgresql/values.yml --version 10.16.2
   - name: Deploy Kafka
     command:  helm upgrade --install kafka bitnami/kafka -f kafka/values.yml --version 14.5.0
-  - name: Deploy Mongodb
+  - name: Deploy MongoDB
     command:  helm upgrade --install mongodb bitnami/mongodb -f mongodb/values.yml --version 7.2.11
   - name: Deploy Frontend
     command: helm upgrade --install frontend frontend/chart --set image=${OKTETO_BUILD_FRONTEND_IMAGE}
   - name: Deploy Catalog
     command: helm upgrade --install catalog catalog/chart --set image=${OKTETO_BUILD_CATALOG_IMAGE}
+  - name: Deploy Rent
+    command: helm upgrade --install rent rent/chart --set image=${OKTETO_BUILD_RENT_IMAGE}
   - name: Deploy Rentals
     command: helm upgrade --install rentals rentals/chart --set image=${OKTETO_BUILD_RENTALS_IMAGE}
 
 dev:
   frontend:
-    image: ${OKTETO_BUILD_FRONTEND-DEV_IMAGE}
+    image: okteto/node:16
     command: yarn start
     sync:
-      - .:/src
+      - frontend:/src
   catalog:
     command: yarn start
     sync:
-      - .:/src
+      - catalog:/src
     forward:
       - 9229:9229
-  rentals:
-    command: yarn start
+  rent:
+    command: mvn spring-boot:run
     sync:
-      - .:/src
+      - rent:/app
+    volumes:
+      - /root/.m2
     forward:
-      - 9229:9229
+      - 5005:5005
+  api:
+    image: okteto/golang:1
+    command: bash
+    securityContext:
+      capabilities:
+        add:
+        - SYS_PTRACE
+    sync:
+      - rentals:/usr/src/app
+    volumes:
+      - /go/
+      - /root/.cache/
+    forward:
+      - 2346:2345
+  worker:
+    image: okteto/golang:1
+    command: bash
+    securityContext:
+      capabilities:
+        add:
+        - SYS_PTRACE
+    sync:
+      - rentals:/usr/src/app
+    volumes:
+      - /go/
+      - /root/.cache/
+    forward:
+      - 2345:2345

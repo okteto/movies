@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rent
+  annotations:
+    dev.okteto.com/generate-host: "movies"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /rent
+            pathType: Prefix
+            backend:
+              service:
+                name: rent
+                port:
+                  number: 8080
