@@ -158,7 +158,7 @@ strong {
   z-index: 20;
   overflow: hidden;
   max-width: 200px;
-  width: calc(20% - 20px);
+  width: calc(30% - 20px);
   margin: 20px 0px 0px 20px;
   aspect-ratio: 0.69;
   box-shadow: rgb(0 0 0 / 69%) 0px 26px 30px -10px, rgb(0 0 0 / 73%) 0px 16px 10px -10px;
@@ -208,12 +208,13 @@ strong {
   width: 100%;
 }
 
-.Item__overlay .title {
+.Item__title {
   font-size: 22px;
   font-weight: 400;
+  text-align: center;
 }
 
-.Item__overlay .rating {
+.Item__rating {
   font-size: 14px;
 }
 
@@ -257,6 +258,26 @@ strong {
   background-color: #1e1e1e;
 }
 
+@media only screen and (max-width: 1050px) {
+  .Item__title {
+    font-size: 18px;
+  }
+
+  .Item__button {
+    font-size: 14px;
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  .Item {
+    width: 180px;
+  }
+
+  .Item__title, .Item__rating {
+    display: none;
+  }
+}
+
 .Cart {
   display: inline-block;
   position: relative;
@@ -264,7 +285,7 @@ strong {
   z-index: 20;
   overflow: hidden;
   max-width: 200px;
-  width: calc(20% - 20px);
+  width: calc(30% - 20px);
   margin: 20px 0px 0px 20px;
   aspect-ratio: 0.69;
   box-shadow: rgb(0 0 0 / 69%) 0px 26px 30px -10px, rgb(0 0 0 / 73%) 0px 16px 10px -10px;
@@ -313,6 +334,8 @@ strong {
 
 .Cart__item-name {
   flex: 1;
+  white-space: nowrap;
+  margin-right: 4px;
 }
 
 .Cart__total {
@@ -325,10 +348,33 @@ strong {
 
 .Cart__total-title {
   flex: 1;
+  white-space: nowrap;
+  margin-right: 4px;
 }
 
 .Cart__total-price {
   font-size: 22px;
+}
+
+@media only screen and (max-width: 800px) {
+  .Cart {
+    width: 180px;
+  }
+
+  .Cart__list {
+    display: none;
+  }
+
+  .Cart__total {
+    border: 0;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+  }
+
+  .Cart__total-title {
+    flex: 0;
+  }
 }
 
 .Loader {

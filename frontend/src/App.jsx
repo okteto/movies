@@ -103,16 +103,16 @@ class App extends Component {
         </header>
         <div className="App__content">
           <TitleList
-            title="Store"
-            titles={catalog.data}
-            loaded={catalog.loaded}
-            onRent={this.handleRent}
-          />
-          <TitleList
             title={`${session.name}'s movies`}
             cost={cost}
             titles={rental.data}
             loaded={rental.loaded}
+          />
+          <TitleList
+            title="Store"
+            titles={catalog.data}
+            loaded={catalog.loaded}
+            onRent={this.handleRent}
           />
         </div>
       </div>
@@ -216,8 +216,8 @@ const Item = ({ item, onRent, backdrop }) => {
     <div className="Item">
       <div className="Item__container" style={{ backgroundImage: `url(${backdrop})` }}>
         <div className="Item__overlay">
-          <div className="title">{item?.original_title ?? 'Unknown Title'}</div>
-          <div className="rating">{item?.vote_average ?? 0} / 10</div>
+          <div className="Item__title">{item?.original_title ?? 'Unknown Title'}</div>
+          <div className="Item__rating">{item?.vote_average ?? 0} / 10</div>
           <div style={{ flex: '1 auto' }} />
           { onRent ?
             <>
