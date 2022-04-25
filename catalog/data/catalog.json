@@ -14,10 +14,18 @@
         "original_title": "The Finalizer",
         "backdrop_path": "/poster-thefinalizer.png",
         "price": 2.99,
-        "overview": "Robert McPod, who serves an unflinching justice for the exploited and oppressed, embarks on a relentless, globe-trotting quest for vengeance when a long-time girl friend is murdered."
+        "overview": "Robert McNode, who serves an unflinching justice for the exploited and oppressed, embarks on a relentless, globe-trotting quest for vengeance when a long-time girl friend is murdered."
       },
       {
         "id": 3,
+        "vote_average": 4.2,
+        "original_title": "Crash Loop Backoff",
+        "backdrop_path": "/poster-crashloop.png",
+        "price": 1.99,
+        "overview": "Mr. Pod keeps starting, crashing, starting, and then crashing again in an endless loop."
+      },
+      {
+        "id": 4,
         "vote_average": 7.8,
         "original_title": "Kube",
         "backdrop_path": "/poster-kube.png",
@@ -25,7 +33,7 @@
         "overview": "Kube is filled with deeper meaning than what meets the surface - it's a philosophical study about human life."
       },
       {
-        "id": 4,
+        "id": 5,
         "vote_average": 7.9,
         "original_title": "Cloud Atlas",
         "backdrop_path": "/poster-cloudatlas.png",
@@ -33,7 +41,7 @@
         "overview": "An exploration of how the actions of individual lives impact one another in the past, present and future, as one soul is shaped from a killer into a hero, and an act of kindness ripples across centuries to inspire a revolution."
       },
       {
-        "id": 5,
+        "id": 6,
         "vote_average": 7.6,
         "original_title": "Aliens",
         "backdrop_path": "/poster-aliens.png",

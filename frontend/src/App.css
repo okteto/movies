@@ -9,7 +9,7 @@ body {
   --app-horizontal-margin: 65px;
   --app-title-font: 'Oswald', serif;
   --app-normal-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --app-header-height: 88px;
+  --app-header-height: 84px;
 
   background: var(--app-background);
   color: #ffffff;
@@ -59,7 +59,7 @@ strong {
   transition: background-color .3s ease-in-out;
   display: flex;
   align-items: center;
-  padding: 20px var(--app-horizontal-margin);
+  padding: 0 var(--app-horizontal-margin);
   flex-direction: row;
   align-items: center;
 }
