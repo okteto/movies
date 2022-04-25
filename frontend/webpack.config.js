@@ -1,7 +1,9 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const srcPath = path.join(__dirname, 'src');
+const distPath = path.join(__dirname, 'dist');
 
 module.exports = {
   context: srcPath,
@@ -10,7 +12,7 @@ module.exports = {
   entry: ['./index.jsx'],
   output: {
     filename: 'app.[contenthash].js',
-    path: path.join(__dirname, '/dist'),
+    path: distPath,
   },
   resolve: {
     extensions: ['.js', '.jsx', '.css'],
@@ -54,6 +56,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './index.html',
       favicon: path.join(srcPath, 'assets/images/favicon.png')
+    }),
+    new CopyPlugin({
+      patterns: [
+        { from: './static', to: distPath },
+      ],
     })
   ],
   devServer: {
