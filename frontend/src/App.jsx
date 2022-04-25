@@ -152,7 +152,7 @@ class TitleList extends Component {
     if (loaded) {
       if (movies.length === 0) {
         return (
-          <div className="TitleListEmpty">
+          <div className="TitleList--empty">
             {onRent && 'No movies left to rent.'}
           </div>
         );
@@ -200,13 +200,13 @@ const Item = ({ item, onRent, backdrop }) => {
         <div className="Item__overlay">
           <div className="Item__title">{item?.original_title ?? 'Unknown Title'}</div>
           <div className="Item__rating">{item?.vote_average ?? 0} / 10</div>
-          <div style={{ flex: '1 auto' }} />
+          <div className="spring" />
           { onRent ?
             <>
               {!!item?.price &&
                 <div className='Item__price'>${item.price}</div>
               }
-              <div style={{ flex: '1 auto' }} />
+              <div className="spring" />
               <div className="Item__button" onClick={() => onRent(item)}>
                 Rent
               </div>

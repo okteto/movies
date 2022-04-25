@@ -95,11 +95,12 @@ strong {
   z-index: 4;
 }
 
-.App .TitleListEmpty {
+.TitleList--empty {
   font-size: 15px;
   font-weight: normal;
   line-height: 1.4;
   margin-bottom: .5em;
+  margin: 1em;
 }
 
 .App .TitleList .TitleList__slider {
