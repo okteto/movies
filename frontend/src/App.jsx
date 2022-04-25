@@ -214,7 +214,7 @@ class TitleList extends Component {
 const Item = ({ item, onRent, backdrop }) => {
   return (
     <div className="Item">
-      <div className="Item__container" style={{ backgroundImage: `url(${backdrop})` }}>
+      <div className="Item__container" style={{ backgroundImage: `url(./${backdrop})` }}>
         <div className="Item__overlay">
           <div className="Item__title">{item?.original_title ?? 'Unknown Title'}</div>
           <div className="Item__rating">{item?.vote_average ?? 0} / 10</div>
