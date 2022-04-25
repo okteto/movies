@@ -177,7 +177,7 @@ class TitleList extends Component {
       }
 
       return movies.map((item, i) => {
-        const backDrop = `https://image.tmdb.org/t/p/original${item.backdrop_path}`;
+        const backDrop = `/${item.backdrop_path}`;
         return (
           <Item
             key={item.id}
