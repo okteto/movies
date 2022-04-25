@@ -44,7 +44,7 @@ strong {
   flex: 1 auto;
 }
 
-.App .App__header {
+.App__header {
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
   position: fixed;
   top: 0;
@@ -55,7 +55,6 @@ strong {
   min-height: var(--app-header-height);
   display: flex;
   flex-direction: column;
-  justify-content: center;
   background-color: transparent;
   transition: background-color .3s ease-in-out;
   display: flex;
@@ -65,11 +64,12 @@ strong {
   align-items: center;
 }
 
-.App .App__header.fixed {
+.App__header.fixed {
   background-color: rgba(0, 0, 0, 0.8);
 }
 
 .App__logo {
+  flex: 1;
   cursor: pointer;
   color: #ce1616;
   text-transform: uppercase;
@@ -81,40 +81,6 @@ strong {
   flex-direction: row;
   align-items: baseline;
   gap: 4px;
-}
-
-.App .UserProfile {
-  margin-left: auto;
-}
-
-.App .UserProfile .User {
-  display: flex;
-}
-
-.App .UserProfile .User:hover {
-  cursor: pointer;
-}
-
-.App .UserProfile .User .image {
-  border-radius: 44px;
-  margin-left: 10px;
-  overflow: hidden;
-  width: 28px;
-  height: 28px;
-  box-sizing: border-box;
-  transition: border .125s ease;
-}
-
-.App .UserProfile .User .image img {
-  width: 100%;
-  display: block;
-}
-
-.App .UserProfile .User .name {
-  align-items: center;
-  display: flex;
-  font-size: 16px;
-  font-weight: 300;
 }
 
 .App .App__content {

@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 
-import userAvatarImage from './assets/images/cindy.jpg';
-
 import './App.css';
 
 const compact = (movies = []) => {
@@ -31,8 +29,7 @@ class App extends Component {
       session: {
         name: 'Cindy',
         lastName: 'Lopez',
-        username: 'cindy',
-        avatar: userAvatarImage
+        username: 'cindy'
       },
       fixHeader: false
     };
@@ -94,13 +91,13 @@ class App extends Component {
     const { catalog, rental, session, cost } = this.state;
     return (
       <div className="App" ref={this.appRef} onScroll={this.handleScroll}>
-        <header className={`App__header ${this.state.fixHeader ? 'fixed' : ''}`}>
+        <div className={`App__header ${this.state.fixHeader ? 'fixed' : ''}`}>
           <div className="App__logo">
             <MoviesIcon />
             Movies
           </div>
-          <UserProfile user={session} />
-        </header>
+          <Logo />
+        </div>
         <div className="App__content">
           <TitleList
             title={`${session.name}'s movies`}
@@ -142,21 +139,6 @@ class Loader extends Component {
               repeatCount="indefinite"/>
           </path>
         </svg>
-      </div>
-    );
-  }
-}
-
-
-class UserProfile extends Component {
-  render() {
-    const { user } = this.props;
-    return (
-      <div className="UserProfile">
-        <div className="User">
-          <div className="name">{`${user.name} ${user.lastName}`}</div>
-          <div className="image"><img src={user.avatar} alt="profile" /></div>
-        </div>
       </div>
     );
   }
@@ -279,6 +261,18 @@ const MoviesIcon = () => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="32" fill="none" viewBox="0 0 46 53">
       <path fill="#fff" fillRule="evenodd" d="m34.8 1.47 3.08 7.3L45.3 7.6 44.1 0l-9.3 1.47Zm-3.98.63 3.08 7.3-7.44 1.18-3.06-7.3 7.42-1.18Zm-9.17 9.24-3.06-7.3-7.43 1.18 3.06 7.3 7.43-1.18ZM6.35 5.98c-4.1.65-6.9 4.5-6.26 8.61l.03.16 9.29-1.47-3.06-7.3ZM.1 48.4a3.85 3.85 0 0 0 3.83 3.85H42c2.1 0 3.83-1.73 3.83-3.85V17.64H.09V48.4Zm18.22-21.66 12.27 8.2L18.3 43.1V26.75Z" clipRule="evenodd"/>
+    </svg>
+  );
+};
+
+const Logo = () => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" height="32" fill="none" viewBox="0 0 420 121">
+      <path d="M0 0h420v121H0z"/>
+      <path fill="#fff" d="M60.5 121a60.5 60.5 0 1 0 0-121 60.5 60.5 0 0 0 0 121Z"/>
+      <path fill="#1A263E" d="M39.46 60.5c0-11.52 9.52-21.04 21.49-21.04a21.6 21.6 0 0 1 16.84 7.97 6.76 6.76 0 1 0 10.51-8.52 35.14 35.14 0 0 0-27.35-12.98c-19.24 0-35.02 15.38-35.02 34.57 0 19.2 15.78 34.57 35.02 34.57A35.14 35.14 0 0 0 88.3 82.1a6.76 6.76 0 0 0-10.5-8.52 21.6 21.6 0 0 1-16.85 7.97c-11.97 0-21.5-9.52-21.5-21.04Z"/>
+      <path fill="#1A263E" d="M88.3 67.26a6.76 6.76 0 1 0 0-13.52 6.76 6.76 0 0 0 0 13.52Z"/>
+      <path fill="#fff" d="m227.98 89-17.25-25.22V89h-9.6V10h9.6v47.9L227.98 33h12.52L221 60l19.5 29h-12.52Zm38.91 0c-4.19 0-7.66-1.33-10.42-4-2.76-2.65-4.17-6.35-4.24-11.1V42.06h-9.01V33h9V19.72h9.64V33h12.57v9.06h-12.57v28.6c0 3.53.67 5.92 2 7.18a6.38 6.38 0 0 0 4.5 1.88 10 10 0 0 0 4.29-.97l3.04 8.85a25.2 25.2 0 0 1-8.8 1.4Zm36.61-56c8 0 13.67 2.68 19.1 7.65 5.43 4.96 8.97 13.11 8.33 22.6h-43.69c.15 5.21 1.9 8.18 5.28 11.36a17.04 17.04 0 0 0 12.11 4.77c6.46 0 11.86-3.35 14.57-9.55h10.65c-1.44 6.34-6.7 12.7-11.02 15.37-4.32 2.67-9.16 3.8-14.59 3.8-7.92 0-14.45-2.68-19.6-8.03-5.13-5.35-7.75-12.62-7.75-20.79 0-8.1 2.47-13.71 7.46-19.1 4.99-5.39 11.37-8.08 19.15-8.08Zm88.84.1c15.28 0 27.66 12.5 27.66 27.95C420 76.48 407.62 89 392.34 89c-15.27 0-27.66-12.52-27.66-27.95 0-15.44 12.38-27.96 27.66-27.96Zm-223.68 0c15.28 0 27.66 12.5 27.66 27.95 0 15.43-12.38 27.95-27.66 27.95S141 76.48 141 61.05c0-15.44 12.38-27.96 27.66-27.96Zm182.2-13.38V33h12.56v9.06h-12.56v28.6c0 3.53.66 5.92 1.99 7.18a6.38 6.38 0 0 0 4.5 1.88 10 10 0 0 0 4.29-.97l3.04 8.85a25.2 25.2 0 0 1-8.8 1.4c-4.19 0-7.66-1.33-10.42-4-2.76-2.65-4.17-6.35-4.24-11.1V42.06h-9V33h9V19.72h9.63Zm41.48 23.3a17.93 17.93 0 0 0-17.84 18.03c0 9.95 7.99 18.02 17.84 18.02s17.84-8.07 17.84-18.02c0-9.96-7.99-18.03-17.84-18.03Zm-223.68 0a17.93 17.93 0 0 0-17.84 18.03c0 9.95 7.99 18.02 17.84 18.02S186.5 71 186.5 61.05c0-9.96-7.99-18.03-17.84-18.03Zm135.55-1.06c-3.85 0-7.66 1.44-10.44 3.77-2.78 2.34-5.21 5.48-6.1 9.42h33c-.79-3.6-2.76-6.9-5.9-9.42-3.14-2.5-5.9-3.77-10.56-3.77Z"/>
     </svg>
   );
 };
