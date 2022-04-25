@@ -302,6 +302,8 @@ strong {
   flex: 1;
   white-space: nowrap;
   margin-right: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .Cart__total {
