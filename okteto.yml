@@ -3,12 +3,22 @@ icon: https://apps.okteto.com/movies/icon.png
 build:
   frontend:
     context: frontend
+    dockerfile: frontend/Dockerfile
+  frontenddev:
+    context: frontend
+    dockerfile: frontend/Dockerfile
+    target: dev
   catalog:
     context: catalog
+    dockerfile: catalog/Dockerfile
   rent:
     context: rent
-  rentals:
-    context: rentals
+    dockerfile: rent/Dockerfile
+  worker:
+    context: .
+  workerdev:
+    context: .
+    target: dev
 
 deploy:
   - name: Install Bitnami Charts
@@ -26,11 +36,11 @@ deploy:
   - name: Deploy Rent
     command: helm upgrade --install rent rent/chart --set image=${OKTETO_BUILD_RENT_IMAGE}
   - name: Deploy Rentals
-    command: helm upgrade --install rentals rentals/chart --set image=${OKTETO_BUILD_RENTALS_IMAGE}
+    command: helm upgrade --install rentals chart --set image=${OKTETO_BUILD_WORKER_IMAGE}
 
 dev:
   frontend:
-    image: okteto/node:16
+    image: ${OKTETO_BUILD_FRONTENDDEV_IMAGE}
     command: bash
     sync:
       - frontend:/usr/src/app
@@ -49,30 +59,24 @@ dev:
     forward:
       - 5005:5005
   api:
-    image: okteto/golang:1
+    image: ${OKTETO_BUILD_WORKERDEV_IMAGE}
     command: bash
     securityContext:
       capabilities:
         add:
         - SYS_PTRACE
     sync:
-      - rentals:/usr/src/app
-    volumes:
-      - /go/
-      - /root/.cache/
+      - .:/usr/src/app
     forward:
       - 2346:2345
   worker:
-    image: okteto/golang:1
+    image: ${OKTETO_BUILD_WORKERDEV_IMAGE}
     command: bash
     securityContext:
       capabilities:
         add:
         - SYS_PTRACE
     sync:
-      - rentals:/usr/src/app
-    volumes:
-      - /go/
-      - /root/.cache/
+      - .:/usr/src/app
     forward:
       - 2345:2345
