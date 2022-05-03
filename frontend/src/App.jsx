@@ -99,7 +99,9 @@ class App extends Component {
           <Logo />
         </div>
 
-        <DevToast />
+        {MODE === 'development' &&
+          <DevToast />
+        }
 
         <div className="App__content">
           <TitleList
