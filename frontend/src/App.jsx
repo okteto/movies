@@ -1,93 +1,117 @@
 import React, { Component } from 'react';
 
-import userAvatarImage from './assets/images/user.jpg';
-import movieBackground from './assets/images/movie-bg.jpg';
-
 import './App.css';
+
+const compact = (movies = []) => {
+  return movies.filter((item, index, self) =>
+    self.findIndex(i => i.id === item.id) === index
+  );
+}
+
+const financial = (x) => {
+  return Number.parseFloat(x).toFixed(2);
+}
 
 class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      movies: {
-        data: {},
+      catalog: {
+        data: [],
         loaded: false
       },
-      watching: {
-        data: {},
+      rental: {
+        data: [],
         loaded: false
       },
+      cost: 0,
       session: {
         name: 'Cindy',
         lastName: 'Lopez',
-        username: 'cindy',
-        avatar: userAvatarImage
+        username: 'cindy'
       },
       fixHeader: false
     };
 
-    this.onScroll = this.onScroll.bind(this);
+    this.appRef = React.createRef();
   }
 
   componentDidMount() {
-    fetch('/api/movies')
-      .then(res => res.json())
-      .then(result => {
-        this.setState({
-          movies: {
-            data: result,
-            loaded: true
-          }
-        });
-      });
-
-    fetch('/api/watching')
-      .then(res => res.json())
-      .then(result => {
-        this.setState({
-          watching: {
-            data: result,
-            loaded: true
-          }
-        });
-      });
-
-    window.addEventListener('scroll', this.onScroll);
+    this.refreshData();
   }
 
-  componentWillUnmount() {
-    window.removeEventListener('scroll', this.onScroll);
+  handleRent = async (item) => {
+    await fetch('/rent', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        catalog_id: item.id,
+        price: item.price
+      })
+    });
+    this.refreshData();
   }
 
-  onScroll() {
+  refreshData = async () => {
+    const catalogPromise = fetch('/catalog')
+      .then(res => res.json())
+      .then(result => compact(result));
+
+    const rentalsPromise = fetch('/rentals')
+      .then(res => res.json())
+      .then(result => compact(result));
+
+    const [catalog, rentals] = await Promise.all([catalogPromise, rentalsPromise]);
     this.setState({
-      fixHeader: window.scrollY > 100
+      rental: {
+        data: rentals,
+        loaded: true
+      },
+      catalog: {
+        data: catalog.map(movie => ({
+          ...movie,
+          rented: !!rentals.find(c => c.id === movie.id)
+        })),
+        loaded: true
+      },
+      cost: financial(rentals.reduce((acc, item) => acc += Number(item?.price ?? 0), 0))
+    });
+  }
+
+  handleScroll = () => {
+    this.setState({
+      fixHeader: this.appRef.current.scrollTop > 20
     });
   }
 
   render() {
-    const { movies, watching, session } = this.state;
+    const { catalog, rental, session, cost } = this.state;
     return (
-      <div className="App">
-        <header className={`Header ${this.state.fixHeader ? 'fixed' : ''}`}>
-          <div className="content">
-            <div className="logo">Movies</div>
-            <ul className="menu">
-              <li className="selected">Home</li>
-              <li>Movies</li>
-              <li>My List</li>
-            </ul>
-            <UserProfile user={session} />
+      <div className="App" ref={this.appRef} onScroll={this.handleScroll}>
+        <div className={`App__header ${this.state.fixHeader ? 'fixed' : ''}`}>
+          <div className="App__logo">
+            <MoviesIcon />
+            Movies
           </div>
-        </header>
-        <Hero />
-        <TitleList title="Movies" titles={movies.data} loaded={movies.loaded} />
-        <TitleList
-          title={`Continue watching for ${session.name}`}
-          titles={watching.data}
-          loaded={watching.loaded}
-        />
+          <Logo />
+        </div>
+        <div className="App__content">
+          <TitleList
+            title={`${session.name}'s movies`}
+            cost={cost}
+            titles={rental.data}
+            loaded={rental.loaded}
+          />
+          <TitleList
+            title="Store"
+            titles={catalog.data}
+            loaded={catalog.loaded}
+            onRent={this.handleRent}
+          />
+        </div>
       </div>
     );
   }
@@ -120,98 +144,48 @@ class Loader extends Component {
   }
 }
 
-
-class UserProfile extends Component {
-  render() {
-    const { user } = this.props;
-    return (
-      <div className="UserProfile">
-        <div className="User">
-          <div className="name">{`${user.name} ${user.lastName}`}</div>
-          <div className="image"><img src={user.avatar} alt="profile" /></div>
-        </div>
-      </div>
-    );
-  }
-}
-
-
-class Hero extends Component {
-  render() {
-    return (
-      <div id="hero" className="Hero" style={{ backgroundImage: `url(${movieBackground})` }}>
-        <div className="spring" />
-        <div className="content">
-          <h1>Bohemian Rhapsody</h1>
-          <p>
-            Queen take the music world by storm when they form the rock &apos;n&apos; roll
-            band in 1970.
-          </p>
-          <div className="button-container">
-            <HeroButton class="play-button">
-              <svg className="icon play-icon" width="20" height="20" viewBox="0 0 512 512">
-                <path d="M405.2 232.9L126.8 67.2c-3.4-2-6.9-3.2-10.9-3.2-10.9 0-19.8 9-19.8 20H96v344h.1c0 11 8.9 20 19.8 20 4.1 0 7.5-1.4 11.2-3.4l278.1-165.5c6.6-5.5 10.8-13.8 10.8-23.1s-4.2-17.5-10.8-23.1z"/>
-              </svg>
-              Play
-            </HeroButton>
-            <HeroButton class="list-button">
-              <svg className="icon add-icon" width="20" height="20" viewBox="0 0 20 20">
-                <path d="M16 9h-5V4H9v5H4v2h5v5h2v-5h5V9z"/>
-              </svg>
-              My list
-            </HeroButton>
-          </div>
-        </div>
-        <div className="overlay"></div>
-      </div>
-    );
-  }
-}
-
-
-class HeroButton extends Component {
-  render() {
-    return (
-      <a href="#" className="Button">{this.props.children}</a>
-    );
-  }
-}
-
-
 class TitleList extends Component {
-  render() {
-    let titles = '';
-    if (this.props.titles && this.props.loaded) {
-      titles = this.props.titles.map((title, i) => {
-        if (i < 4) {
-          let name = '';
-          const backDrop = `https://image.tmdb.org/t/p/original${title.backdrop_path}`;
-          if (!title.name) {
-            name = title.original_title;
-          } else {
-            name = title.name;
-          }
-          return (
-            <Item
-              key={title.id}
-              title={name}
-              score={title.vote_average}
-              overview={title.overview}
-              backdrop={backDrop}
-            />
-          );
-        }
+  renderList() {
+    const { titles = [], loaded, onRent } = this.props;
+    const movies = titles.filter(item => !item?.rented);
+
+    if (loaded) {
+      if (movies.length === 0) {
         return (
-          <div key={title.id}></div>
+          <div className="TitleList--empty">
+            {onRent && 'No movies left to rent.'}
+          </div>
+        );
+      }
+
+      return movies.map((item, i) => {
+        const backDrop = `/${item.backdrop_path}`;
+        return (
+          <Item
+            key={item.id}
+            item={item}
+            backdrop={backDrop}
+            onRent={onRent}
+          />
         );
       });
     }
+  }
+
+  render() {
+    const { titles, title, cost = 0 } = this.props;
+
     return (
       <div className="TitleList">
         <div className="Title">
-          <h1>{this.props.title}</h1>
-          <div className="titles-slider">
-            {titles || <Loader />}
+          <h1>
+            {title}
+          </h1>
+          <div className="TitleList__slider">
+            {!!cost &&
+              <Cart cost={cost} titles={titles} />
+            }
+            {this.renderList() || <Loader />}
           </div>
         </div>
       </div>
@@ -219,58 +193,88 @@ class TitleList extends Component {
   }
 }
 
-
-class Item extends Component {
-  render() {
-    return (
-      <div className="Item">
-        <div className="ItemContainer" style={{ backgroundImage: `url(${this.props.backdrop})` }}>
-          <div className="overlay">
-            <div className="title">{this.props.title}</div>
-            <div className="rating">{this.props.score} / 10</div>
-            <ListToggle />
-          </div>
+const Item = ({ item, onRent, backdrop }) => {
+  return (
+    <div className="Item">
+      <div className="Item__container" style={{ backgroundImage: `url(./${backdrop})` }}>
+        <div className="Item__overlay">
+          <div className="Item__title">{item?.original_title ?? 'Unknown Title'}</div>
+          <div className="Item__rating">{item?.vote_average ?? 0} / 10</div>
+          <div className="spring" />
+          { onRent ?
+            <>
+              {!!item?.price &&
+                <div className='Item__price'>${item.price}</div>
+              }
+              <div className="spring" />
+              <div className="Item__button" onClick={() => onRent(item)}>
+                Rent
+              </div>
+            </> :
+            <>
+              <div className="Item__button Item__button--rented">
+                Watch Now
+              </div>
+            </>
+          }
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
+const CartIcon = () => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 21 22" width="16">
+      <path fill="#fff" d="M6.3 22c-.53 0-.99-.2-1.36-.58a1.94 1.94 0 0 1-.56-1.4c0-.55.18-1.02.56-1.4a1.86 1.86 0 0 1 2.71-.01c.38.39.57.86.57 1.4 0 .56-.19 1.03-.56 1.41A1.8 1.8 0 0 1 6.3 22Zm10.68 0c-.54 0-1-.2-1.36-.58a1.94 1.94 0 0 1-.56-1.4c0-.55.18-1.02.56-1.4a1.85 1.85 0 0 1 2.7-.01c.39.39.58.86.58 1.4 0 .56-.19 1.03-.56 1.41-.38.39-.83.58-1.36.58ZM4.9 3.83l2.94 6.28h7.69l3.33-6.28H4.91Zm-.8-1.65h15.72c.57 0 .93.17 1.08.53.16.36.1.76-.14 1.2l-3.6 6.7c-.18.3-.43.57-.75.8-.32.23-.67.35-1.04.35h-8.1L5.8 14.62h13.1v1.65H6.04c-.74 0-1.28-.25-1.61-.77-.33-.51-.33-1.09.01-1.73l1.7-3.25-4.05-8.87H0V0h3.12l1 2.18Zm3.74 7.93h7.69-7.7Z" opacity=".8"/>
+    </svg>
+  );
 }
 
 
-class ListToggle extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = { toggled: false };
-    this.handleClick = this.handleClick.bind(this);
-  }
-
-  handleClick() {
-    if(this.state.toggled === true) {
-      this.setState({ toggled: false });
-    } else {
-      this.setState({ toggled: true });
-    }
-  }
-
-  render() {
-    return (
-      <div className="ListToggle" onClick={this.handleClick} data-toggled={this.state.toggled}>
-        <div>
-          <div style={{ width: '32px', height: '32px'}}>
-            <svg className="plus" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-              <path d="M24,13.2c-0.6,0-1,0.4-1,1v9h-9c-0.6,0-1,0.4-1,1s0.4,1,1,1h9v9c0,0.6,0.4,1,1,1s1-0.4,1-1v-9h9c0.6,0,1-0.4,1-1    s-0.4-1-1-1h-9v-9C25,13.6,24.6,13.2,24,13.2z"/>
-            </svg>
-          </div>
-          <div style={{ width: '32px', height: '32px'}}>
-            <svg className="check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-              <path d="M33.2,16.9L21,29l-6.5-6.4c-0.4-0.4-1-0.4-1.4,0c-0.4,0.4-0.4,1,0,1.4l7.2,7.1c0.2,0.2,0.5,0.3,0.7,0.3    c0.3,0,0.5-0.1,0.7-0.3l12.8-12.8c0.4-0.4,0.4-1,0-1.4C34.2,16.5,33.6,16.5,33.2,16.9z"/>
-            </svg>
-          </div>
+const Cart = ({ cost, titles }) => {
+  return (
+    <div className="Cart">
+      <div className="Cart__container">
+        <div className="Cart__header">
+          <CartIcon />
+          Cart
+        </div>
+        <div className="Cart__list">
+          {titles.map((movie, i) => (
+            <div className="Cart__item" key={i}>
+              <div className="Cart__item-name">{movie.original_title}</div>
+              <div className="Cart__item-price">${movie.price}</div>
+            </div>
+          ))}
+        </div>
+        <div className="Cart__total">
+          <div className="Cart__total-title">Total due:</div>
+          <div className="Cart__total-price">${cost}</div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
+
+const MoviesIcon = () => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" fill="none" viewBox="0 0 46 53">
+      <path fill="#fff" fillRule="evenodd" d="m34.8 1.47 3.08 7.3L45.3 7.6 44.1 0l-9.3 1.47Zm-3.98.63 3.08 7.3-7.44 1.18-3.06-7.3 7.42-1.18Zm-9.17 9.24-3.06-7.3-7.43 1.18 3.06 7.3 7.43-1.18ZM6.35 5.98c-4.1.65-6.9 4.5-6.26 8.61l.03.16 9.29-1.47-3.06-7.3ZM.1 48.4a3.85 3.85 0 0 0 3.83 3.85H42c2.1 0 3.83-1.73 3.83-3.85V17.64H.09V48.4Zm18.22-21.66 12.27 8.2L18.3 43.1V26.75Z" clipRule="evenodd"/>
+    </svg>
+  );
+};
+
+const Logo = () => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" height="32" fill="none" viewBox="0 0 420 121">
+      <path d="M0 0h420v121H0z"/>
+      <path fill="#fff" d="M60.5 121a60.5 60.5 0 1 0 0-121 60.5 60.5 0 0 0 0 121Z"/>
+      <path fill="#1A263E" d="M39.46 60.5c0-11.52 9.52-21.04 21.49-21.04a21.6 21.6 0 0 1 16.84 7.97 6.76 6.76 0 1 0 10.51-8.52 35.14 35.14 0 0 0-27.35-12.98c-19.24 0-35.02 15.38-35.02 34.57 0 19.2 15.78 34.57 35.02 34.57A35.14 35.14 0 0 0 88.3 82.1a6.76 6.76 0 0 0-10.5-8.52 21.6 21.6 0 0 1-16.85 7.97c-11.97 0-21.5-9.52-21.5-21.04Z"/>
+      <path fill="#1A263E" d="M88.3 67.26a6.76 6.76 0 1 0 0-13.52 6.76 6.76 0 0 0 0 13.52Z"/>
+      <path fill="#fff" d="m227.98 89-17.25-25.22V89h-9.6V10h9.6v47.9L227.98 33h12.52L221 60l19.5 29h-12.52Zm38.91 0c-4.19 0-7.66-1.33-10.42-4-2.76-2.65-4.17-6.35-4.24-11.1V42.06h-9.01V33h9V19.72h9.64V33h12.57v9.06h-12.57v28.6c0 3.53.67 5.92 2 7.18a6.38 6.38 0 0 0 4.5 1.88 10 10 0 0 0 4.29-.97l3.04 8.85a25.2 25.2 0 0 1-8.8 1.4Zm36.61-56c8 0 13.67 2.68 19.1 7.65 5.43 4.96 8.97 13.11 8.33 22.6h-43.69c.15 5.21 1.9 8.18 5.28 11.36a17.04 17.04 0 0 0 12.11 4.77c6.46 0 11.86-3.35 14.57-9.55h10.65c-1.44 6.34-6.7 12.7-11.02 15.37-4.32 2.67-9.16 3.8-14.59 3.8-7.92 0-14.45-2.68-19.6-8.03-5.13-5.35-7.75-12.62-7.75-20.79 0-8.1 2.47-13.71 7.46-19.1 4.99-5.39 11.37-8.08 19.15-8.08Zm88.84.1c15.28 0 27.66 12.5 27.66 27.95C420 76.48 407.62 89 392.34 89c-15.27 0-27.66-12.52-27.66-27.95 0-15.44 12.38-27.96 27.66-27.96Zm-223.68 0c15.28 0 27.66 12.5 27.66 27.95 0 15.43-12.38 27.95-27.66 27.95S141 76.48 141 61.05c0-15.44 12.38-27.96 27.66-27.96Zm182.2-13.38V33h12.56v9.06h-12.56v28.6c0 3.53.66 5.92 1.99 7.18a6.38 6.38 0 0 0 4.5 1.88 10 10 0 0 0 4.29-.97l3.04 8.85a25.2 25.2 0 0 1-8.8 1.4c-4.19 0-7.66-1.33-10.42-4-2.76-2.65-4.17-6.35-4.24-11.1V42.06h-9V33h9V19.72h9.63Zm41.48 23.3a17.93 17.93 0 0 0-17.84 18.03c0 9.95 7.99 18.02 17.84 18.02s17.84-8.07 17.84-18.02c0-9.96-7.99-18.03-17.84-18.03Zm-223.68 0a17.93 17.93 0 0 0-17.84 18.03c0 9.95 7.99 18.02 17.84 18.02S186.5 71 186.5 61.05c0-9.96-7.99-18.03-17.84-18.03Zm135.55-1.06c-3.85 0-7.66 1.44-10.44 3.77-2.78 2.34-5.21 5.48-6.1 9.42h33c-.79-3.6-2.76-6.9-5.9-9.42-3.14-2.5-5.9-3.77-10.56-3.77Z"/>
+    </svg>
+  );
+};
 
 export default App;

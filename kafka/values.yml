@@ -1,0 +1,34 @@
+listeners:
+  - PLAINTEXT://:9092
+  - CONTROLLER://:9093
+advertisedListeners:
+  - "PLAINTEXT://$(MY_POD_NAME).kafka-headless:9092"
+listenerSecurityProtocolMap: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+allowPlaintextListener: true
+interBrokerListenerName: PLAINTEXT
+command:
+  - /opt/bitnami/scripts/kafka/entrypoint.sh
+  - "sh"
+  - "-c"
+  - |
+    set -ex
+    /opt/bitnami/scripts/kafka/setup.sh
+    export KAFKA_CFG_BROKER_ID="$(kafka-storage.sh random-uuid)"
+    kafka-storage.sh format --config "${KAFKA_CONF_FILE}" --cluster-id "${KAFKA_CFG_BROKER_ID}" --ignore-formatted
+    /opt/bitnami/scripts/kafka/run.sh
+extraEnvVars:
+  # Kraft Setup (Kafka as Controller - no Zookeeper)
+  - name: KAFKA_CFG_NODE_ID
+    value: "1"
+  - name: KAFKA_CFG_BROKER_ID
+    value: "1"
+  - name: KAFKA_CFG_CONTROLLER_QUORUM_VOTERS
+    value: 1@127.0.0.1:9093
+  - name: KAFKA_CFG_CONTROLLER_LISTENER_NAMES
+    value: CONTROLLER
+  - name: KAFKA_CFG_PROCESS_ROLES
+    value: broker,controller
+persistence:
+  enabled: false
+zookeeper:
+  enabled: false

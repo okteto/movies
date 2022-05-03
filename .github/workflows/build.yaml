@@ -3,29 +3,21 @@ on:
     branches:
       - main
 
+name: Build to Okteto Global Registry
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Context
-      uses: okteto/context@latest
-      with:
-        token: ${{ secrets.OKTETO_TOKEN }}
-        url: ${{ secrets.OKTETO_URL }}
+      - name: Checkout
+        uses: actions/checkout@master
 
-    - name: checkout
-      uses: actions/checkout@master
+      - uses: okteto/context@latest
+        with:
+          token: ${{ secrets.OKTETO_TOKEN }}
 
-    - name: "Build frontend"
-      uses: okteto/build@latest
-      with:
-        tag: okteto.global/frontend:${{ github.sha }}
-        path: frontend
-        file: frontend/Dockerfile
-
-    - name: "Build api"
-      uses: okteto/build@latest
-      with:
-        tag: okteto.global/api:${{ github.sha }}
-        path: api
-        file: api/Dockerfile
+      - name: Build
+        uses: okteto/build@main
+        with:
+          global: true
+        env:
+          OKTETO_GIT_COMMIT: ${{ github.sha }}

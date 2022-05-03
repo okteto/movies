@@ -1,24 +1,37 @@
 @import url("https://fonts.googleapis.com/css?family=Oswald:500");
 
+html {
+  height: 100%;
+}
+
 body {
-  --app-background-color: #141414;
+  --app-background: linear-gradient(180deg, #1A161F 0%, #0D0C0F 49.17%);
   --app-horizontal-margin: 65px;
   --app-title-font: 'Oswald', serif;
   --app-normal-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  background: var(--app-background-color);
+  --app-header-height: 84px;
+
+  background: var(--app-background);
   color: #ffffff;
   font-family: var(--app-normal-font);
+}
+
+strong {
+  font-weight: bold;
 }
 
 .App {
   font-family: var(--app-normal-font);
   font-size: 16px;
+  height: 100vh;
+  overflow: auto;
 }
 
 .App h2, .App .TitleList .Title {
   font-size: 22px;
-  font-weight: normal;
+  font-weight: 500;
   line-height: 1.4;
+  letter-spacing: -.01em;
   margin-bottom: .5em;
 }
 
@@ -31,7 +44,7 @@ body {
   flex: 1 auto;
 }
 
-.App .Header {
+.App__header {
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
   position: fixed;
   top: 0;
@@ -39,22 +52,24 @@ body {
   width: 100vw;
   box-sizing: border-box;
   z-index: 5;
+  min-height: var(--app-header-height);
+  display: flex;
+  flex-direction: column;
+  background-color: transparent;
+  transition: background-color .3s ease-in-out;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--app-horizontal-margin);
+  flex-direction: row;
+  align-items: center;
 }
 
-.App .Header.fixed .content {
+.App__header.fixed {
   background-color: rgba(0, 0, 0, 0.8);
 }
 
-.App .Header .content {
-  background-color: transparent;
-  transition: background-color .7s ease-in-out;
-  display: flex;
-  align-items: center;
-  padding: 20px var(--app-horizontal-margin);
-  flex-direction: row;
-}
-
-.App .Header .content .logo {
+.App__logo {
+  flex: 1;
   cursor: pointer;
   color: #ce1616;
   text-transform: uppercase;
@@ -62,153 +77,14 @@ body {
   font-weight: 500;
   font-family: var(--app-title-font);
   letter-spacing: -1.2px;
-}
-
-.App .Header .content .menu {
   display: flex;
   flex-direction: row;
-  align-items: center;
-  font-weight: 300;
-  font-size: .9rem;
-  list-style: none;
-  margin-left: 18px;
+  align-items: baseline;
+  gap: 4px;
 }
 
-.App .Header .content .menu li {
-  margin-left: 24px;
-  opacity: .8;
-  cursor: pointer;
-}
-
-.App .Header .content .menu li.selected {
-  font-weight: 400;
-  opacity: 1;
-}
-
-.App .Header .content .menu li:hover {
-  opacity: 1;
-}
-
-.App .UserProfile {
-  margin-left: auto;
-}
-
-.App .UserProfile .User {
-  display: flex;
-}
-
-.App .UserProfile .User:hover {
-  cursor: pointer;
-}
-
-.App .UserProfile .User .image {
-  border-radius: 44px;
-  margin-left: 10px;
-  overflow: hidden;
-  width: 28px;
-  height: 28px;
-  box-sizing: border-box;
-  transition: border .125s ease;
-}
-
-.App .UserProfile .User .image img {
-  width: 100%;
-  display: block;
-}
-
-.App .UserProfile .User .name {
-  align-items: center;
-  display: flex;
-  font-size: 16px;
-  font-weight: 300;
-}
-
-.App .Hero {
-  width: 100%;
-  position: relative;
-  background-size: cover;
-  height: 34vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.App .Hero .content {
-  position: relative;
-  z-index: 4;
-  width: auto;
-  left: 0;
-  right: 0;
-  margin: 0 var(--app-horizontal-margin);
-  margin-bottom: 46px;
-}
-
-.App .Hero .content h1 {
-  font-size: 1.4em;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-
-.App .Hero .content p {
-  width: 100%;
-  font-size: 1.1em;
-  font-weight: 300;
-}
-
-.App .Hero .content .button-container {
-  display: flex;
-  width: 400px;
-  margin-top: 18px;
-}
-
-.App .Hero .content .button-container .Button:first-child {
-  margin-right: 10px;
-}
-
-.App .Hero .overlay {
-  background: linear-gradient(to bottom, var(--app-background-color) 0%, rgba(34, 31, 31, 0.116) 100%);
-  height: 100%;
-  position: absolute;
-  z-index: 3;
-  top: 0;
-  left: 0;
-  width: 100%;
-  transform: rotate(180deg);
-}
-
-.App .Button {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  white-space: nowrap;
-  background-color: rgba(51, 51, 51, 0.5);
-  border: 0;
-  padding: 8px 28px;
-  border-radius: 4px;
-  box-shadow: none;
-  font-size: .9rem;
-  font-weight: 500;
-  color: #fff;
-  text-decoration: none;
-  outline: 0;
-}
-
-.App .Button:hover {
-  outline: 0;
-  background-color: #e6e6e6;
-  color: #000;
-}
-
-.App .Button:hover .icon path {
-  fill: #000;
-}
-
-.App .Button .icon {
-  margin-left: -4px;
-  margin-right: 6px;
-}
-
-.App .Button .icon path {
-  fill: white;
+.App .App__content {
+  padding-top: var(--app-header-height);
 }
 
 .App .TitleList {
@@ -219,46 +95,72 @@ body {
   z-index: 4;
 }
 
-.App .TitleList .titles-slider {
-  margin: 20px 0;
+.TitleList--empty {
+  font-size: 15px;
+  font-weight: normal;
+  line-height: 1.4;
+  margin-bottom: .5em;
+  margin: 1em;
+}
+
+.App .TitleList .TitleList__slider {
   width: 100%;
   box-sizing: border-box;
   position: relative;
+  display: flex;
+  place-content: center flex-start;
+  flex-flow: row wrap;
 }
 
-.App .Item {
+.App .TitleList h1 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.Item {
   display: inline-block;
   position: relative;
   cursor: pointer;
-  transition: transform .3s ease-in-out;
   z-index: 20;
-  width: 25%;
+  overflow: hidden;
+  max-width: 200px;
+  width: calc(30% - 20px);
+  margin: 20px 0px 0px 20px;
+  aspect-ratio: 0.69;
+  box-shadow: rgb(0 0 0 / 69%) 0px 26px 30px -10px, rgb(0 0 0 / 73%) 0px 16px 10px -10px;
+  transition-duration: 150ms;
+  transition-property: transform, box-shadow;
+  transition-timing-function: ease-out;
 }
 
-.App .Item:hover {
+.Item:hover {
   z-index: 21;
+  box-shadow: rgb(0 0 0 / 70%) 0px 40px 58px -16px, rgb(0 0 0 / 52%) 0px 30px 22px -10px;
+  transform: scale(1.05, 1.05) translateZ(0px) translate3d(0px, 0px, 0px);
 }
 
-.App .Item:hover .ItemContainer {
-  box-shadow: -1px 4px 20px 3px #00000094;
-}
-
-.App .Item:last-child {
+.Item:last-child {
   margin-right: 0;
 }
 
-.App .Item .ItemContainer {
+.Item__container {
+  border-radius: 12px;
   background-color: #000000;
   background-position: center;
-  height: 13vw;
+  height: 100%;
+  width: 100%;
   background-repeat: no-repeat;
   background-size: cover;
   overflow: hidden;
-  margin: 0 2px;
+  margin: 2px;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.App .Item .ItemContainer .overlay {
+.Item__overlay {
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.75) 20%, transparent 100%);
   padding: 20px;
   position: relative;
@@ -267,85 +169,191 @@ body {
   opacity: 0;
   transition: opacity .125s ease;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
-.App .Item .ItemContainer .overlay .title {
+.Item__title {
   font-size: 22px;
   font-weight: 400;
+  text-align: center;
 }
 
-.App .Item .ItemContainer .overlay .rating {
+.Item__rating {
   font-size: 14px;
 }
 
-.App .Item .ItemContainer .overlay .plot {
-  font-size: 14px;
-  margin-top: 100px;
-  font-weight: 300;
-  line-height: 1.6;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.Item__price {
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0.8;
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 26px;
 }
 
-.App .Item .ItemContainer .overlay .ListToggle {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-}
-
-.App .Item:hover .overlay {
+.Item:hover .Item__overlay {
   opacity: 1;
   pointer-events: all;
 }
 
-.App .ListToggle {
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  width: 32px;
-  height: 32px;
-  font-size: 16px;
-  border-radius: 32px;
-  overflow: hidden;
+.Item__button {
+  display: inline-block;
+  color: #fff;
+  background-color: #ce1616;
+  border-radius: 100px;
+  box-shadow: -1px 4px 20px 3px #000000;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 8px 20px;
+  margin: 8px;
+  text-align: center;
+  transition: transform .2s ease-in-out;
+}
+
+.Item__button:hover {
+  background-color: #f02323;
+  transform: scale(1.05);
+}
+
+.Item__button--rented {
+  background-color: #000000;
+}
+
+.Item__button--rented:hover {
+  background-color: #1e1e1e;
+}
+
+@media only screen and (max-width: 1050px) {
+  .Item__title {
+    font-size: 18px;
+  }
+
+  .Item__button {
+    font-size: 14px;
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  .Item {
+    width: 180px;
+  }
+
+  .Item__title, .Item__rating {
+    display: none;
+  }
+}
+
+.Cart {
+  display: inline-block;
+  position: relative;
   cursor: pointer;
+  z-index: 20;
+  overflow: hidden;
+  max-width: 200px;
+  width: calc(30% - 20px);
+  margin: 20px 0px 0px 20px;
+  aspect-ratio: 0.69;
+  box-shadow: rgb(0 0 0 / 69%) 0px 26px 30px -10px, rgb(0 0 0 / 73%) 0px 16px 10px -10px;
+  transition-duration: 150ms;
+  transition-property: transform, box-shadow;
+  transition-timing-function: ease-out;
 }
 
-.App .ListToggle:hover {
-  border: 2px solid #ffffff;
+.Cart__container {
+  border-radius: 12px;
+  background-color: #2A2332;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  margin: 2px;
+  position: relative;
+  padding: 14px 20px;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
 }
 
-.App .ListToggle:hover div {
-  top: -32px;
+.Cart__header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
 }
 
-.App .ListToggle > div {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 64px;
-  width: 32px;
-  transition: .125s ease;
+.Cart__list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  font-size: 14px;
+  font-weight: normal;
+  margin: 12px 4px;
 }
 
-.App .ListToggle div svg path {
-  fill: #ffffff;
+.Cart__item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 4px;
 }
 
-.App .ListToggle[data-toggled="true"] {
-  background: #00d1ca;
-  border: 2px solid #00d1ca;
+.Cart__item-name {
+  flex: 1;
+  white-space: nowrap;
+  margin-right: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.App .ListToggle[data-toggled="true"] div {
-  top: -32px;
+.Cart__total {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 14px 0;
+  border-top: 1px solid #d4d3d668;
 }
 
-.App .Loader {
+.Cart__total-title {
+  flex: 1;
+  white-space: nowrap;
+  margin-right: 4px;
+}
+
+.Cart__total-price {
+  font-size: 22px;
+}
+
+@media only screen and (max-width: 800px) {
+  .Cart {
+    width: 180px;
+  }
+
+  .Cart__list {
+    display: none;
+  }
+
+  .Cart__total {
+    border: 0;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+  }
+
+  .Cart__total-title {
+    flex: 0;
+  }
+}
+
+.Loader {
   display: flex;
   align-items: center;
   align-content: center;
   margin: 0 auto 1em;
 }
 
-.App .Loader svg path,
-.App .Loader svg rect {
+.Loader svg path,
+.Loader svg rect {
   fill: #00d1ca;
 }

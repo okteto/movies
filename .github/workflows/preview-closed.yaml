@@ -13,7 +13,7 @@ jobs:
         token: ${{ secrets.OKTETO_TOKEN }}
         url: ${{ secrets.OKTETO_URL }}
 
-    - name: Delete namespace
+    - name: Destroy preview environment
       uses: okteto/destroy-preview@latest
       with:
         name: pr-${{ github.event.number }}-cindylopez

@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: catalog
+  labels:
+    {{- include "movies.labels" . | nindent 4 }}
+  annotations:
+    dev.okteto.com/generate-host: "movies"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /catalog
+            pathType: Prefix
+            backend:
+              service:
+                name: catalog
+                port:
+                  number: 8080
