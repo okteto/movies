@@ -4,7 +4,7 @@ build:
   frontend:
     context: frontend
     dockerfile: frontend/Dockerfile
-  fronten-dev:
+  frontend-dev:
     context: frontend
     dockerfile: frontend/Dockerfile
     target: dev
