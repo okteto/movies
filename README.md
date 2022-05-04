@@ -9,7 +9,7 @@ This example shows how to leverage [Okteto](https://github.com/okteto/okteto) to
 - A [rent](rent) service. It has an API in Java.
 - A [catalog](catalog) service. It has a Node.js API serving data from a MongoDB database.
 
-![Architecture diagram](architecture.png)
+![Architecture diagram](architecture-diagram.png)
 
 ## Demo script
 
