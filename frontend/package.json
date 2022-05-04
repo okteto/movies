@@ -1,6 +1,6 @@
 {
   "name": "okteto-movies-frontend",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "Apache-2.0",
   "private": true,
   "dependencies": {
@@ -28,7 +28,7 @@
   },
   "scripts": {
     "start": "yarn devel",
-    "devel": "webpack serve",
+    "devel": "webpack serve --mode=development",
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

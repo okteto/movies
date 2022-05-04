@@ -10,6 +10,12 @@ body {
   --app-title-font: 'Oswald', serif;
   --app-normal-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --app-header-height: 84px;
+  --app-header-z-index: 5;
+
+  --color-green: #00D1CA;
+  --color-navy: #1A263E;
+  --shadow-level-1: rgb(0 0 0 / 69%) 0px 26px 30px -10px, rgb(0 0 0 / 73%) 0px 16px 10px -10px;
+  --shadow-level-2: rgb(0 0 0 / 70%) 0px 40px 58px -16px, rgb(0 0 0 / 52%) 0px 30px 22px -10px;
 
   background: var(--app-background);
   color: #ffffff;
@@ -51,7 +57,7 @@ strong {
   left: 0;
   width: 100vw;
   box-sizing: border-box;
-  z-index: 5;
+  z-index: var(--app-header-z-index);
   min-height: var(--app-header-height);
   display: flex;
   flex-direction: column;
@@ -70,7 +76,6 @@ strong {
 
 .App__logo {
   flex: 1;
-  cursor: pointer;
   color: #ce1616;
   text-transform: uppercase;
   font-size: 32px;
@@ -93,6 +98,29 @@ strong {
   transition: opacity 3s ease;
   position: relative;
   z-index: 4;
+}
+
+.DevToast {
+  --toast-size: 224px;
+
+  background-color: var(--color-green);
+  color: var(--color-navy);
+  letter-spacing: -.04rem;
+  font-weight: 500;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  position: absolute;
+  z-index: calc(var(--app-header-z-index) + 1);
+  width: var(--toast-size);
+  left: calc(50% - calc(var(--toast-size) / 2));
+  padding: 6px 0;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+  box-shadow: var(--shadow-level-1);
+  cursor: default;
 }
 
 .TitleList--empty {
@@ -128,7 +156,7 @@ strong {
   width: calc(30% - 20px);
   margin: 20px 0px 0px 20px;
   aspect-ratio: 0.69;
-  box-shadow: rgb(0 0 0 / 69%) 0px 26px 30px -10px, rgb(0 0 0 / 73%) 0px 16px 10px -10px;
+  box-shadow: var(--shadow-level-1);
   transition-duration: 150ms;
   transition-property: transform, box-shadow;
   transition-timing-function: ease-out;
@@ -136,7 +164,7 @@ strong {
 
 .Item:hover {
   z-index: 21;
-  box-shadow: rgb(0 0 0 / 70%) 0px 40px 58px -16px, rgb(0 0 0 / 52%) 0px 30px 22px -10px;
+  box-shadow: var(--shadow-level-2);
   transform: scale(1.05, 1.05) translateZ(0px) translate3d(0px, 0px, 0px);
 }
 
@@ -355,5 +383,5 @@ strong {
 
 .Loader svg path,
 .Loader svg rect {
-  fill: #00d1ca;
+  fill: var(--color-green);
 }
