@@ -4,7 +4,7 @@ build:
   frontend:
     context: frontend
     dockerfile: frontend/Dockerfile
-  frontenddev:
+  fronten-dev:
     context: frontend
     dockerfile: frontend/Dockerfile
     target: dev
@@ -16,7 +16,7 @@ build:
     dockerfile: rent/Dockerfile
   worker:
     context: .
-  workerdev:
+  worker-dev:
     context: .
     target: dev
 
@@ -40,7 +40,7 @@ deploy:
 
 dev:
   frontend:
-    image: ${OKTETO_BUILD_FRONTENDDEV_IMAGE}
+    image: ${OKTETO_BUILD_FRONTEND_DEV_IMAGE}
     command: bash
     sync:
       - frontend:/usr/src/app
@@ -59,7 +59,7 @@ dev:
     forward:
       - 5005:5005
   api:
-    image: ${OKTETO_BUILD_WORKERDEV_IMAGE}
+    image: ${OKTETO_BUILD_WORKER_DEV_IMAGE}
     command: bash
     securityContext:
       capabilities:
@@ -70,7 +70,7 @@ dev:
     forward:
       - 2346:2345
   worker:
-    image: ${OKTETO_BUILD_WORKERDEV_IMAGE}
+    image: ${OKTETO_BUILD_WORKER_DEV_IMAGE}
     command: bash
     securityContext:
       capabilities:
