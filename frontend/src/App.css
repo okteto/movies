@@ -9,7 +9,7 @@ body {
   --app-horizontal-margin: 65px;
   --app-title-font: 'Oswald', serif;
   --app-normal-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --app-header-height: 84px;
+  --app-header-height: 64px;
   --app-header-z-index: 5;
 
   --color-green: #00D1CA;
@@ -33,7 +33,8 @@ strong {
   overflow: auto;
 }
 
-.App h2, .App .TitleList .Title {
+.App h2,
+.TitleList .Title {
   font-size: 22px;
   font-weight: 500;
   line-height: 1.4;
@@ -78,7 +79,7 @@ strong {
   flex: 1;
   color: #ce1616;
   text-transform: uppercase;
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 500;
   font-family: var(--app-title-font);
   letter-spacing: -1.2px;
@@ -88,11 +89,30 @@ strong {
   gap: 4px;
 }
 
-.App .App__content {
-  padding-top: var(--app-header-height);
+.App__content {
+  padding-top: calc(var(--app-header-height) + 12px);
 }
 
-.App .TitleList {
+.App__promo {
+  background-color: #514360;
+  padding: 8px 10px;
+  color: #FFF;
+  margin: 8px var(--app-horizontal-margin);
+  border-radius: 4px;
+  font-size: 15px;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.App__promo strong {
+  color: var(--color-green);
+}
+
+.TitleList {
   padding: 10px var(--app-horizontal-margin);
   box-sizing: border-box;
   transition: opacity 3s ease;
@@ -131,7 +151,7 @@ strong {
   margin: 1em;
 }
 
-.App .TitleList .TitleList__slider {
+.TitleList__slider {
   width: 100%;
   box-sizing: border-box;
   position: relative;
@@ -140,7 +160,7 @@ strong {
   flex-flow: row wrap;
 }
 
-.App .TitleList h1 {
+.TitleList h1 {
   display: flex;
   flex-direction: row;
   align-items: center;
