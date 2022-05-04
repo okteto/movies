@@ -1,5 +1,5 @@
-/frontend/node_modules
-/catalog/node_modules
-/rentals/bin
-/rent/.idea
-/rent/target
+frontend/node_modules
+catalog/node_modules
+bin
+rent/.idea
+rent/target

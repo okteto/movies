@@ -1,5 +1,8 @@
 FROM node:16 AS dev
 
+# setup okteto message
+COPY bashrc /root/.bashrc
+
 WORKDIR /usr/src/app
 
 COPY package.json yarn.lock ./

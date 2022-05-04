@@ -1,0 +1,10 @@
+.git
+/bin/*
+/__debug_bin
+/chart
+/catalog
+/frontend
+/kafka
+/mongodb
+/postgresql
+/rent
