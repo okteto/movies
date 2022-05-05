@@ -47,7 +47,7 @@ deploy:
   - name: Deploy Worker
     command: helm upgrade --install worker worker/chart --set image=${OKTETO_BUILD_WORKER_IMAGE}
   - name: Deploy API
-    command: helm upgrade --install api api/chart --set image=${OKTETO_BUILD_WORKER_IMAGE}  
+    command: helm upgrade --install api api/chart --set image=${OKTETO_BUILD_API_IMAGE}  
 
 dev:
   frontend:
@@ -70,7 +70,7 @@ dev:
     forward:
       - 5005:5005
   api:
-    image: ${OKTETO_BUILD_WORKER_DEV_IMAGE}
+    image: ${OKTETO_BUILD_API_DEV_IMAGE}
     command: bash
     securityContext:
       capabilities:
