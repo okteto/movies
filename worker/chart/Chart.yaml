@@ -1,6 +1,6 @@
 apiVersion: v2
-name: movies-rentals
-description: Rentals backend for Movies App
+name: movies-worker
+description: Rentals worker for Movies App
 type: application
 version: 0.1.0
 appVersion: 1.0.0
