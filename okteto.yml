@@ -14,10 +14,19 @@ build:
   rent:
     context: rent
     dockerfile: rent/Dockerfile
+  api:
+    context: api
+    dockerfile: api/Dockerfile
+  api-dev:
+    context: api
+    dockerfile: api/Dockerfile
+    target: dev
   worker:
-    context: .
+    context: worker
+    dockerfile: worker/Dockerfile
   worker-dev:
-    context: .
+    context: worker
+    dockerfile: worker/Dockerfile
     target: dev
 
 deploy:
@@ -35,8 +44,10 @@ deploy:
     command: helm upgrade --install catalog catalog/chart --set image=${OKTETO_BUILD_CATALOG_IMAGE}
   - name: Deploy Rent
     command: helm upgrade --install rent rent/chart --set image=${OKTETO_BUILD_RENT_IMAGE}
-  - name: Deploy Rentals
-    command: helm upgrade --install rentals chart --set image=${OKTETO_BUILD_WORKER_IMAGE}
+  - name: Deploy Worker
+    command: helm upgrade --install worker worker/chart --set image=${OKTETO_BUILD_WORKER_IMAGE}
+  - name: Deploy API
+    command: helm upgrade --install api api/chart --set image=${OKTETO_BUILD_WORKER_IMAGE}  
 
 dev:
   frontend:
@@ -66,7 +77,7 @@ dev:
         add:
         - SYS_PTRACE
     sync:
-      - .:/usr/src/app
+      - api:/usr/src/app
     forward:
       - 2346:2345
   worker:
@@ -77,6 +88,6 @@ dev:
         add:
         - SYS_PTRACE
     sync:
-      - .:/usr/src/app
+      - worker:/usr/src/app
     forward:
       - 2345:2345
