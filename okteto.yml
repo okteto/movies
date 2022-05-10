@@ -30,6 +30,8 @@ build:
     target: dev
 
 deploy:
+  - name: Okteto CLI
+    command: okteto version
   - name: Install Bitnami Charts
     command: helm repo add bitnami https://charts.bitnami.com/bitnami
   - name: Deploy PostgreSQL
