@@ -18,5 +18,4 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: pr-${{ github.event.number }}-cindylopez
-        scope: personal
+        name: pr-movies-${{ github.event.number }}
