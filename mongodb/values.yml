@@ -1,3 +1,6 @@
+persistence:
+  size: 1Gi
+
 auth:
   enabled: true
   database: okteto
