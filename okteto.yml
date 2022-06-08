@@ -23,7 +23,7 @@ build:
 
 deploy:
   - name: Install Bitnami Charts
-    command: helm repo add bitnami https://charts.bitnami.com/bitnami
+    command: helm repo add bitnami https://charts.bitnami.com/bitnami && helm repo update
   - name: Deploy PostgreSQL
     command:  helm upgrade --install postgresql bitnami/postgresql -f postgresql/values.yml --version 10.16.2
   - name: Deploy Kafka
