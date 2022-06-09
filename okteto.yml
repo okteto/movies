@@ -2,44 +2,28 @@ icon: https://apps.okteto.com/movies/icon.png
 
 build:
   frontend:
-    image: okteto.dev/frontend
     context: frontend
-    dockerfile: frontend/Dockerfile
   frontend-dev:
-    image: okteto.dev/frontend-dev
     context: frontend
-    dockerfile: frontend/Dockerfile
     target: dev
   catalog:
-    image: okteto.dev/catalog
     context: catalog
-    dockerfile: catalog/Dockerfile
   rent:
-    image: okteto.dev/rent
     context: rent
-    dockerfile: rent/Dockerfile
   api:
-    image: okteto.dev/api
     context: api
-    dockerfile: api/Dockerfile
   api-dev:
-    image: okteto.dev/api-dev
     context: api
-    dockerfile: api/Dockerfile
     target: dev
   worker:
-    image: okteto.dev/worker
     context: worker
-    dockerfile: worker/Dockerfile
   worker-dev:
-    image: okteto.dev/worker-dev
     context: worker
-    dockerfile: worker/Dockerfile
     target: dev
 
 deploy:
   - name: Install Bitnami Charts
-    command: helm repo add bitnami https://charts.bitnami.com/bitnami
+    command: helm repo add bitnami https://charts.bitnami.com/bitnami && helm repo update
   - name: Deploy PostgreSQL
     command:  helm upgrade --install postgresql bitnami/postgresql -f postgresql/values.yml --version 10.16.2
   - name: Deploy Kafka
