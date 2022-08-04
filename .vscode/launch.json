@@ -2,13 +2,26 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Connect to okteto",
+            "name": "Debug Worker",
             "type": "go",
             "request": "attach",
             "mode": "remote",
             "remotePath": "/usr/src/app",
             "port": 2345,
-            "host": "127.0.0.1"
-        }
+            "host": "127.0.0.1",
+            "cwd": "${workspaceFolder}/worker"
+        },
+        {
+            "name": "Debug Catalog",
+            "type": "node",
+            "request": "attach",
+            "address": "localhost",
+            "port": 9229,
+            "localRoot": "${workspaceFolder}/catalog",
+            "remoteRoot": "/src",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
     ]
 }
