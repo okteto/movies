@@ -16,3 +16,6 @@ vendor
 
 # dlv binary
 __debug_bin
+
+# binary
+bin/worker
