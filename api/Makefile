@@ -4,6 +4,10 @@ BACKEND ?= $(OKTETO_NAME)
 build:
 	go build -o bin/$(BACKEND) cmd/$(BACKEND)/main.go
 
+.PHONY: load-data
+load-data:
+	bin/$(BACKEND) load-data
+
 .PHONY: start
 start:
 	bin/$(BACKEND)

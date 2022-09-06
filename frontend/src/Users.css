@@ -1,0 +1,109 @@
+.Table {
+  margin: 20px;
+  overflow: auto;
+}
+
+.Table {
+  padding: 20px;
+}
+
+.Table > * {
+  margin: 8px;
+}
+
+.Table h5 {
+  text-align: right;
+}
+
+.Table__table {
+  border-spacing: 1;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  min-width: 1024px;
+}
+
+.Table__header {
+  padding: 20px;
+}
+.Table__data {
+  padding: 12px;
+  vertical-align: middle;
+}
+
+.Table__head .Table__row {
+  height: 60px;
+  background: #2a2332;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.Table__body .Table__row {
+  color: black;
+  height: 48px;
+  border-bottom: 1px solid #ececec;
+}
+
+.Table__body .Table__row:hover {
+  background-color: #ececec;
+}
+
+.Pagination__wrapper {
+  margin: 10px;
+  padding: 10px 24px;
+}
+
+.Pagination__list {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.Pagination__list li {
+  margin: 2px 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Pagination__list li:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.Pagination__item-nav.disabled {
+  pointer-events: none;
+}
+
+.Pagination__item-number {
+  padding: 8px 13px;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+.Pagination__selected {
+  border-radius: 50%;
+  line-height: 1.875em;
+  width: 30px;
+  vertical-align: middle;
+  display: inline-block;
+  position: relative;
+}
+
+.Pagination__circle {
+  background-color: red;
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 20px;
+  right: 0;
+  left: 0;
+  margin: 0 auto;
+  z-index: -1;
+}
+
