@@ -104,10 +104,10 @@ class App extends Component {
         }
 
         <div className="App__content">
-          {/* <div className="App__promo">
+          { <div className="App__promo">
             <KubeconLogo size="22" />
             Kubecon 2022 special offer! Get a <strong>50% discount</strong> on all movies today!
-          </div> */}
+          </div>}
           <TitleList
             title={`${session.name}'s movies`}
             cost={cost}
