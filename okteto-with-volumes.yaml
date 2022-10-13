@@ -23,7 +23,16 @@ build:
 
 deploy:
   - name: Deploy PostgreSQL
-    command: helm upgrade --install postgresql postgresql/postgresql-11.6.21.tgz -f postgresql/values.yml --version 11.6.21
+    command: |
+      if [ -z $DB_SNAPSHOT_NAME ]; then
+        helm upgrade --install postgresql postgresql/postgresql-11.6.21.tgz -f postgresql/values.yml --version 11.6.21
+      else
+        helm upgrade --install postgresql postgresql/postgresql-11.6.21.tgz \
+        -f postgresql/values.yml \
+        --version 11.6.21 \
+        --set primary.persistence.annotations."dev\.okteto\.com/from-snapshot-name"="$DB_SNAPSHOT_NAME" \
+        --set primary.persistence.annotations."dev\.okteto\.com/from-snapshot-namespace"="$DB_SNAPSHOT_NAMESPACE"
+      fi
   - name: Deploy Kafka
     command:  helm upgrade --install kafka kafka/kafka-18.0.3.tgz -f kafka/values.yml --version 18.0.3
   - name: Deploy MongoDB

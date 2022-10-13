@@ -191,7 +191,7 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 		log.Panic("error in rows", err)
 	}
 
-	fmt.Println("Returned", users)
+	fmt.Println("Returned", len(users), "user records.")
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(users)
 }
