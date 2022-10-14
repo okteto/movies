@@ -5,4 +5,4 @@ auth:
 
 primary:
   persistence:
-    size: 5Gi
+    size: 2Gi
