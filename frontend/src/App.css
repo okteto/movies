@@ -31,10 +31,12 @@ strong {
   font-size: 16px;
   height: 100vh;
   overflow: auto;
+  letter-spacing: 1px;
 }
 
 .App h2,
-.TitleList .Title {
+.TitleList .Title,
+.Users h1 {
   font-size: 22px;
   font-weight: 500;
   line-height: 1.4;
@@ -69,6 +71,22 @@ strong {
   padding: 0 var(--app-horizontal-margin);
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
+}
+
+.App__nav {
+  display: flex;
+  justify-content: right;
+}
+
+.App__nav a {
+  color: var(--color-green);
+  font-weight: 200;
+  text-transform: lowercase;
+}
+
+.App__nav a:hover {
+  color: #FFF;
 }
 
 .App__header.fixed {
@@ -90,7 +108,7 @@ strong {
 }
 
 .App__content {
-  padding-top: calc(var(--app-header-height) + 12px);
+  padding: calc(var(--app-header-height) + 12px) var(--app-horizontal-margin) 10px;
 }
 
 .App__promo {
@@ -113,7 +131,6 @@ strong {
 }
 
 .TitleList {
-  padding: 10px var(--app-horizontal-margin);
   box-sizing: border-box;
   transition: opacity 3s ease;
   position: relative;

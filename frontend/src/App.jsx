@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import Loader from './Loader';
+import Users from './Users';
 
 import './App.css';
 
@@ -90,65 +93,59 @@ class App extends Component {
   render() {
     const { catalog, rental, session, cost } = this.state;
     return (
-      <div className="App" ref={this.appRef} onScroll={this.handleScroll}>
-        <div className={`App__header ${this.state.fixHeader ? 'fixed' : ''}`}>
-          <div className="App__logo">
-            <MoviesIcon size="22" />
-            Movies
+      <Router>
+        <div className="App" ref={this.appRef} onScroll={this.handleScroll}>
+          <div className={`App__header ${this.state.fixHeader ? 'fixed' : ''}`}>
+            <Link to="/">
+              <div className="App__logo">
+                <MoviesIcon size="22" />
+                Movies
+              </div>
+            </Link>
+            <Logo size="24" />
           </div>
-          <Logo size="24" />
+
+          {MODE === 'development' &&
+            <DevToast />
+          }
+          <div className="App__content">
+            {/* <div className="App__promo">
+              <KubeconLogo size="22" />
+              Kubecon 2022 special offer! Get a <strong>50% discount</strong> on all movies today!
+            </div> */}
+
+            <Switch>
+              <Route exact path="/">
+                <div>
+                  <div className='App__nav'>
+                    <Link to="/admin/users">Admin</Link>
+                  </div>
+                  <TitleList
+                    title={`${session.name}'s movies`}
+                    cost={cost}
+                    titles={rental.data}
+                    loaded={rental.loaded}
+                  />
+                  <TitleList
+                    title="Store"
+                    titles={catalog.data}
+                    loaded={catalog.loaded}
+                    onRent={this.handleRent}
+                  />
+                </div>
+              </Route>
+            </Switch>
+            <Switch>
+              <Route path="/admin/users">
+              <div className='App__nav'>
+                <Link to="/">Back to Movies</Link>
+              </div>
+                <Users />
+              </Route>
+            </Switch>
+          </div>
         </div>
-
-        {MODE === 'development' &&
-          <DevToast />
-        }
-
-        <div className="App__content">
-          {/* <div className="App__promo">
-            <KubeconLogo size="22" />
-            Kubecon 2022 special offer! Get a <strong>50% discount</strong> on all movies today!
-          </div> */}
-          <TitleList
-            title={`${session.name}'s movies`}
-            cost={cost}
-            titles={rental.data}
-            loaded={rental.loaded}
-          />
-          <TitleList
-            title="Store"
-            titles={catalog.data}
-            loaded={catalog.loaded}
-            onRent={this.handleRent}
-          />
-        </div>
-      </div>
-    );
-  }
-}
-
-
-class Loader extends Component {
-  render() {
-    return (
-      <div className="Loader">
-        <svg version="1.1" id="loader" x="0px" y="0px"
-          width="40px"
-          height="40px"
-          viewBox="0 0 50 50"
-          style={{
-            enableBackground: 'new 0 0 50 50'
-          }}>
-          <path fill="#000" d="M43.935,25.145c0-10.318-8.364-18.683-18.683-18.683c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615c8.072,0,14.615,6.543,14.615,14.615H43.935z">
-            <animateTransform attributeType="xml"
-              attributeName="transform"
-              type="rotate"
-              from="0 25 25"
-              to="360 25 25"
-              dur="0.6s"
-              repeatCount="indefinite"/>
-          </path>
-        </svg>
-      </div>
+      </Router>
     );
   }
 }
@@ -313,5 +310,4 @@ const KubeconLogo = ({ size = '21'}) => {
     </svg>
   );
 }
-
 export default App;

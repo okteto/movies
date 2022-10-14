@@ -8,6 +8,7 @@ const distPath = path.join(__dirname, 'dist');
 
 module.exports = (_, argv) => {
   const mode = argv.mode ?? 'production';
+  const includeSourceMap = mode === 'production' ? 'hidden-nosources-source-map' : 'source-map';
   return {
     context: srcPath,
     mode,
@@ -16,6 +17,7 @@ module.exports = (_, argv) => {
     output: {
       filename: 'app.[contenthash].js',
       path: distPath,
+      publicPath: '/'
     },
     resolve: {
       extensions: ['.js', '.jsx', '.css'],
@@ -70,6 +72,7 @@ module.exports = (_, argv) => {
       })
     ],
     devServer: {
+      historyApiFallback: true,
       port: 80,
       host: '0.0.0.0',
       hot: true,
@@ -94,6 +97,7 @@ module.exports = (_, argv) => {
         },
       },
     },
+    devtool: includeSourceMap,
     cache: {
       type: 'filesystem',
       buildDependencies: {

@@ -15,7 +15,7 @@ This example shows how to leverage [Okteto](https://github.com/okteto/okteto) to
 
 ![Architecture diagram](architecture-diagram.png)
 
-## Demo script
+## Development container demo script
 
 - Deploy the repo from UI
 - Rent two movies
