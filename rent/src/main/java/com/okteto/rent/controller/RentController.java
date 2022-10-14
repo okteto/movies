@@ -9,12 +9,15 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Collections;
 
 @RestController
 public class RentController {
@@ -25,6 +28,11 @@ public class RentController {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
+    @GetMapping(path= "/rent", produces = "application/json")
+    Map<String, String> healthz() {
+            return Collections.singletonMap("status", "ok");
+    }
+    
     @PostMapping(path= "/rent", consumes = "application/json", produces = "application/json")
     List<String> rent(@RequestBody Rent rentInput, HttpServletResponse response) {
         String catalogID = rentInput.getMovieID();
