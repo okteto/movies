@@ -24,6 +24,9 @@ build:
 deploy:
   - name: Deploy PostgreSQL
     command: |
+      # If we get a snapshot name passed into the deployment we will add two annotations to the persistent volume for PostgreSQL.
+      # These annotations tell Okteto to create the volume from an existing snapshot. 
+      # Details in https://www.okteto.com/docs/self-hosted/administration/volume-snapshots/#consuming-a-volume-snapshot-created-in-kubernetes 
       if [ -z $DB_SNAPSHOT_NAME ]; then
         helm upgrade --install postgresql postgresql/postgresql-11.6.21.tgz -f postgresql/values.yml --version 11.6.21
       else
