@@ -48,7 +48,7 @@ dev:
     sync:
       - frontend:/usr/src/app
     environment:
-      - LD_CLIENT_ID=$LD_CLIENT_ID
+      - LD_CLIENT_ID
   catalog:
     command: yarn start
     sync:
