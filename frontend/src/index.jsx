@@ -10,6 +10,12 @@ if (module.hot) {
   module.hot.accept();
 }
 
-const app = withLDProvider({ clientSideID: process.env.LD_CLIENT_ID })(App);
+const app = withLDProvider({ 
+  clientSideID: process.env.LD_CLIENT_ID,  
+  user: {
+  "key": "aa0ceb",
+  "name": "Cindy Lopez",
+  "email": "cindy@okteto.com"
+}, })(App);
 const Root = hot(app);
 render(<Root />, document.getElementById('root'));
