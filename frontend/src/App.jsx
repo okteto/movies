@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import Loader from './Loader';
-import { AdminLink, AdminSwitch } from './Admin';
-
+import { AdminLink } from './Admin';
+import Users from './Users';
 
 import './App.css';
 
