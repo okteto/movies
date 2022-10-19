@@ -111,6 +111,8 @@ a:hover {
 .App__nav {
   display: flex;
   justify-content: right;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .App__header.fixed {
@@ -137,17 +139,18 @@ a:hover {
 
 .App__promo {
   background-color: #514360;
-  padding: 8px 10px;
   color: #FFF;
-  margin: 8px var(--app-horizontal-margin);
-  border-radius: 4px;
+  margin: 0;
+  border-radius: 8px;
   font-size: 15px;
+  letter-spacing: -.005rem;
   text-align: center;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 6px;
+  flex: 1;
 }
 
 .App__promo strong {
