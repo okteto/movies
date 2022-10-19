@@ -13,17 +13,51 @@ body {
   --app-header-z-index: 5;
 
   --color-green: #00D1CA;
+  --color-red: #ce1616;
   --color-navy: #1A263E;
+  --color-navy-light: #2A2332;
   --shadow-level-1: rgb(0 0 0 / 69%) 0px 26px 30px -10px, rgb(0 0 0 / 73%) 0px 16px 10px -10px;
   --shadow-level-2: rgb(0 0 0 / 70%) 0px 40px 58px -16px, rgb(0 0 0 / 52%) 0px 30px 22px -10px;
 
   background: var(--app-background);
   color: #ffffff;
   font-family: var(--app-normal-font);
+  font-weight: 400;
 }
 
 strong {
   font-weight: bold;
+}
+
+a {
+  color: var(--color-green);
+  font-weight: 200;
+  text-transform: lowercase;
+}
+
+a:hover {
+  color: #FFF;
+}
+
+.button {
+  display: inline-flex;
+  gap: 8px;
+  color: #fff;
+  background-color: var(--color-navy-light);
+  border-radius: 8px;
+  box-shadow: var(--shadow-level-1);
+  font-size: 16px;
+  font-weight: 400;
+  padding: 8px 20px;
+  text-align: center;
+  letter-spacing: -.01em;
+  transition: transform .2s ease-in-out;
+}
+
+.button:hover {
+  box-shadow: var(--shadow-level-1);
+  filter: brightness(1.2);
+  transform: scale(1.05);
 }
 
 .App {
@@ -77,16 +111,8 @@ strong {
 .App__nav {
   display: flex;
   justify-content: right;
-}
-
-.App__nav a {
-  color: var(--color-green);
-  font-weight: 200;
-  text-transform: lowercase;
-}
-
-.App__nav a:hover {
-  color: #FFF;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .App__header.fixed {
@@ -95,7 +121,7 @@ strong {
 
 .App__logo {
   flex: 1;
-  color: #ce1616;
+  color: var(--color-red);
   text-transform: uppercase;
   font-size: 28px;
   font-weight: 500;
@@ -113,17 +139,18 @@ strong {
 
 .App__promo {
   background-color: #514360;
-  padding: 8px 10px;
   color: #FFF;
-  margin: 8px var(--app-horizontal-margin);
-  border-radius: 4px;
+  margin: 0;
+  border-radius: 8px;
   font-size: 15px;
+  letter-spacing: -.005rem;
   text-align: center;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 6px;
+  flex: 1;
 }
 
 .App__promo strong {
@@ -264,26 +291,15 @@ strong {
 }
 
 .Item__button {
-  display: inline-block;
-  color: #fff;
-  background-color: #ce1616;
-  border-radius: 100px;
-  box-shadow: -1px 4px 20px 3px #000000;
+  background-color: var(--color-red);
   font-size: 18px;
   font-weight: bold;
-  padding: 8px 20px;
-  margin: 8px;
-  text-align: center;
-  transition: transform .2s ease-in-out;
-}
-
-.Item__button:hover {
-  background-color: #f02323;
-  transform: scale(1.05);
 }
 
 .Item__button--rented {
   background-color: #000000;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 .Item__button--rented:hover {
@@ -328,7 +344,7 @@ strong {
 
 .Cart__container {
   border-radius: 12px;
-  background-color: #2A2332;
+  background-color: var(--color-navy-light);
   height: 100%;
   width: 100%;
   overflow: hidden;
