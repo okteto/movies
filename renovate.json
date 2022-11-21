@@ -3,6 +3,7 @@
   "extends": [
     "config:base"
   ],
+  "enabledManagers": ["npm"],
   "prConcurrentLimit": 1,
   "semanticCommits": "enabled",
   "updateLockFiles": false,
