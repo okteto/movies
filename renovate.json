@@ -2,5 +2,14 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:base"
-  ]
+  ],
+  "includePaths": ["frontend/"],
+  "internalChecksFilter": "strict",
+  "prConcurrentLimit": 1,
+  "semanticCommits": "enabled",
+  "stabilityDays": 15,
+  "updateLockFiles": false,
+  "vulnerabilityAlerts": {
+    "labels": ["security"]
+  }
 }
