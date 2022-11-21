@@ -3,7 +3,7 @@
   "extends": [
     "config:base"
   ],
-  "includePaths": ["frontend/"],
+  "includePaths": ["./frontend/"],
   "internalChecksFilter": "strict",
   "prConcurrentLimit": 1,
   "semanticCommits": "enabled",
