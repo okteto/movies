@@ -4,6 +4,7 @@
     "config:base"
   ],
   "enabledManagers": ["npm"],
+  "includePaths": ["frontend/**"],
   "prConcurrentLimit": 1,
   "semanticCommits": "enabled",
   "updateLockFiles": false,
