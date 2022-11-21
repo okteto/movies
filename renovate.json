@@ -3,6 +3,7 @@
   "extends": [
     "config:base"
   ],
+  "includePaths": ["frontend"],
   "prConcurrentLimit": 1,
   "semanticCommits": "enabled",
   "updateLockFiles": false,
