@@ -4,7 +4,7 @@
 
 This example shows how to leverage [Okteto](https://github.com/okteto/okteto) to develop an application based on microservices directly on Kubernetes. The Movies App is deployed using a Helm Charts. It creates the following components:
 
-- A *React* based [frontend](frontend) service, using [webpack](https://webpack.js.org) as bundler and *hot-reload server* for development
+- A _React_ based [frontend](frontend) service, using [webpack](https://webpack.js.org) as bundler and _hot-reload server_ for development
 - A Node.js based [catalog](catalog) service to serve the available movies from a MongoDB database
 - A Java based [rent](rent) service to receive rent requests and send them to Kafka
 - A Golang based [worker](worker) to process rent request from Kafka and update the PostgreSQL database
@@ -23,3 +23,5 @@ This example shows how to leverage [Okteto](https://github.com/okteto/okteto) to
 - Uncomment line 61 in `rentals/cmd/worker/main.go`
 - `make build` + `make start`
 - Show how the change is applied
+
+# Test (opening PR)
