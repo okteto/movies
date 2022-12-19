@@ -23,3 +23,5 @@ This example shows how to leverage [Okteto](https://github.com/okteto/okteto) to
 - Uncomment line 61 in `rentals/cmd/worker/main.go`
 - `make build` + `make start`
 - Show how the change is applied
+
+
