@@ -128,7 +128,7 @@ class App extends Component {
                     </Link>
                   </div>
                   <TitleList
-                    title={`${session.name}'s movies`}
+                    title={`${session.name}'s shows`}
                     cost={cost}
                     titles={rental.data}
                     loaded={rental.loaded}
