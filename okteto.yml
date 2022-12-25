@@ -81,3 +81,4 @@ dev:
       - worker:/usr/src/app
     forward:
       - 2345:2345
+
