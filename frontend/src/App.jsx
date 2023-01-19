@@ -117,7 +117,7 @@ class App extends Component {
 
                     <div className="App__promo">
                       <KubeconLogo size="22" />
-                      Kubecon 2022 special offer! Get a <strong>50% discount</strong> on all movies today!
+                      2023 Academy Awards special offer! Get a <strong>60% discount</strong> on all movies today!
                     </div> 
 
                     <Link className="button" role="button" to="/admin/users">
@@ -323,17 +323,3 @@ const KubeconLogo = ({ size = '21'}) => {
   );
 }
 export default App;
-Footer
-© 2023 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
