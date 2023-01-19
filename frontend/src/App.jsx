@@ -312,5 +312,4 @@ const Symbol = ({ size = '18'}) => {
     </svg>
   );
 };
-}
 export default App;
