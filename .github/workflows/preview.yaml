@@ -1,4 +1,4 @@
-on: 
+on:
   pull_request:
     branches:
       - main
@@ -10,13 +10,13 @@ jobs:
     - name: Context
       uses: okteto/context@latest
       with:
+        url: ${{secrets.OKTETO_URL}}
         token: ${{ secrets.OKTETO_TOKEN }}
-        url: ${{ secrets.OKTETO_URL }}
 
     - name: Deploy preview environment
       uses: okteto/deploy-preview@latest
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         name: pr-${{ github.event.number }}-cindylopez
-        scope: global
+        timeout: 15m
