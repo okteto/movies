@@ -117,7 +117,7 @@ class App extends Component {
 
                     {/* <div className="App__promo">
                       <KubeconLogo size="22" />
-                      Kubecon 2022 special offer! Get a <strong>50% discount</strong> on all movies today!
+                      Kubecon 2023 special offer! Get a <strong>50% discount</strong> on all movies today!
                     </div> */}
 
                     <Link className="button" role="button" to="/admin/users">
