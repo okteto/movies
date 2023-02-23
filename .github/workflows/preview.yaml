@@ -18,5 +18,5 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: pr-${{ github.event.number }}-cindylopez
+        name: pr-${{ github.event.number }}-mithun
         scope: global
