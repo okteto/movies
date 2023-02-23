@@ -16,4 +16,4 @@ jobs:
     - name: Destroy preview environment
       uses: okteto/destroy-preview@latest
       with:
-        name: pr-${{ github.event.number }}-cindylopez
+        name: pr-${{ github.event.number }}-mithunnair
