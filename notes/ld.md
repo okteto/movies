@@ -2,6 +2,8 @@
 
 LaunchDarkly provides fast, scalable feature flag & toggle management (feature management) for the modern enterprise. Learn more at https://launchdarkly.com
 
+An OIDC discovery endpoint consists of joining the "`iss`" (issuer) claim value with "`.well-known/openid-configuration`".
+
 <img src="https://www.iwillnotrender.com" alt="I will render as is">
 
 ![small picture with relative path](./180px-Eagle_nebula_pillars_complete.jpg)
