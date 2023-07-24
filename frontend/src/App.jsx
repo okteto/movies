@@ -30,9 +30,9 @@ class App extends Component {
       },
       cost: 0,
       session: {
-        name: 'Cindy',
-        lastName: 'Lopez',
-        username: 'cindy'
+        name: 'Ranchero',
+        lastName: 'Chido',
+        username: 'ElRancheroChido'
       },
       fixHeader: false
     };
