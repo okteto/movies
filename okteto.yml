@@ -3,6 +3,8 @@ icon: https://apps.okteto.com/movies/icon.png
 build:
   frontend:
     context: frontend
+    args:
+      - LD_CLIENT_ID=$LD_CLIENT_ID
   frontend-dev:
     context: frontend
     target: dev
@@ -45,6 +47,8 @@ dev:
     command: bash
     sync:
       - frontend:/usr/src/app
+    environment:
+      - LD_CLIENT_ID
   catalog:
     command: yarn start
     sync:

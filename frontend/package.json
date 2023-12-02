@@ -5,10 +5,13 @@
   "private": true,
   "dependencies": {
     "@hot-loader/react-dom": "^17.0.2",
+    "add": "^2.0.6",
+    "launchdarkly-react-client-sdk": "^2.29.0",
     "react": "17.0.2",
     "react-dom": "^17.0.1",
     "react-hot-loader": "^4.13.0",
-    "react-router-dom": "5.3.3"
+    "react-router-dom": "5.3.3",
+    "yarn": "^1.22.19"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
@@ -29,8 +32,8 @@
   },
   "scripts": {
     "start": "yarn devel",
-    "devel": "webpack serve --mode=development",
-    "build": "webpack",
+    "devel": "webpack serve --mode=development --env LD_CLIENT_ID=$LD_CLIENT_ID ",
+    "build": "webpack  --env LD_CLIENT_ID=$LD_CLIENT_ID",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "browserslist": [

@@ -6,7 +6,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const srcPath = path.join(__dirname, 'src');
 const distPath = path.join(__dirname, 'dist');
 
-module.exports = (_, argv) => {
+module.exports = (env, argv) => {
   const mode = argv.mode ?? 'production';
   const includeSourceMap = mode === 'production' ? 'hidden-nosources-source-map' : 'source-map';
   return {
@@ -69,6 +69,9 @@ module.exports = (_, argv) => {
       }),
       new DefinePlugin({
         MODE: JSON.stringify(mode),
+      }),
+      new DefinePlugin({
+        'process.env.LD_CLIENT_ID': JSON.stringify(env.LD_CLIENT_ID),
       })
     ],
     devServer: {
