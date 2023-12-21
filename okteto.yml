@@ -38,6 +38,8 @@ deploy:
     command: helm upgrade --install worker worker/chart --set image=${OKTETO_BUILD_WORKER_IMAGE}
   - name: Deploy API
     command: helm upgrade --install api api/chart --set image=${OKTETO_BUILD_API_IMAGE} --set load=${API_LOAD_DATA:-true}
+  - name: Deploy Test
+    command: okteto deploy -f docker-compose.test.yml
 
 dev:
   frontend:

@@ -1,0 +1,6 @@
+services:
+  test:
+    scale: 5
+    build: .
+    volumes:
+      - /data
