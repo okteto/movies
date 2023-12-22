@@ -4,3 +4,6 @@ services:
     build: .
     volumes:
       - /data
+    resources:
+      requests:
+        cpu: 20m
