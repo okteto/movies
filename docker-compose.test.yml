@@ -1,6 +1,6 @@
 services:
   test:
-    image: pchico83/movies-test:latest
+    image: pchico83/movies-test:latest2
     scale: 5
     volumes:
       - /data

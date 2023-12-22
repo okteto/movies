@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo Endpoint: https://movies-${OKTETO_NAMESPACE}.${OKTETO_DOMAIN}/catalog
+echo Endpoint: http://catalog/catalog
 while true
 do
   curl -v http://catalog/catalog
