@@ -1,7 +1,7 @@
 services:
   test:
+    image: pchico83/movies-test:latest
     scale: 5
-    build: .
     volumes:
       - /data
     resources:

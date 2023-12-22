@@ -1,26 +1,5 @@
 icon: https://apps.okteto.com/movies/icon.png
 
-build:
-  frontend:
-    context: frontend
-  frontend-dev:
-    context: frontend
-    target: dev
-  catalog:
-    context: catalog
-  rent:
-    context: rent
-  api:
-    context: api
-  api-dev:
-    context: api
-    target: dev
-  worker:
-    context: worker
-  worker-dev:
-    context: worker
-    target: dev
-
 deploy:
   - name: Deploy PostgreSQL
     command: helm upgrade --install postgresql postgresql/postgresql-11.6.21.tgz -f postgresql/values.yml --version 11.6.21
@@ -29,15 +8,15 @@ deploy:
   - name: Deploy MongoDB
     command:  helm upgrade --install mongodb mongodb/mongodb-12.1.30.tgz -f mongodb/values.yml --version 12.1.30
   - name: Deploy Frontend
-    command: helm upgrade --install frontend frontend/chart --set image=${OKTETO_BUILD_FRONTEND_IMAGE}
+    command: helm upgrade --install frontend frontend/chart --set image=pchico83/movies-frontend:latest
   - name: Deploy Catalog
-    command: helm upgrade --install catalog catalog/chart --set image=${OKTETO_BUILD_CATALOG_IMAGE}
+    command: helm upgrade --install catalog catalog/chart --set image=pchico83/movies-catalog:latest
   - name: Deploy Rent
-    command: helm upgrade --install rent rent/chart --set image=${OKTETO_BUILD_RENT_IMAGE}
+    command: helm upgrade --install rent rent/chart --set image=pchico83/movies-rent:latest
   - name: Deploy Worker
-    command: helm upgrade --install worker worker/chart --set image=${OKTETO_BUILD_WORKER_IMAGE}
+    command: helm upgrade --install worker worker/chart --set image=pchico83/movies-worker:latest
   - name: Deploy API
-    command: helm upgrade --install api api/chart --set image=${OKTETO_BUILD_API_IMAGE} --set load=${API_LOAD_DATA:-true}
+    command: helm upgrade --install api api/chart --set image=pchico83/movies-api:latest --set load=${API_LOAD_DATA:-true}
   - name: Deploy Test
     command: okteto deploy -f docker-compose.test.yml
 
