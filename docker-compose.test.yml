@@ -2,8 +2,6 @@ services:
   test:
     image: pchico83/movies-test:latest3
     scale: 5
-    volumes:
-      - /data
     resources:
       requests:
         cpu: 20m
