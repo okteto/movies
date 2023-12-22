@@ -3,6 +3,6 @@
 echo Endpoint: https://movies-${OKTETO_NAMESPACE}.${OKTETO_DOMAIN}/catalog
 while true
 do
-  curl -v https://movies-${OKTETO_NAMESPACE}.${OKTETO_DOMAIN}/catalog
+  curl -v http://catalog/catalog
   sleep 1
 done
