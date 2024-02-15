@@ -23,11 +23,11 @@ build:
 
 deploy:
   - name: Deploy PostgreSQL
-    command: helm upgrade --install postgresql postgresql/postgresql-11.6.21.tgz -f postgresql/values.yml --version 11.6.21
+    command: helm upgrade --install postgresql oci://registry-1.docker.io/bitnamicharts/postgresql -f postgresql/values.yml --version 13.4.4
   - name: Deploy Kafka
-    command:  helm upgrade --install kafka kafka/kafka-18.0.3.tgz -f kafka/values.yml --version 18.0.3
+    command:  helm upgrade --install kafka oci://registry-1.docker.io/bitnamicharts/kafka -f kafka/values.yml --version 26.8.3
   - name: Deploy MongoDB
-    command:  helm upgrade --install mongodb mongodb/mongodb-12.1.30.tgz -f mongodb/values.yml --version 12.1.30
+    command:  helm upgrade --install mongodb oci://registry-1.docker.io/bitnamicharts/mongodb -f mongodb/values.yml --version 14.8.2
   - name: Deploy Frontend
     command: helm upgrade --install frontend frontend/chart --set image=${OKTETO_BUILD_FRONTEND_IMAGE}
   - name: Deploy Catalog
