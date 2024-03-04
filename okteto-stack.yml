@@ -45,7 +45,7 @@ services:
         condition: service_healthy
 
   mongodb:
-    image: docker.io/bitnami/mongodb:4.0.12-debian-9-r43
+    image: zcube/bitnami-compat-mongodb:6.0.5
     environment:
       - MONGODB_USERNAME=okteto
       - MONGODB_PASSWORD=mongodb123
