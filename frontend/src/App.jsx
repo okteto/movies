@@ -99,7 +99,7 @@ class App extends Component {
             <Link to="/">
               <div className="App__logo">
                 <MoviesIcon size="22" />
-                Movies
+                Movies FOR USSSS
               </div>
             </Link>
             <Logo size="24" />
