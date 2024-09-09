@@ -81,3 +81,9 @@ dev:
       - worker:/usr/src/app
     forward:
       - 2345:2345
+
+test:
+  worker:
+    image: golang
+    commands:
+    - cd worker && printenv | grep GITHUB

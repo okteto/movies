@@ -1,0 +1,27 @@
+on: 
+  pull_request:
+    branches:
+      - main
+
+jobs:
+devflow:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Context
+      uses: okteto/context@latest
+      with:
+        token: ${{ secrets.OKTETO_TOKEN }}
+        url: ${{ secrets.OKTETO_URL }}
+    - name: checkout
+      uses: actions/checkout@master
+    - name: "Set multi-line env vars"
+      run: |
+          echo "MY_VAR<<EOF" >> $GITHUB_ENV
+          echo "This is line 1" >> $GITHUB_ENV
+          echo "This is line 2" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+    - name: "Run tests"
+      uses: okteto/test@latest
+      with:
+        tests: "integration"
+        variables: "PASS=admin"
