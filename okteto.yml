@@ -87,4 +87,4 @@ test:
   worker:
     image: golang
     commands:
-    - cd worker && printenv | grep OKTETO_
+    - cd worker && printenv | grep GITHUB_
