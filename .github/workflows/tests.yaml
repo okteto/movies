@@ -18,10 +18,6 @@ jobs:
       uses: actions/checkout@master
     - name: "Run tests"
       uses: okteto/test@jlo/fix-fithub-multiline-envvars
-      env:
-        MY_VAR: |
-          Line 1
-          Line 2
-          Line 3
       with:
         tests: "worker"
+        log-level: "debug"
