@@ -16,10 +16,7 @@ jobs:
         url: ${{ secrets.OKTETO_URL }}
     - name: checkout
       uses: actions/checkout@master
-
     - name: "Run tests"
-      environment:
-        GITHUB_MULTILINE: ${{ env.MY_VAR }}
       uses: okteto/test@latest
       with:
         tests: "worker"
