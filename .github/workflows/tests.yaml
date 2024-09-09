@@ -1,4 +1,4 @@
-name: My name is
+name: My
 
 on: 
   pull_request:
