@@ -1,4 +1,6 @@
-name: "a\na"
+name: |
+  My name is
+  GitHub Actions
 
 on: 
   pull_request:
