@@ -4,7 +4,7 @@ on:
       - main
 
 jobs:
-devflow:
+  devflow:
     runs-on: ubuntu-latest
     steps:
     - name: Context
