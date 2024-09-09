@@ -17,7 +17,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@master
     - name: "Run tests"
-      uses: okteto/test@latest
+      uses: okteto/test@jlo/fix-fithub-multiline-envvars
       env:
         MY_VAR: |
           Line 1
