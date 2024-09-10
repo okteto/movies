@@ -1,5 +1,4 @@
-name: My Abuelo Es Bacano
-
+name: "My Abuelo "
 on: 
   pull_request:
     branches:
@@ -20,4 +19,5 @@ jobs:
       uses: okteto/test@jlo/fix-fithub-multiline-envvars
       with:
         tests: "worker"
+        variables: "USER=im the admin,PASS=admin"
         log-level: "debug"
