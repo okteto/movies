@@ -1,4 +1,4 @@
-FROM node:16 AS dev
+FROM node:20 AS dev
 
 # setup okteto message
 COPY bashrc /root/.bashrc
