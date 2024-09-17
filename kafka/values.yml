@@ -1,10 +1,14 @@
-zookeeper:
-  persistence:
-    size: 1Gi
-
-persistence:
-  size: 1Gi
+controller:
+  replicaCount: 1
 
 listeners:
   client:
     protocol: PLAINTEXT
+
+persistence:
+  size: 1Gi
+
+zookeeper:
+  persistence:
+    size: 1Gi
+
