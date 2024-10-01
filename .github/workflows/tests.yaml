@@ -7,8 +7,6 @@ on:
 jobs:
   devflow:
     runs-on: ubuntu-latest
-    env:
-      OKTETO_CA_CERT: ${{ secrets.OKTETO_CA_CERT }}
     steps:
     - name: Context
       uses: okteto/context@latest
@@ -27,3 +25,5 @@ jobs:
         tests: "worker"
         variables: USER="im the admin",PASS="admin",COMMIT_INFO_MESSAGE="${{ env.COMMIT_INFO_MESSAGE }}"
         log-level: "debug"
+      env:
+        OKTETO_CA_CERT: ${{ secrets.OKTETO_CA_CERT }}
