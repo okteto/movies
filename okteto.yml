@@ -88,3 +88,5 @@ test:
     image: golang
     commands:
     - cd worker && printenv | grep GITHUB_
+    - echo ------------
+    - printenv
