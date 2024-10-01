@@ -14,7 +14,7 @@ jobs:
         token: ${{ secrets.OKTETO_TOKEN }}
         url: ${{ secrets.OKTETO_URL }}
     - name: checkout
-      uses: actions/checkout@maste
+      uses: actions/checkout@master
     - name: Save Git values
       run: |
           echo "COMMIT_INFO_MESSAGE=\"$(git show -s --format='%h %s')\"" >> $GITHUB_ENV
