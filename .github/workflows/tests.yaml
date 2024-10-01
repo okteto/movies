@@ -14,10 +14,14 @@ jobs:
         token: ${{ secrets.OKTETO_TOKEN }}
         url: ${{ secrets.OKTETO_URL }}
     - name: checkout
-      uses: actions/checkout@master
+      uses: actions/checkout@maste
+    - name: Save Git values
+      run: |
+          echo "COMMIT_INFO_MESSAGE=\"$(git show -s --format='%h %s')\"" >> $GITHUB_ENV
+      shell: bash
     - name: "Run tests"
       uses: okteto/test@jlo/fix-fithub-multiline-envvars
       with:
         tests: "worker"
-        variables: "USER=im the admin,PASS=admin"
+        variables: USER="im the admin",PASS="admin",COMMIT_INFO_MESSAGE="${{ env.COMMIT_INFO_MESSAGE }}"
         log-level: "debug"
