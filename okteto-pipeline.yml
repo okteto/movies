@@ -1,5 +1,5 @@
 icon: https://apps.okteto.com/movies/icon.png
 deploy:
-  - okteto build -t okteto.dev/api:${OKTETO_GIT_COMMIT} api
-  - okteto build -t okteto.dev/frontend:${OKTETO_GIT_COMMIT} frontend
+  - okteto build -t okteto.dev/api:${OKTETO_GIT_COMMIT} -f api/Dockerfile api
+  - okteto build -t okteto.dev/frontend:${OKTETO_GIT_COMMIT} -f frontend/Dockerfile frontend
   - helm upgrade --install movies chart --set tag=${OKTETO_GIT_COMMIT}
