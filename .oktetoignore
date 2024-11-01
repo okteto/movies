@@ -1,3 +1,13 @@
-.git
-.github
-.vscode
+// Ignore all other files and folders
+**
+
+// Synch chart folders
+!api/chart
+!catalog/chart
+!frontend/chart
+!kafka
+!mongodb
+!postgresql
+!rent/chart
+!worker/chart
+
