@@ -1,7 +1,7 @@
 auth:
   username: okteto
   password: okteto
-  database: votes
+  database: rentals
 
 primary:
   persistence:
