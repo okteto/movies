@@ -50,6 +50,7 @@ dev:
       - /root/.m2
     forward:
       - 5005:5005
+      - 5432:postgresql:5432
   api:
     image: okteto/golang:1.22
     command: bash

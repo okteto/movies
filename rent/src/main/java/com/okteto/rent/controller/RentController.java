@@ -33,11 +33,11 @@ public class RentController {
     @PostMapping(path= "/rent", consumes = "application/json", produces = "application/json")
     List<String> rent(@RequestBody Rent rentInput) {
         String catalogID = rentInput.getMovieID();
-        String price = rentInput.getPrice();
-
+        Double price = rentInput.getPrice();
+        price *= 0.80;
         logger.info("Rent [{},{}] received", catalogID, price);
 
-        kafkaTemplate.send(KAFKA_TOPIC, catalogID, price)
+        kafkaTemplate.send(KAFKA_TOPIC, catalogID, price.toString())
         .thenAccept(result -> logger.info("Message [{}] delivered with offset {}",
                         catalogID,
                         result.getRecordMetadata().offset()))
@@ -53,7 +53,7 @@ public class RentController {
     public static class Rent {
         @JsonProperty("catalog_id")
         private String movieID;
-        private String price;
+        private Double price;
 
         public void setMovieID(String movieID) {
             this.movieID = movieID;
@@ -64,11 +64,11 @@ public class RentController {
         }
 
 
-        public void setPrice(String price) {
+        public void setPrice(Double price) {
             this.price = price;
         }
 
-        public String getPrice() {
+        public Double getPrice() {
             return price;
         }
     }

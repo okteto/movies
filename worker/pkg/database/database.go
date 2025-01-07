@@ -12,7 +12,7 @@ const (
 	port     = 5432
 	user     = "okteto"
 	password = "okteto"
-	dbname   = "votes"
+	dbname   = "rentals"
 )
 
 func Open() *sql.DB {
