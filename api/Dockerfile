@@ -1,11 +1,5 @@
 FROM golang:buster as dev
 
-# setup okteto message
-COPY bashrc /root/.bashrc
-
-RUN go install github.com/go-delve/delve/cmd/dlv@latest && \
-    curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b /usr/bin
-
 WORKDIR /usr/src/app
 
 ADD go.mod go.sum ./
