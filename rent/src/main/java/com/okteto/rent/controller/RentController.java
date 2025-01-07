@@ -36,6 +36,8 @@ public class RentController {
         String catalogID = rentInput.getMovieID();
         Double price = rentInput.getPrice();
 
+        // discount by 25% to celebrate 2025
+        price = price * 0.75;
         logger.info("Rent [{},{}] received", catalogID, price);
 
         kafkaTemplate.send(KAFKA_TOPIC_RENTALS, catalogID, price.toString())
