@@ -6,14 +6,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,29 +31,21 @@ public class RentController {
     }
     
     @PostMapping(path= "/rent", consumes = "application/json", produces = "application/json")
-    List<String> rent(@RequestBody Rent rentInput, HttpServletResponse response) {
+    List<String> rent(@RequestBody Rent rentInput) {
         String catalogID = rentInput.getMovieID();
         String price = rentInput.getPrice();
 
         logger.info("Rent [{},{}] received", catalogID, price);
 
-        ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send(KAFKA_TOPIC, catalogID, price);
-
-        future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
-            @Override
-            public void onSuccess(SendResult<String, String> result) {
-                logger.info("Message [{}] delivered with offset {}",
+        kafkaTemplate.send(KAFKA_TOPIC, catalogID, price)
+        .thenAccept(result -> logger.info("Message [{}] delivered with offset {}",
                         catalogID,
-                        result.getRecordMetadata().offset());
-            }
-
-            @Override
-            public void onFailure(Throwable ex) {
-                logger.warn("Unable to deliver message [{}]. {}",
-                        catalogID,
-                        ex.getMessage());
-            }
+                        result.getRecordMetadata().offset()))
+        .exceptionally(ex -> {
+            logger.warn("Unable to deliver message [{}]. {}", catalogID, ex.getMessage());
+            return null;
         });
+        
 
         return new LinkedList<>();
     }

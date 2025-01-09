@@ -1,0 +1,3 @@
+deploy:
+  - name: Deploy Kafka
+    command:  helm upgrade --install kafka oci://registry-1.docker.io/bitnamicharts/kafka -f values.yml --version 26.8.3

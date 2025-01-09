@@ -24,18 +24,18 @@ Before creating a database snapshot you will need to create an instance of the d
 4. In another terminal, connect to database using psql:
 
    ```
-   $ psql -h localhost -p 5432 -U okteto -d votes
+   $ psql -h localhost -p 5432 -U okteto -d rentals
    Password for user okteto:  #The password is "okteto"
    psql (14.5 (Ubuntu 14.5-0ubuntu0.22.04.1), server 14.4)
    Type "help" for help.
 
-   votes=>
+   rentals=>
    ```
 
 5. Modify the data as needed for your purposes. In this example, we'll just update the last-name column to a static value but you can make any needed modifications here.
 
    ```
-   votes=> UPDATE users SET last_name='testing-snapshot';
+   rentals=> UPDATE users SET last_name='testing-snapshot';
    ```
 
 ### Create VolumeSnapshot

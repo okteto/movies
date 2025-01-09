@@ -16,5 +16,5 @@ LICENSE
 !/**/chart
 !/**/chart/**
 !/kafka
-!mongodb
-!postgresql
+!/mongodb
+!/postgresql
