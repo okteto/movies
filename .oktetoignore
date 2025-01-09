@@ -1,0 +1,23 @@
+.github
+.vscode
+docs
+/*.png
+/*.svg
+LICENSE
+/README.md
+.gitignore
+
+[deploy]
+# we ignore all the source code since this is only needed during build
+api
+catalog
+frontend
+rent
+worker
+
+# we re-include the chart folders since we need those during deployment
+!api/chart
+!catalog/chart
+!frontend/chart
+!rent/chart
+!worker/chart
