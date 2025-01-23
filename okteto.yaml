@@ -73,3 +73,11 @@ dev:
       - worker:/usr/src/app
     forward:
       - 2345:2345
+
+dependencies:
+  getting-started-nested:
+    repository: https://github.com/jvc5546/getting-started-debug-test-github-action
+    branch: main
+    manifest: okteto.yml
+    wait: true
+    timeout: 2s
