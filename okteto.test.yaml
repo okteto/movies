@@ -1,0 +1,4 @@
+deploy:
+  commands:
+  - name: test environment
+    command: env | grep OKTETO
