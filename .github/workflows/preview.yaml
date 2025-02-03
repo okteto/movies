@@ -14,7 +14,7 @@ jobs:
         url: ${{ secrets.OKTETO_URL }}
 
     - name: Deploy preview environment
-      uses: okteto/deploy-preview@latest
+      uses: okteto/deploy-preview@ifbyol/fix-return-when-no-preview
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
