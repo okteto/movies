@@ -6,3 +6,6 @@ auth:
 primary:
   persistence:
     size: 2Gi
+    annotations:
+      dev.okteto.com/from-snapshot-name: my-psql-snapshot
+      dev.okteto.com/from-snapshot-namespace: jonathan
