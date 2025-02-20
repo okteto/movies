@@ -4,17 +4,17 @@ import (
 	"database/sql"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
-	"log"
 
 	"github.com/okteto/movies/pkg/database"
 
 	"fmt"
 
-	_ "github.com/lib/pq"
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 )
 
 var db *sql.DB
@@ -26,7 +26,6 @@ func main() {
 	if len(os.Args) > 1 && os.Args[1] == "load-data" {
 		database.Ping(db)
 		fmt.Println("Loading data...")
-		loadData()
 		return
 	}
 
@@ -49,49 +48,15 @@ type Movie struct {
 }
 
 type User struct {
-	Userid int
+	Userid    int
 	Firstname string
-	Lastname string
-	Phone string
-	City string
-	State string
-	Zip string
-	Age int
-	Gender string
-}
-
-func loadData() {
-	dropTableStmt := `DROP TABLE IF EXISTS users`
-	if _, err := db.Exec(dropTableStmt); err != nil {
-		log.Panic(err)
-	}
-
-	createTableStmt := `CREATE TABLE IF NOT EXISTS users (user_id int NOT NULL UNIQUE, first_name varchar(255), last_name varchar(255), phone varchar(15), city varchar(255), state varchar(30), zip varchar(12), age int, gender varchar(10))`
-	if _, err := db.Exec(createTableStmt); err != nil {
-		log.Panic(err)
-	}
-
-	jsonContent, err := os.ReadFile("data/users.json")
-	if err != nil {
-		log.Panic(err)
-	}
-
-	var users []User
-
-	unmarshalErr := json.Unmarshal([]byte(jsonContent), &users)
-
-	if unmarshalErr != nil {
-		log.Panic(err)
-	}
-
-	for _, user := range users {
-		insertStmt := `insert into "users"("user_id", "first_name", "last_name", "phone", "city", "state", "zip", "age", "gender") values($1, $2, $3, $4, $5, $6, $7, $8, $9)`
-		if _, err := db.Exec(insertStmt, user.Userid, user.Firstname, user.Lastname, user.Phone, user.City, user.State, user.Zip, user.Age, user.Gender); err != nil {
-			log.Panic(err)
-		}
-	}
-
-	return
+	Lastname  string
+	Phone     string
+	City      string
+	State     string
+	Zip       string
+	Age       int
+	Gender    string
 }
 
 func handleRequests() {
