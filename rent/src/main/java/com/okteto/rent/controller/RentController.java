@@ -18,7 +18,8 @@ import java.util.Collections;
 
 @RestController
 public class RentController {
-    private static final String KAFKA_TOPIC = "rentals";
+    private static final String KAFKA_TOPIC_RENTALS = "rentals";
+    private static final String KAFKA_TOPIC_RETURNS = "returns";
 
     private final Logger logger = LoggerFactory.getLogger(RentController.class);
 
@@ -37,7 +38,7 @@ public class RentController {
 
         logger.info("Rent [{},{}] received", catalogID, price);
 
-        kafkaTemplate.send(KAFKA_TOPIC, catalogID, price)
+        kafkaTemplate.send(KAFKA_TOPIC_RENTALS, catalogID, price)
         .thenAccept(result -> logger.info("Message [{}] delivered with offset {}",
                         catalogID,
                         result.getRecordMetadata().offset()))
@@ -48,6 +49,24 @@ public class RentController {
         
 
         return new LinkedList<>();
+    }
+
+    @PostMapping(path= "/rent/return", consumes = "application/json", produces = "application/json")
+    public Map<String, String> returnMovie(@RequestBody ReturnRequest returnRequest) {
+        String catalogID = returnRequest.getMovieID();
+
+        logger.info("Return [{}] received", catalogID);
+
+        kafkaTemplate.send(KAFKA_TOPIC_RETURNS, catalogID, catalogID)
+        .thenAccept(result -> logger.info("Return message [{}] delivered with offset {}",
+                        catalogID,
+                        result.getRecordMetadata().offset()))
+        .exceptionally(ex -> {
+            logger.warn("Unable to deliver return message [{}]. {}", catalogID, ex.getMessage());
+            return null;
+        });
+
+        return Collections.singletonMap("status", "return processed");
     }
 
     public static class Rent {
@@ -70,6 +89,19 @@ public class RentController {
 
         public String getPrice() {
             return price;
+        }
+    }
+
+    public static class ReturnRequest {
+        @JsonProperty("catalog_id")
+        private String movieID;
+
+        public void setMovieID(String movieID) {
+            this.movieID = movieID;
+        }
+
+        public String getMovieID() {
+            return movieID;
         }
     }
 }
