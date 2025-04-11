@@ -58,6 +58,21 @@ class App extends Component {
     this.refreshData();
   }
 
+  handleReturn = async (item) =>{
+    await fetch('/rent/return', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        catalog_id: item.id
+      })
+    });
+    this.refreshData();
+
+  }
+  
+
   refreshData = async () => {
     const catalogPromise = fetch('/catalog')
       .then(res => res.json())
@@ -132,12 +147,14 @@ class App extends Component {
                     cost={cost}
                     titles={rental.data}
                     loaded={rental.loaded}
+                    onReturn={this.handleReturn}
                   />
                   <TitleList
                     title="Store"
                     titles={catalog.data}
                     loaded={catalog.loaded}
                     onRent={this.handleRent}
+
                   />
                 </div>
               </Route>
@@ -173,7 +190,7 @@ const DevToast = () => {
 
 class TitleList extends Component {
   renderList() {
-    const { titles = [], loaded, onRent } = this.props;
+    const { titles = [], loaded, onRent, onReturn } = this.props;
     const movies = titles.filter(item => !item?.rented);
 
     if (loaded) {
@@ -193,6 +210,7 @@ class TitleList extends Component {
             item={item}
             backdrop={backDrop}
             onRent={onRent}
+            onReturn={onReturn}
           />
         );
       });
@@ -220,7 +238,7 @@ class TitleList extends Component {
   }
 }
 
-const Item = ({ item, onRent, backdrop }) => {
+const Item = ({ item, onRent, onReturn, backdrop }) => {
   return (
     <div className="Item">
       <div className="Item__container" style={{ backgroundImage: `url(./${backdrop})` }}>
@@ -242,7 +260,7 @@ const Item = ({ item, onRent, backdrop }) => {
               <div className="Item__button Item__button--rented button">
                 Watch Now
               </div>
-              <div className="Item__button button" onClick={() => handleReturn(item)}>
+              <div className="Item__button button" onClick={() => onReturn(item)}>
                 Return
               </div>
             </>
@@ -251,32 +269,6 @@ const Item = ({ item, onRent, backdrop }) => {
       </div>
     </div>
   );
-}
-
-function handleReturn(item) {
-  fetch('/rent/return', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      catalog_id: item.id
-    })
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log(`Returned movie with ID: ${item.id}`);
-    // Refresh data to update the UI
-    this.refreshData();
-  })
-  .catch(error => {
-    console.error('There was a problem with the return request:', error);
-  });
 }
 
 const CartIcon = () => {
