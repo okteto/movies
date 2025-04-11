@@ -242,12 +242,41 @@ const Item = ({ item, onRent, backdrop }) => {
               <div className="Item__button Item__button--rented button">
                 Watch Now
               </div>
+              <div className="Item__button button" onClick={() => handleReturn(item)}>
+                Return
+              </div>
             </>
           }
         </div>
       </div>
     </div>
   );
+}
+
+function handleReturn(item) {
+  fetch('/rent/return', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      catalog_id: item.id
+    })
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log(`Returned movie with ID: ${item.id}`);
+    // Refresh data to update the UI
+    this.refreshData();
+  })
+  .catch(error => {
+    console.error('There was a problem with the return request:', error);
+  });
 }
 
 const CartIcon = () => {

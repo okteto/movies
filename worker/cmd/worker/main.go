@@ -41,7 +41,14 @@ func main() {
 	master := kafka.GetMaster()
 	defer master.Close()
 
-	consumer, err := master.ConsumePartition(*topic, 0, sarama.OffsetOldest)
+	// Consumer for "rentals" topic
+	consumerRentals, err := master.ConsumePartition("rentals", 0, sarama.OffsetOldest)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	// Consumer for "returns" topic
+	consumerReturns, err := master.ConsumePartition("returns", 0, sarama.OffsetOldest)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -49,18 +56,25 @@ func main() {
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, os.Interrupt)
 	doneCh := make(chan struct{})
+
 	go func() {
 		for {
 			select {
-			case err := <-consumer.Errors():
+			case err := <-consumerRentals.Errors():
 				fmt.Println(err)
-			case msg := <-consumer.Messages():
+			case msg := <-consumerRentals.Messages():
 				*messageCountStart++
 				fmt.Printf("Received message: movies %s price %s\n", string(msg.Key), string(msg.Value))
 				price, _ := strconv.ParseFloat(string(msg.Value), 64)
-				// price *= 0.5
 				insertDynStmt := `insert into "rentals"("id", "price") values($1, $2) on conflict(id) do update set price = $2`
 				if _, err := db.Exec(insertDynStmt, string(msg.Key), fmt.Sprintf("%f", price)); err != nil {
+					log.Panic(err)
+				}
+			case msg := <-consumerReturns.Messages():
+				catalogID := string(msg.Value)
+				fmt.Printf("Received return message: catalogID %s\n", catalogID)
+				deleteStmt := `DELETE FROM rentals WHERE id = $1`
+				if _, err := db.Exec(deleteStmt, catalogID); err != nil {
 					log.Panic(err)
 				}
 			case <-signals:
