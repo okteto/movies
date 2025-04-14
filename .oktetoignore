@@ -1,13 +1,20 @@
-// Ignore all other files and folders
-**
+.github
+.vscode
+docs
+/*.png
+/*.svg
+LICENSE
+/README.md
+.gitignore
 
-// Synch chart folders
-!api/chart
-!catalog/chart
-!frontend/chart
-!kafka
-!mongodb
-!postgresql
-!rent/chart
-!worker/chart
+[deploy]
+# ignore all files and subfolders
+*
+*/
 
+# Then explicitly allow what we need for remote deploying
+!/**/chart
+!/**/chart/**
+!/kafka
+!/mongodb
+!/postgresql
