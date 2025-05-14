@@ -13,4 +13,7 @@
 
 
 [test]
-!tests/tests
+!tests/tests/main.spec.js
+!tests/tests/Dockerfile
+!tests/tests/package.json
+!tests/tests/playwright.config.js

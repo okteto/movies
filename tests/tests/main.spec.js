@@ -14,3 +14,23 @@ test('movies has title', async ({ page }) => {
   // The page title
   await expect(page).toHaveTitle('Movies');
 });
+
+test('catalog has entries', async ({ request }) => {
+    const apiUrl = `https://movies-${process.env.OKTETO_NAMESPACE}.${process.env.OKTETO_DOMAIN}/catalog`;
+    const response = await request.get(apiUrl);
+    expect(response.status()).toBe(200);
+    const data = await response.json();
+    expect(data.length).toBe(6);
+
+    const expectedTitles = [
+    'Moby Dock',
+    'The Finalizer',
+    'Crash Loop Backoff',
+    'Kube',
+    'Cloud Atlas',
+    'Aliens'
+  ];
+
+  const actualTitles = data.map(item => item.original_title);
+  expect(actualTitles).toEqual(expectedTitles);  
+});
