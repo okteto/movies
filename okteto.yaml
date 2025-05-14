@@ -11,6 +11,8 @@ build:
     context: api
   worker:
     context: worker
+  tests:
+    context: tests
 
 deploy:
   - name: Deploy PostgreSQL
@@ -73,3 +75,16 @@ dev:
       - worker:/usr/src/app
     forward:
       - 2345:2345
+test:
+  e2e:
+    image: ${OKTETO_BUILD_TESTS_IMAGE}
+    context: tests
+    caches:
+      - yarn/.cache
+      - node_modules
+    commands:
+      - yarn install
+      - yarn test
+    artifacts:
+      - test-results
+      - playwright-report
