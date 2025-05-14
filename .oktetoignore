@@ -11,3 +11,6 @@
 !rent/chart
 !worker/chart
 
+
+[test]
+!tests/tests
