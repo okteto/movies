@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"fmt"
+	"time"
 
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 
@@ -16,6 +17,8 @@ func GetMaster() sarama.Consumer {
 	kingpin.Parse()
 	config := sarama.NewConfig()
 	config.Consumer.Return.Errors = true
+	config.Consumer.Offsets.AutoCommit.Enable = true
+	config.Consumer.Offsets.AutoCommit.Interval = 1 * time.Second
 	brokers := *brokerList
 	fmt.Println("Waiting for kafka...")
 	for {

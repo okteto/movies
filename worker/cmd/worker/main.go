@@ -42,13 +42,13 @@ func main() {
 	defer master.Close()
 
 	// Consumer for "rentals" topic
-	consumerRentals, err := master.ConsumePartition("rentals", 0, sarama.OffsetOldest)
+	consumerRentals, err := master.ConsumePartition("rentals", 0, sarama.OffsetNewest)
 	if err != nil {
 		log.Panic(err)
 	}
 
 	// Consumer for "returns" topic
-	consumerReturns, err := master.ConsumePartition("returns", 0, sarama.OffsetOldest)
+	consumerReturns, err := master.ConsumePartition("returns", 0, sarama.OffsetNewest)
 	if err != nil {
 		log.Panic(err)
 	}
