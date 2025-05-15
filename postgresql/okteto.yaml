@@ -1,6 +1,8 @@
 deploy:
   - name: Deploy PostgreSQL
     command: |
+      env
+      
       if [ -z $DB_SNAPSHOT_NAME ]; then
         helm upgrade --install postgresql oci://registry-1.docker.io/bitnamicharts/postgresql -f values.yml --version 13.4.4 
       else
