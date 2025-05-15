@@ -4,6 +4,7 @@ deploy:
       if [ -z $DB_SNAPSHOT_NAME ]; then
         helm upgrade --install postgresql oci://registry-1.docker.io/bitnamicharts/postgresql -f values.yml --version 13.4.4 
       else
+        echo "using volume snapshot $DB_SNAPSHOT_NAMESPACE/$DB_SNAPSHOT_NAME"
         helm upgrade --install postgresql oci://registry-1.docker.io/bitnamicharts/postgresql -f values.yml --version 13.4.4 \
         --set primary.persistence.annotations."dev\.okteto\.com/from-snapshot-name"="$DB_SNAPSHOT_NAME" \
         --set primary.persistence.annotations."dev\.okteto\.com/from-snapshot-namespace"="$DB_SNAPSHOT_NAMESPACE"
