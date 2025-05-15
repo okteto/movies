@@ -35,6 +35,7 @@ deploy:
 dev:
   frontend:
     image: okteto/node:20
+    workdir: /usr/src/app
     command: bash
     sync:
       - frontend:/usr/src/app
@@ -46,6 +47,7 @@ dev:
       - 9229:9229
   rent:
     command: mvn spring-boot:run
+    workdir: /app
     sync:
       - rent:/app
     volumes:
@@ -55,6 +57,7 @@ dev:
       - 5432:postgresql:5432
   api:
     image: okteto/golang:1.22
+    workdir: /usr/src/app
     command: bash
     securityContext:
       capabilities:
@@ -66,6 +69,7 @@ dev:
       - 2346:2345
   worker:
     image: okteto/golang:1.22
+    workdir: /usr/src/app
     command: bash
     securityContext:
       capabilities:
