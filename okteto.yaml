@@ -16,7 +16,7 @@ build:
 
 deploy:
   - name: Deploy PostgreSQL
-    command: okteto deploy -f postgresql/okteto.yaml
+    command: okteto deploy -f postgresql/okteto.yaml --var DB_SNAPSHOT_NAME=$DB_SNAPSHOT_NAME --var DB_SNAPSHOT_NAMESPACE=$DB_SNAPSHOT_NAMESPACE
   - name: Deploy Kafka
     command: okteto deploy -f kafka/okteto.yaml
   - name: Deploy MongoDB
