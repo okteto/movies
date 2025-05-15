@@ -17,6 +17,13 @@ spec:
                 name: api
                 port:
                   number: 8080
+          - path: /rentals-history
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 8080
           - path: /users
             pathType: Prefix
             backend:

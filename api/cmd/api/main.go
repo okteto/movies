@@ -3,18 +3,19 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
-	"log"
 
 	"github.com/okteto/movies/pkg/database"
 
 	"fmt"
 
-	_ "github.com/lib/pq"
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 )
 
 var db *sql.DB
@@ -39,6 +40,14 @@ type Rental struct {
 	Price string
 }
 
+type RentalHistory struct {
+	ID        int
+	MovieID   string
+	Price     string
+	CreatedAt string
+	Title     string
+}
+
 type Movie struct {
 	ID            int     `json:"id,omitempty"`
 	VoteAverage   float64 `json:"vote_average,omitempty"`
@@ -49,15 +58,15 @@ type Movie struct {
 }
 
 type User struct {
-	Userid int
+	Userid    int
 	Firstname string
-	Lastname string
-	Phone string
-	City string
-	State string
-	Zip string
-	Age int
-	Gender string
+	Lastname  string
+	Phone     string
+	City      string
+	State     string
+	Zip       string
+	Age       int
+	Gender    string
 }
 
 func loadData() {
@@ -90,14 +99,13 @@ func loadData() {
 			log.Panic(err)
 		}
 	}
-
-	return
 }
 
 func handleRequests() {
 	muxRouter := mux.NewRouter().StrictSlash(true)
 
 	muxRouter.HandleFunc("/rentals", rentals)
+	muxRouter.HandleFunc("/rentals-history", rentalsHistory)
 	muxRouter.HandleFunc("/users", allUsers)
 	muxRouter.HandleFunc("/users/{userid}", singleUser)
 
@@ -165,6 +173,72 @@ func rentals(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Returned", result)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(result)
+}
+
+func rentalsHistory(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Received request...")
+
+	rows, err := db.Query("SELECT id, movie_id, price, rented_at FROM rentals_history")
+	if err != nil {
+		fmt.Println("error listing rentals history", err)
+		w.WriteHeader(500)
+		return
+	}
+	defer rows.Close()
+
+	var rentalsHistory []RentalHistory
+
+	for rows.Next() {
+		var r RentalHistory
+		if err := rows.Scan(&r.ID, &r.MovieID, &r.Price, &r.CreatedAt); err != nil {
+			fmt.Println("error scanning row", err)
+			os.Exit(1)
+		}
+		rentalsHistory = append(rentalsHistory, r)
+	}
+	if err = rows.Err(); err != nil {
+		fmt.Println("error in rows", err)
+		os.Exit(1)
+	}
+
+	resp, err := http.Get("http://catalog:8080/catalog")
+	if err != nil {
+		fmt.Println("error listing catalog", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("error reading catalog", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	movies := []Movie{}
+	if err := json.Unmarshal(body, &movies); err != nil {
+		fmt.Println("error unmarshaling catalog", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	movieTitles := make(map[int]string)
+	for _, m := range movies {
+		movieTitles[m.ID] = m.OriginalTitle
+	}
+
+	for i, _ := range rentalsHistory {
+		movieId, err := strconv.Atoi(rentalsHistory[i].MovieID)
+		if err != nil {
+			continue
+		}
+
+		rentalsHistory[i].Title = movieTitles[movieId]
+	}
+
+	fmt.Println("Returned", rentalsHistory)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(rentalsHistory)
 }
 
 func allUsers(w http.ResponseWriter, r *http.Request) {

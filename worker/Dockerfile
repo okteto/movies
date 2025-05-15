@@ -1,10 +1,9 @@
-FROM golang:buster as dev
+FROM golang:buster AS dev
 
 WORKDIR /usr/src/app
 
 ADD go.mod go.sum ./
 RUN go mod download all
-
 
 ADD . .
 RUN CGO_ENABLED=0 GOOS=linux go build -v -o /usr/local/bin/worker cmd/worker/main.go
