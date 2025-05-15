@@ -11,7 +11,7 @@ This example shows how to leverage [Okteto](https://github.com/okteto/okteto) to
 - A [Kafka](https://bitnami.com/stack/kafka/helm) queue
 - A [PostgresQL](https://bitnami.com/stack/postgresql/helm) database
 
-![Architecture diagram](architecture-diagram.png)
+![Architecture diagram](docs/architecture-diagram.png)
 
 ## Development container demo script
 
