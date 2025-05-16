@@ -66,7 +66,10 @@ const Table = ({ rentalsHistory }) => {
                   Object.keys(rentalHistory).map((property) => {
                     return (
                     <td className="Table__data" key={`${rentalHistory.id}--${property}`}>
-                      {rentalHistory[property]}
+                      {property === 'Price' 
+                        ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(rentalHistory[property])
+                        : rentalHistory[property]
+                      }
                     </td>
                     )
                   })
@@ -92,17 +95,26 @@ const Pagination = (props) => {
     setCurrentPage,
   } = props;
 
-  const [pageNumbers, setPageNumbers] = useState([...Array(totalPages + 1).keys()].slice(1, 11));
+  const [pageNumbers, setPageNumbers] = useState([]);
 
   const handlePageNumbers = () => {
-    const start = totalPages - currentPage < 9 ? totalPages - 9 : currentPage > 8 ? currentPage - 5 : 1;
-    const end = start + 10;
-    setPageNumbers([...Array(totalPages + 1).keys()].slice(start, end))
+    const maxVisiblePages = 10;
+    let start = 1;
+    let end = Math.min(maxVisiblePages, totalPages);
+
+    if (totalPages > maxVisiblePages) {
+      if (currentPage > 5) {
+        start = Math.min(currentPage - 4, totalPages - maxVisiblePages + 1);
+        end = start + maxVisiblePages - 1;
+      }
+    }
+
+    setPageNumbers(Array.from({ length: end - start + 1 }, (_, i) => start + i));
   }
 
   useEffect(() => {
-    return handlePageNumbers();
-  }, [currentPage]);
+    handlePageNumbers();
+  }, [currentPage, totalPages]);
 
   const setPage = {
     prevPage: function () {
