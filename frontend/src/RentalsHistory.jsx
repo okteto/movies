@@ -22,7 +22,8 @@ const RentalsHistory = () => {
     <div className="RentalsHistory">
         <h1>Rentals History </h1>
       { loading && <Loader />}
-      { !!rentalsHistory.length && <Table rentalsHistory={rentalsHistory} /> }
+      { !loading && rentalsHistory.length === 0 && <p>No rentals found</p> }
+      { !loading && rentalsHistory.length > 0 && <Table rentalsHistory={rentalsHistory} /> }
     </div>
   )
 };
