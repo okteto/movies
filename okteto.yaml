@@ -16,7 +16,7 @@ build:
 
 deploy:
   - name: Deploy PostgreSQL
-    command: okteto deploy -f postgresql/okteto.yaml
+    command: okteto deploy -f postgresql/okteto.yaml --var DB_SNAPSHOT_NAME=$DB_SNAPSHOT_NAME --var DB_SNAPSHOT_NAMESPACE=$DB_SNAPSHOT_NAMESPACE
   - name: Deploy Kafka
     command: okteto deploy -f kafka/okteto.yaml
   - name: Deploy MongoDB
@@ -30,7 +30,7 @@ deploy:
   - name: Deploy Worker
     command: helm upgrade --install worker worker/chart --set image=${OKTETO_BUILD_WORKER_IMAGE}
   - name: Deploy API
-    command: helm upgrade --install api api/chart --set image=${OKTETO_BUILD_API_IMAGE} --set load=${API_LOAD_DATA:-true}
+    command: helm upgrade --install api api/chart --set image=${OKTETO_BUILD_API_IMAGE}
 
 dev:
   frontend:

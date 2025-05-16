@@ -1,58 +1,59 @@
 import React, { useState, useEffect } from 'react';
 import Loader from './Loader';
-import './Users.css';
+import './RentalsHistory.css';
 
-const Users = () => {
-  const [users, setUsers] = useState([]);
+const RentalsHistory = () => {
+  const [rentalsHistory, setRentalsHistory] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchUsers = async () => {
+  const fetchRentalsHistory = async () => {
     setLoading(true);
-    const reqUsers = await fetch('/users');
-    const usersResult = await reqUsers.json();
-    setUsers(usersResult);
+    const reqRentalsHistory = await fetch('/rentals-history');
+    const rentalsHistoryResult = await reqRentalsHistory.json();
+    setRentalsHistory(rentalsHistoryResult);
     return setLoading(false);
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchRentalsHistory();
   }, []);
 
   return (
-    <div className="Users">
-        <h1>Users </h1>
+    <div className="RentalsHistory">
+        <h1>Rentals History </h1>
       { loading && <Loader />}
-      { !!users.length && <Table users={users} /> }
+      { !loading && rentalsHistory.length === 0 && <p>No rentals found</p> }
+      { !loading && rentalsHistory.length > 0 && <Table rentalsHistory={rentalsHistory} /> }
     </div>
   )
 };
 
-const Table = ({ users }) => {
-  const allUsers = [...users];
-  const [currentUsers, setCurrentUsers] = useState(allUsers.slice(0, 100));
+const Table = ({ rentalsHistory }) => {
+  const allRentalsHistory = [...rentalsHistory];
+  const [currentRentalHistory, setCurrentRentalsHistory] = useState(allRentalsHistory.slice(0, 100));
   const [currentPage, setCurrentPage] = useState(1);
 
-  const pageSize = 100;
-  const totalPages = Math.ceil(allUsers.length / pageSize);
+  const pageSize = 10;
+  const totalPages = Math.ceil(allRentalsHistory.length / pageSize);
 
   useEffect(() => {
-    handleUsersToDisplay();
+    handleRentalsHistoryToDisplay();
   }, [currentPage]);
 
-  const handleUsersToDisplay = () => {
+  const handleRentalsHistoryToDisplay = () => {
     const endIndex = currentPage * pageSize;
     const startIndex = endIndex - pageSize;
-    setCurrentUsers(allUsers.slice(startIndex, endIndex));
+    setCurrentRentalsHistory(allRentalsHistory.slice(startIndex, endIndex));
   }
 
   return (
     <div className="Table">
-      <h5>Total Users: {allUsers.length ? allUsers.length : '0'}</h5>
+      <h5>Total Users: {allRentalsHistory.length ? allRentalsHistory.length : '0'}</h5>
       <table className='Table__table'>
         <thead className="Table__head">
           <tr className="Table__row">
             {
-              Object.keys(allUsers[0]).map((key) => {
+              Object.keys(allRentalsHistory[0]).map((key) => {
                 return <th className="Table__header" key={key}>{key}</th>
               })
             }
@@ -60,13 +61,16 @@ const Table = ({ users }) => {
         </thead>
         <tbody className="Table__body">
           {
-            currentUsers.map((user) => (
-              <tr className="Table__row" key={user.Userid}>
+            currentRentalHistory.map((rentalHistory) => (
+              <tr className="Table__row" key={rentalHistory.id}>
                 {
-                  Object.keys(user).map((property) => {
+                  Object.keys(rentalHistory).map((property) => {
                     return (
-                    <td className="Table__data" key={`${user.Userid}--${property}`}>
-                      {user[property]}
+                    <td className="Table__data" key={`${rentalHistory.id}--${property}`}>
+                      {property === 'Price' 
+                        ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(rentalHistory[property])
+                        : rentalHistory[property]
+                      }
                     </td>
                     )
                   })
@@ -92,17 +96,26 @@ const Pagination = (props) => {
     setCurrentPage,
   } = props;
 
-  const [pageNumbers, setPageNumbers] = useState([...Array(totalPages + 1).keys()].slice(1, 11));
+  const [pageNumbers, setPageNumbers] = useState([]);
 
   const handlePageNumbers = () => {
-    const start = totalPages - currentPage < 9 ? totalPages - 9 : currentPage > 8 ? currentPage - 5 : 1;
-    const end = start + 10;
-    setPageNumbers([...Array(totalPages + 1).keys()].slice(start, end))
+    const maxVisiblePages = 10;
+    let start = 1;
+    let end = Math.min(maxVisiblePages, totalPages);
+
+    if (totalPages > maxVisiblePages) {
+      if (currentPage > 5) {
+        start = Math.min(currentPage - 4, totalPages - maxVisiblePages + 1);
+        end = start + maxVisiblePages - 1;
+      }
+    }
+
+    setPageNumbers(Array.from({ length: end - start + 1 }, (_, i) => start + i));
   }
 
   useEffect(() => {
-    return handlePageNumbers();
-  }, [currentPage]);
+    handlePageNumbers();
+  }, [currentPage, totalPages]);
 
   const setPage = {
     prevPage: function () {
@@ -176,4 +189,4 @@ const CaretIcon = (props) => {
   );
 }
 
-export default Users;
+export default RentalsHistory;

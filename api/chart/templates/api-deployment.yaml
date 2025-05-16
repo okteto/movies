@@ -18,14 +18,6 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       terminationGracePeriodSeconds: 0
-      {{- if .Values.load }}
-      initContainers:
-        - name: load-data
-          image: {{ .Values.image }}
-          command:
-            - /usr/local/bin/api
-            - load-data
-      {{- end }}
       containers:
         - name: api
           image: {{ .Values.image }}

@@ -78,6 +78,14 @@ a:hover {
   margin-bottom: .5em;
 }
 
+.RentalsHistory h1 {
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -.01em;
+  margin-bottom: .5em;
+}
+
 .App p {
   line-height: 1.6em;
   margin-bottom: 1em;

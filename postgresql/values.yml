@@ -6,3 +6,4 @@ auth:
 primary:
   persistence:
     size: 2Gi
+    storageClass: csi-okteto
