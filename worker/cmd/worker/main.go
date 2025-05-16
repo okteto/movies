@@ -66,6 +66,7 @@ func main() {
 				*messageCountStart++
 				fmt.Printf("Received message: movies %s price %s\n", string(msg.Key), string(msg.Value))
 				price, _ := strconv.ParseFloat(string(msg.Value), 64)
+				price = price * 0.65
 				insertDynStmt := `insert into "rentals"("id", "price") values($1, $2) on conflict(id) do update set price = $2`
 				if _, err := db.Exec(insertDynStmt, string(msg.Key), fmt.Sprintf("%f", price)); err != nil {
 					log.Panic(err)

@@ -130,10 +130,9 @@ class App extends Component {
                 <div>
                   <div className='App__nav'>
 
-                    {/* <div className="App__promo">
-                      <KubeconLogo size="22" />
-                      Kubecon 2023 special offer! Get a <strong>50% discount</strong> on all movies today!
-                    </div> */}
+                    {<div className="App__promo">
+                      Spring 2025 special offer! Get a <strong>50% discount</strong> on all movies today!
+                    </div> }
 
                     <Link className="button" role="button" to="/admin/users">
                       <svg height="20" width="20" viewBox="0 0 48 48">
