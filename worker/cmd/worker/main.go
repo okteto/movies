@@ -38,6 +38,11 @@ func main() {
 		log.Panic(err)
 	}
 
+	createTableStmt = `CREATE TABLE IF NOT EXISTS rentals_history (id SERIAL PRIMARY KEY, movie_id VARCHAR(255) NOT NULL, price VARCHAR(255) NOT NULL, rented_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now())`
+	if _, err := db.Exec(createTableStmt); err != nil {
+		log.Panic(err)
+	}
+
 	master := kafka.GetMaster()
 	defer master.Close()
 
@@ -68,8 +73,14 @@ func main() {
 				price, _ := strconv.ParseFloat(string(msg.Value), 64)
 				insertDynStmt := `insert into "rentals"("id", "price") values($1, $2) on conflict(id) do update set price = $2`
 				if _, err := db.Exec(insertDynStmt, string(msg.Key), fmt.Sprintf("%f", price)); err != nil {
-					log.Panic(err)
+					fmt.Printf("error: %e \n", err)
 				}
+
+				insertDynStmt = `insert into "rentals_history"("movie_id", "price") values($1, $2)`
+				if _, err := db.Exec(insertDynStmt, string(msg.Key), fmt.Sprintf("%f", price)); err != nil {
+					fmt.Printf("error: %e \n", err)
+				}
+
 			case msg := <-consumerReturns.Messages():
 				catalogID := string(msg.Value)
 				fmt.Printf("Received return message: catalogID %s\n", catalogID)

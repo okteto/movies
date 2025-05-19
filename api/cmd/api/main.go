@@ -3,40 +3,32 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
-	"log"
 
 	"github.com/okteto/movies/pkg/database"
 
 	"fmt"
 
-	_ "github.com/lib/pq"
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 )
-
-var db *sql.DB
-
-func main() {
-	db = database.Open()
-	defer db.Close()
-
-	if len(os.Args) > 1 && os.Args[1] == "load-data" {
-		database.Ping(db)
-		fmt.Println("Loading data...")
-		loadData()
-		return
-	}
-
-	fmt.Println("Running server on port 8080...")
-	handleRequests()
-}
 
 type Rental struct {
 	Movie string
 	Price string
+}
+
+type RentalHistory struct {
+	ID        int
+	MovieID   string
+	Price     string
+	CreatedAt string
+	Title     string
 }
 
 type Movie struct {
@@ -48,59 +40,18 @@ type Movie struct {
 	Overview      string  `json:"overview,omitempty"`
 }
 
-type User struct {
-	Userid int
-	Firstname string
-	Lastname string
-	Phone string
-	City string
-	State string
-	Zip string
-	Age int
-	Gender string
-}
+var db *sql.DB
 
-func loadData() {
-	dropTableStmt := `DROP TABLE IF EXISTS users`
-	if _, err := db.Exec(dropTableStmt); err != nil {
-		log.Panic(err)
-	}
+func main() {
+	db = database.Open()
+	defer db.Close()
 
-	createTableStmt := `CREATE TABLE IF NOT EXISTS users (user_id int NOT NULL UNIQUE, first_name varchar(255), last_name varchar(255), phone varchar(15), city varchar(255), state varchar(30), zip varchar(12), age int, gender varchar(10))`
-	if _, err := db.Exec(createTableStmt); err != nil {
-		log.Panic(err)
-	}
+	fmt.Println("Running server on port 8080...")
 
-	jsonContent, err := os.ReadFile("data/users.json")
-	if err != nil {
-		log.Panic(err)
-	}
-
-	var users []User
-
-	unmarshalErr := json.Unmarshal([]byte(jsonContent), &users)
-
-	if unmarshalErr != nil {
-		log.Panic(err)
-	}
-
-	for _, user := range users {
-		insertStmt := `insert into "users"("user_id", "first_name", "last_name", "phone", "city", "state", "zip", "age", "gender") values($1, $2, $3, $4, $5, $6, $7, $8, $9)`
-		if _, err := db.Exec(insertStmt, user.Userid, user.Firstname, user.Lastname, user.Phone, user.City, user.State, user.Zip, user.Age, user.Gender); err != nil {
-			log.Panic(err)
-		}
-	}
-
-	return
-}
-
-func handleRequests() {
 	muxRouter := mux.NewRouter().StrictSlash(true)
 
 	muxRouter.HandleFunc("/rentals", rentals)
-	muxRouter.HandleFunc("/users", allUsers)
-	muxRouter.HandleFunc("/users/{userid}", singleUser)
-
+	muxRouter.HandleFunc("/rentals-history", rentalsHistory)
 	log.Fatal(http.ListenAndServe(":8080", muxRouter))
 }
 
@@ -167,56 +118,75 @@ func rentals(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-func allUsers(w http.ResponseWriter, r *http.Request) {
+func rentalsHistory(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Received request...")
 
-	rows, err := db.Query("SELECT * FROM users")
+	rows, err := db.Query("SELECT id, movie_id, price, rented_at FROM rentals_history")
 	if err != nil {
-		fmt.Println("error listing users", err)
+		fmt.Println("error listing rentals history", err)
 		w.WriteHeader(500)
 		return
 	}
 	defer rows.Close()
 
-	var users []User
+	var rentalsHistory []RentalHistory
 
 	for rows.Next() {
-		var u User
-		if err := rows.Scan(&u.Userid, &u.Firstname, &u.Lastname, &u.Phone, &u.City, &u.State, &u.Zip, &u.Age, &u.Gender); err != nil {
-			log.Panic("error scanning row", err)
+		var r RentalHistory
+		if err := rows.Scan(&r.ID, &r.MovieID, &r.Price, &r.CreatedAt); err != nil {
+			fmt.Println("error scanning row", err)
+			os.Exit(1)
 		}
-		users = append(users, u)
+		rentalsHistory = append(rentalsHistory, r)
 	}
 	if err = rows.Err(); err != nil {
-		log.Panic("error in rows", err)
+		fmt.Println("error in rows", err)
+		os.Exit(1)
 	}
 
-	fmt.Println("Returned", len(users), "user records.")
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(users)
-}
+	if len(rentalsHistory) == 0 {
+		fmt.Println("no rentals history found")
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode([]RentalHistory{})
+		return
+	}
 
-func singleUser(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	userid := vars["userid"]
+	resp, err := http.Get("http://catalog:8080/catalog")
+	if err != nil {
+		fmt.Println("error listing catalog", err)
+		w.WriteHeader(500)
+		return
+	}
 
-	fmt.Println("Received request...")
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("error reading catalog", err)
+		w.WriteHeader(500)
+		return
+	}
 
-	row := db.QueryRow("SELECT * FROM users WHERE user_id = $1", userid)
+	movies := []Movie{}
+	if err := json.Unmarshal(body, &movies); err != nil {
+		fmt.Println("error unmarshaling catalog", err)
+		w.WriteHeader(500)
+		return
+	}
 
-	var user User
+	movieTitles := make(map[int]string)
+	for _, m := range movies {
+		movieTitles[m.ID] = m.OriginalTitle
+	}
 
-	if err := row.Scan(&user.Userid, &user.Firstname, &user.Lastname, &user.Phone, &user.City, &user.State, &user.Zip, &user.Age, &user.Gender); err != nil {
-		if err == sql.ErrNoRows {
-			fmt.Println("No user was found")
-			w.WriteHeader(404)
-			return
-		} else {
-			log.Panic("error scanning returned user", err)
+	for i, _ := range rentalsHistory {
+		movieId, err := strconv.Atoi(rentalsHistory[i].MovieID)
+		if err != nil {
+			continue
 		}
+
+		rentalsHistory[i].Title = movieTitles[movieId]
 	}
 
-	fmt.Println("Returned", user)
+	fmt.Println("Returned", rentalsHistory)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(user)
+	json.NewEncoder(w).Encode(rentalsHistory)
 }
