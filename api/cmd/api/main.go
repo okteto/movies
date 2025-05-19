@@ -42,14 +42,12 @@ type Movie struct {
 
 var db *sql.DB
 
-
-
 func main() {
 	db = database.Open()
 	defer db.Close()
 
 	fmt.Println("Running server on port 8080...")
-	
+
 	muxRouter := mux.NewRouter().StrictSlash(true)
 
 	muxRouter.HandleFunc("/rentals", rentals)
@@ -123,7 +121,7 @@ func rentals(w http.ResponseWriter, r *http.Request) {
 func rentalsHistory(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Received request...")
 
-	rows, err := db.Query("SELECT id, movie_id, price, rented_at FROM rentals_history WHERE id = '10000000'")
+	rows, err := db.Query("SELECT id, movie_id, price, rented_at FROM rentals_history")
 	if err != nil {
 		fmt.Println("error listing rentals history", err)
 		w.WriteHeader(500)
@@ -146,8 +144,8 @@ func rentalsHistory(w http.ResponseWriter, r *http.Request) {
 		os.Exit(1)
 	}
 
-	if (rentalsHistory == nil  || len(rentalsHistory) == 0) {
-		fmt.Println("no history found")
+	if len(rentalsHistory) == 0 {
+		fmt.Println("no rentals history found")
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode([]RentalHistory{})
 		return
