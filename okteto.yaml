@@ -15,6 +15,8 @@ build:
     context: tests
 
 deploy:
+  - name: sleep
+    command: sleep 5m
   - name: Deploy PostgreSQL
     command: okteto deploy -f postgresql/okteto.yaml
   - name: Deploy Kafka

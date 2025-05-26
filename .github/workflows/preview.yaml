@@ -19,7 +19,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         name: pr-${{ github.event.number }}-cindylopez
-        scope: global
+        timeout: 2m
 
     - name: Checkout code
       uses: actions/checkout@v4
