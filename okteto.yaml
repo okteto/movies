@@ -15,8 +15,6 @@ build:
     context: tests
 
 deploy:
-  - name: sleep
-    command: sleep 5m
   - name: Deploy PostgreSQL
     command: okteto deploy -f postgresql/okteto.yaml
   - name: Deploy Kafka
@@ -34,6 +32,11 @@ deploy:
   - name: Deploy API
     command: helm upgrade --install api api/chart --set image=${OKTETO_BUILD_API_IMAGE} --set load=${API_LOAD_DATA:-true}
 
+destroy:
+  - name: wait
+    command: sleep 10m
+  - name: done
+    command: echo "Done"
 dev:
   frontend:
     image: okteto/node:20
@@ -64,7 +67,7 @@ dev:
     securityContext:
       capabilities:
         add:
-        - SYS_PTRACE
+          - SYS_PTRACE
     sync:
       - api:/usr/src/app
     forward:
@@ -76,7 +79,7 @@ dev:
     securityContext:
       capabilities:
         add:
-        - SYS_PTRACE
+          - SYS_PTRACE
     sync:
       - worker:/usr/src/app
     forward:

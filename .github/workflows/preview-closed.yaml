@@ -7,13 +7,20 @@ jobs:
   closed:
     runs-on: ubuntu-latest
     steps:
-    - name: Context
-      uses: okteto/context@latest
-      with:
-        token: ${{ secrets.OKTETO_TOKEN }}
-        url: ${{ secrets.OKTETO_URL }}
+      - name: Context
+        uses: okteto/context@latest
+        with:
+          token: ${{ secrets.OKTETO_TOKEN }}
+          url: ${{ secrets.OKTETO_URL }}
 
-    - name: Destroy preview environment
-      uses: okteto/destroy-preview@latest
-      with:
-        name: pr-${{ github.event.number }}-cindylopez
+      - name: Destroy development environment
+        uses: okteto/destroy-pipeline@660c76af27655a7643896dcd2702c564ad10e9cf
+        with:
+          name: pr-${{ github.event.number }}-cindylopez
+          timeout: 8m
+
+      - name: Destroy preview environment
+        uses: okteto/destroy-preview@latest
+        with:
+          name: pr-${{ github.event.number }}-cindylopez
+          timeout: 10m
