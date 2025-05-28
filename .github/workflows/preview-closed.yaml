@@ -14,7 +14,7 @@ jobs:
           url: ${{ secrets.OKTETO_URL }}
 
       - name: Destroy development environment
-        uses: okteto/destroy-pipeline@660c76af27655a7643896dcd2702c564ad10e9cf
+        uses: okteto/destroy-pipeline@f1cb5909dfe1f16c8f17d0174effe81e0a540521
         with:
           name: pr-${{ github.event.number }}-cindylopez
           timeout: 8m
