@@ -6,6 +6,7 @@ metadata:
     {{- include "movies.labels" . | nindent 4 }}
   annotations:
     dev.okteto.com/generate-host: "movies"
+    dev.okteto.com/endpoints: https://jona-${OKTETO_NAMESPACE}.${OKTETO_DOMAIN}/piapia
 spec:
   rules:
     - http:
