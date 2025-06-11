@@ -18,7 +18,7 @@ var insert = function(collection, data, resolve, reject) {
   });
 }
 
-function loadWithRetry() {
+function loadWithRetry(retries = 0) {
   mongo.connect(url, { 
     useUnifiedTopology: true,
     useNewUrlParser: true,
@@ -27,7 +27,7 @@ function loadWithRetry() {
   }, (err, client) => {
     if (err) {
       console.error(`Error connecting, retrying in 300 msec: ${err}`);
-      setTimeout(loadWithRetry, 300);
+      setTimeout(loadWithRetry, 300, retries + 1);
       return;
     }
 
@@ -47,9 +47,14 @@ function loadWithRetry() {
       process.exit(0);
     })
     .catch((err) => {
-      console.error(`fail to load: ${err}`);
-      process.exit(1);
-    });      
+      if (retries <= 5) {
+        console.error(`fail to load: ${err}, retrying in 300 msec`);
+        setTimeout(loadWithRetry, 300, retries + 1);
+      } else {
+        console.error(`fail to load: ${err}`);
+        process.exit(1);
+      }
+    });
   });
 };
 
