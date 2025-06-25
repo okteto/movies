@@ -11,4 +11,18 @@ spec:
     port: 8080
   selector:
     app: rent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: rent
+  name: rent-canary
+spec:
+  type: ClusterIP
+  ports:
+  - name: rent
+    port: 8080
+  selector:
+    app: rent
   

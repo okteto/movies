@@ -1,0 +1,7 @@
+deploy:
+  - name: Install Argo Rollouts
+    command: |
+      kubectl create namespace argo-rollouts --dry-run=client -o yaml | kubectl apply -f -
+      kubectl apply -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/releases/latest/download/install.yaml
+      kubectl wait --for=condition=available --timeout=300s deployment/argo-rollouts-controller -n argo-rollouts
+      kubectl apply -f argo-rollouts/analysis-templates.yaml -n ${OKTETO_NAMESPACE}

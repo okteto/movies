@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: success-rate
+spec:
+  args:
+  - name: service-name
+  metrics:
+  - name: success-rate
+    interval: 10s
+    count: 3
+    successCondition: result[0] >= 0.95
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          sum(irate(
+            http_requests_total{job="{{args.service-name}}",code!~"5.."}[5m]
+          )) / 
+          sum(irate(
+            http_requests_total{job="{{args.service-name}}"}[5m]
+          ))
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: response-time
+spec:
+  args:
+  - name: service-name
+  metrics:
+  - name: response-time
+    interval: 10s
+    count: 3
+    successCondition: result[0] <= 0.5
+    provider:
+      prometheus:
+        address: http://prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket{job="{{args.service-name}}"}[5m])) by (le)
+          )

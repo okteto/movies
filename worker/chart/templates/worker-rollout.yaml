@@ -1,11 +1,16 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   labels:
     app: worker
   name: worker
 spec:
   replicas: {{ .Values.replicaCount }}
+  strategy:
+    canary:
+      steps:
+      - setWeight: 50
+      - pause: {duration: 60}
   selector:
     matchLabels:
       app: worker
