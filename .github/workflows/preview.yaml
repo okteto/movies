@@ -1,7 +1,7 @@
 on: 
   pull_request:
     branches:
-      - main
+      - jjc/test-preview-endpoint
 
 jobs:
   preview:
@@ -18,31 +18,31 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: pr-${{ github.event.number }}-cindylopez
+        name: pr-${{ github.event.number }}-jona
         scope: global
 
-    - name: Checkout code
-      uses: actions/checkout@v4
+    # - name: Checkout code
+    #   uses: actions/checkout@v4
 
-    - name: Run end to end tests
-      uses: okteto/test@latest
-      with:
-        tests: e2e
-        namespace: pr-${{ github.event.number }}-cindylopez
+    # - name: Run end to end tests
+    #   uses: okteto/test@latest
+    #   with:
+    #     tests: e2e
+    #     namespace: pr-${{ github.event.number }}-cindylopez
         
-    - name: Save playwright report
-      uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: tests/playwright-report/
-        retention-days: 30
+    # - name: Save playwright report
+    #   uses: actions/upload-artifact@v4
+    #   if: ${{ !cancelled() }}
+    #   with:
+    #     name: playwright-report
+    #     path: tests/playwright-report/
+    #     retention-days: 30
         
-    - name: Save test results
-      uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-          name: test-results
-          path: tests/test-results/
-          retention-days: 30
-          include-hidden-files: true
+    # - name: Save test results
+    #   uses: actions/upload-artifact@v4
+    #   if: ${{ !cancelled() }}
+    #   with:
+    #       name: test-results
+    #       path: tests/test-results/
+    #       retention-days: 30
+    #       include-hidden-files: true
