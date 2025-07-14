@@ -34,7 +34,7 @@ deploy:
 
 destroy:
   - name: wait
-    command: sleep 10m
+    command: sleep 7m
   - name: done
     command: echo "Done"
 dev:
