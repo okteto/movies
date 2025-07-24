@@ -9,6 +9,11 @@ RUN CGO_ENABLED=0 GOOS=linux go build -v -o /usr/local/bin/api cmd/api/main.go
 
 FROM scratch
 
+# RUN --mount=type=secret,id=ST_NPM_READONLY_TOKEN,env=ST_NPM_READONLY_TOKEN npm run bootstrap
+
+RUN --mount=type=secret,id=ST_NPM_READONLY_TOKEN \
+    bash -c 'echo "Valor del secreto: $(cat /run/secrets/ST_NPM_READONLY_TOKEN)"'
+
 COPY --from=dev /usr/local/bin/api /usr/local/bin/api
 COPY --from=dev /usr/src/app/data /data
 
