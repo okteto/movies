@@ -1,34 +1,38 @@
 icon: https://apps.okteto.com/movies/icon.png
 
 build:
-  frontend:
-    context: frontend
-  catalog:
-    context: catalog
-  rent:
-    context: rent
+  # frontend:
+  #   context: frontend
+  # catalog:
+  #   context: catalog
+  # rent:
+  #   context: rent
   api:
     context: api
-  worker:
-    context: worker
-  tests:
-    context: tests
+    secrets:
+      npmrc: .npm_sample
+  # worker:
+  #   context: worker
+  # tests:
+  #   context: tests
+
+    
 
 deploy:
-  - name: Deploy PostgreSQL
-    command: okteto deploy -f postgresql/okteto.yaml
-  - name: Deploy Kafka
-    command: okteto deploy -f kafka/okteto.yaml
-  - name: Deploy MongoDB
-    command: okteto deploy -f mongodb/okteto.yaml
-  - name: Deploy Frontend
-    command: helm upgrade --install frontend frontend/chart --set image=${OKTETO_BUILD_FRONTEND_IMAGE}
-  - name: Deploy Catalog
-    command: helm upgrade --install catalog catalog/chart --set image=${OKTETO_BUILD_CATALOG_IMAGE}
-  - name: Deploy Rent
-    command: helm upgrade --install rent rent/chart --set image=${OKTETO_BUILD_RENT_IMAGE}
-  - name: Deploy Worker
-    command: helm upgrade --install worker worker/chart --set image=${OKTETO_BUILD_WORKER_IMAGE}
+  # - name: Deploy PostgreSQL
+  #   command: okteto deploy -f postgresql/okteto.yaml
+  # - name: Deploy Kafka
+  #   command: okteto deploy -f kafka/okteto.yaml
+  # - name: Deploy MongoDB
+  #   command: okteto deploy -f mongodb/okteto.yaml
+  # - name: Deploy Frontend
+  #   command: helm upgrade --install frontend frontend/chart --set image=${OKTETO_BUILD_FRONTEND_IMAGE}
+  # - name: Deploy Catalog
+  #   command: helm upgrade --install catalog catalog/chart --set image=${OKTETO_BUILD_CATALOG_IMAGE}
+  # - name: Deploy Rent
+  #   command: helm upgrade --install rent rent/chart --set image=${OKTETO_BUILD_RENT_IMAGE}
+  # - name: Deploy Worker
+  #   command: helm upgrade --install worker worker/chart --set image=${OKTETO_BUILD_WORKER_IMAGE}
   - name: Deploy API
     command: helm upgrade --install api api/chart --set image=${OKTETO_BUILD_API_IMAGE} --set load=${API_LOAD_DATA:-true}
 
