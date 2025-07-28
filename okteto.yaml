@@ -10,7 +10,7 @@ build:
   api:
     context: api
     secrets:
-      ST_NPM_READONLY_TOKEN: "id=ST_NPM_READONLY_TOKEN,src=./.npm_token"
+      ST_NPM_READONLY_TOKEN: ./.npm_token
   # worker:
   #   context: worker
   # tests:

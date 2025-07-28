@@ -11,8 +11,8 @@ FROM scratch
 
 # RUN --mount=type=secret,id=ST_NPM_READONLY_TOKEN,env=ST_NPM_READONLY_TOKEN npm run bootstrap
 
-RUN --mount=type=secret,id=ST_NPM_READONLY_TOKEN \
-    bash -c 'echo "Valor del secreto: $(cat /run/secrets/ST_NPM_READONLY_TOKEN)"'
+RUN --mount=type=secret,id=npm_token \
+    bash -c 'echo "secret: $(cat /run/secrets/npm_token)"'
 
 COPY --from=dev /usr/local/bin/api /usr/local/bin/api
 COPY --from=dev /usr/src/app/data /data
