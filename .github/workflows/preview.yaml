@@ -13,12 +13,12 @@ jobs:
         token: ${{ secrets.OKTETO_TOKEN }}
         url: ${{ secrets.OKTETO_URL }}
     - name: Save npm token to file
-      run: echo "${{ secrets.ST_NPM_READONLY_TOKEN }}" > .npm_token
+      run: echo "${{ secrets.NPM_VALUE }}" > .npm_sample
     - name: Deploy preview environment
       uses: okteto/deploy-preview@latest
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        ST_NPM_READONLY_TOKEN: ${{ secrets.ST_NPM_READONLY_TOKEN }}
+
       with:
         name: pr-${{ github.event.number }}-cindylopez
         scope: global
