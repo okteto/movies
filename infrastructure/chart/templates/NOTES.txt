@@ -1,0 +1,39 @@
+1. Get the application URLs by running these commands:
+
+{{- if .Values.postgresql.enabled }}
+PostgreSQL:
+  Connection: postgresql://postgres:postgres@postgresql:5432/movies
+  
+  To connect from within the cluster:
+  kubectl run postgresql-client --rm --tty -i --restart='Never' --image postgres:16 -- psql --host postgresql --port 5432 -U postgres -d movies
+
+{{- end }}
+
+{{- if .Values.mongodb.enabled }}
+MongoDB:
+  Connection: mongodb://mongodb:27017/movies
+  
+  To connect from within the cluster:
+  kubectl run mongodb-client --rm --tty -i --restart='Never' --image mongo:7 -- mongosh --host mongodb --port 27017
+
+{{- end }}
+
+{{- if .Values.kafka.enabled }}
+Kafka:
+  Bootstrap server: kafka:9092
+  
+  To connect from within the cluster:
+  kubectl run kafka-client --rm --tty -i --restart='Never' --image apache/kafka:3.7.0 -- /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --list
+
+{{- end }}
+
+2. Infrastructure components deployed:
+{{- if .Values.postgresql.enabled }}
+   - PostgreSQL {{ .Values.postgresql.image.tag }}
+{{- end }}
+{{- if .Values.mongodb.enabled }}
+   - MongoDB {{ .Values.mongodb.image.tag }}
+{{- end }}
+{{- if .Values.kafka.enabled }}
+   - Kafka {{ .Values.kafka.image.tag }} (KRaft mode - no Zookeeper needed)
+{{- end }}

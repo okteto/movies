@@ -1,8 +1,0 @@
-auth:
-  username: okteto
-  password: okteto
-  database: rentals
-
-primary:
-  persistence:
-    size: 2Gi

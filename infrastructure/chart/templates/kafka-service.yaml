@@ -1,0 +1,21 @@
+{{- if .Values.kafka.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  labels:
+    app: kafka
+    chart: {{ include "infrastructure.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.kafka.service.port }}
+      targetPort: kafka
+      protocol: TCP
+      name: kafka
+  selector:
+    app: kafka
+    release: {{ .Release.Name }}
+{{- end }}
