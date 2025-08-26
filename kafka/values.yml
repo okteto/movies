@@ -1,3 +1,6 @@
+image:
+  repository: bitnamilegacy/kafka
+
 controller:
   replicaCount: 1
 
@@ -11,4 +14,3 @@ persistence:
 zookeeper:
   persistence:
     size: 1Gi
-
