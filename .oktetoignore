@@ -10,6 +10,7 @@
 !postgresql
 !rent/chart
 !worker/chart
+!infrastructure/chart
 
 
 [test]
