@@ -36,7 +36,9 @@ mongodb:
     repository: mongo
     tag: "7"
   auth:
-    enabled: false
+    enabled: true
+    username: "okteto"
+    password: "okteto"
     database: "okteto"
   storage:
     size: 1Gi

@@ -26,9 +26,9 @@ spec:
             - load
           env:
             - name: MONGODB_USERNAME
-              value: ""
+              value: "okteto"
             - name: MONGODB_PASSWORD
-              value: ""
+              value: "okteto"
             - name: MONGODB_DATABASE
               value: okteto
             - name: MONGODB_HOST
@@ -38,9 +38,9 @@ spec:
           image: {{ .Values.image }}
           env:
             - name: MONGODB_USERNAME
-              value: ""
+              value: "okteto"
             - name: MONGODB_PASSWORD
-              value: ""
+              value: "okteto"
             - name: MONGODB_DATABASE
               value: okteto
             - name: MONGODB_HOST
