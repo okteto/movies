@@ -6,8 +6,6 @@
 !catalog/chart
 !frontend/chart
 !kafka
-!mongodb
-!postgresql
 !rent/chart
 !worker/chart
 !infrastructure/chart
