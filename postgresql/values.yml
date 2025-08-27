@@ -1,3 +1,6 @@
+image:
+  repository: bitnamilegacy/postgresql
+
 auth:
   username: okteto
   password: okteto
