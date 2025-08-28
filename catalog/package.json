@@ -5,7 +5,7 @@
   "dependencies": {
     "async": "^3.1.0",
     "express": "^4.16.4",
-    "mongodb": "^3.2.3",
+    "mongodb": "^6.18.0",
     "nodemon": "^2.0.2",
     "saslprep": "^1.0.3"
   },
@@ -13,5 +13,6 @@
     "debug": "node --inspect-brk=0.0.0.0:9229 server.js",
     "start": "nodemon server.js",
     "load": "node load.js"
-  }
+  },
+  "packageManager": "yarn@4.9.4"
 }

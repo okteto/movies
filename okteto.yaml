@@ -15,12 +15,8 @@ build:
     context: tests
 
 deploy:
-  - name: Deploy PostgreSQL
-    command: okteto deploy -f postgresql/okteto.yaml
-  - name: Deploy Kafka
-    command: okteto deploy -f kafka/okteto.yaml
-  - name: Deploy MongoDB
-    command: okteto deploy -f mongodb/okteto.yaml
+  - name: Deploy Infrastructure (PostgreSQL, Kafka, MongoDB)
+    command: helm upgrade --install infrastructure infrastructure/chart
   - name: Deploy Frontend
     command: helm upgrade --install frontend frontend/chart --set image=${OKTETO_BUILD_FRONTEND_IMAGE}
   - name: Deploy Catalog

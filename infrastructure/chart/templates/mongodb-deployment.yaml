@@ -1,0 +1,103 @@
+{{- if .Values.mongodb.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+  labels:
+    app: mongodb
+    chart: {{ include "infrastructure.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: mongodb
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: mongodb
+          image: "{{ .Values.mongodb.image.repository }}:{{ .Values.mongodb.image.tag }}"
+          ports:
+            - name: mongodb
+              containerPort: {{ .Values.mongodb.service.port }}
+              protocol: TCP
+          {{- if .Values.mongodb.auth.enabled }}
+          env:
+            - name: MONGO_INITDB_DATABASE
+              value: "{{ .Values.mongodb.auth.database }}"
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: "{{ .Values.mongodb.auth.username }}"
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: "{{ .Values.mongodb.auth.password }}"
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data/db
+              subPath: mongodb
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          livenessProbe:
+            exec:
+              command:
+                - mongosh
+                {{- if .Values.mongodb.auth.enabled }}
+                - --username
+                - "{{ .Values.mongodb.auth.username }}"
+                - --password
+                - "{{ .Values.mongodb.auth.password }}"
+                {{- end }}
+                - --eval
+                - "db.adminCommand('ping')"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - mongosh
+                {{- if .Values.mongodb.auth.enabled }}
+                - --username
+                - "{{ .Values.mongodb.auth.username }}"
+                - --password
+                - "{{ .Values.mongodb.auth.password }}"
+                {{- end }}
+                - --eval
+                - "db.adminCommand('ping')"
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mongodb-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-pvc
+  labels:
+    app: mongodb
+    chart: {{ include "infrastructure.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.mongodb.storage.size }}
+  {{- if .Values.mongodb.storage.storageClass }}
+  storageClassName: {{ .Values.mongodb.storage.storageClass }}
+  {{- end }}
+{{- end }}

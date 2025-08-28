@@ -1,0 +1,47 @@
+# PostgreSQL Configuration
+postgresql:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "16"
+  auth:
+    postgresPassword: "okteto"
+    username: "okteto"
+    password: "okteto"
+    database: "rentals"
+  storage:
+    size: 1Gi
+    storageClass: ""
+  service:
+    port: 5432
+
+# Kafka Configuration (using KRaft mode - no Zookeeper needed)
+kafka:
+  enabled: true
+  image:
+    repository: apache/kafka
+    tag: "3.7.0"
+  auth:
+    enabled: false
+  storage:
+    size: 1Gi
+    storageClass: ""
+  service:
+    port: 9092
+
+# MongoDB Configuration
+mongodb:
+  enabled: true
+  image:
+    repository: mongo
+    tag: "7"
+  auth:
+    enabled: true
+    username: "okteto"
+    password: "okteto"
+    database: "okteto"
+  storage:
+    size: 1Gi
+    storageClass: ""
+  service:
+    port: 27017
