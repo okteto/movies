@@ -13,6 +13,10 @@ RUN --mount=type=cache,target=./node_modules/.cache/webpack yarn build
 
 FROM nginx:alpine
 
+# overwrite nginx.conf
+RUN rm /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/nginx.conf
+
 # overwrite default.conf
 RUN rm /etc/nginx/conf.d/default.conf
 COPY default.conf /etc/nginx/conf.d
