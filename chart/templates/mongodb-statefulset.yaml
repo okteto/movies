@@ -23,7 +23,7 @@ spec:
       initContainers:
       containers:
       - name: mongodb
-        image: docker.io/bitnami/mongodb:4.0.12-debian-9-r43
+        image: docker.io/bitnamilegacy/mongodb:4.0.12-r43
         securityContext:
           runAsNonRoot: true
           runAsUser: 1001
