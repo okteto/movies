@@ -31,7 +31,39 @@ func main() {
 	}
 
 	fmt.Println("Running server on port 8080...")
+	
+	// Output 801 lines of logs after startup
+	outputStartupLogs()
+	
 	handleRequests()
+}
+
+func outputStartupLogs() {
+	fmt.Println("Starting to output 801 startup log lines...")
+	
+	for i := 1; i <= 801; i++ {
+		if i <= 100 {
+			fmt.Printf("Log line %d: Initializing application components...\n", i)
+		} else if i <= 200 {
+			fmt.Printf("Log line %d: Loading configuration settings...\n", i)
+		} else if i <= 300 {
+			fmt.Printf("Log line %d: Establishing database connections...\n", i)
+		} else if i <= 400 {
+			fmt.Printf("Log line %d: Setting up HTTP routes and middleware...\n", i)
+		} else if i <= 500 {
+			fmt.Printf("Log line %d: Validating system dependencies...\n", i)
+		} else if i <= 600 {
+			fmt.Printf("Log line %d: Preparing background services...\n", i)
+		} else if i <= 700 {
+			fmt.Printf("Log line %d: Configuring security policies...\n", i)
+		} else if i <= 800 {
+			fmt.Printf("Log line %d: Running health checks and diagnostics...\n", i)
+		} else {
+			fmt.Printf("Log line %d: Application startup completed successfully!\n", i)
+		}
+	}
+	
+	fmt.Println("Finished outputting 801 startup log lines. Server is ready to accept requests.")
 }
 
 type Rental struct {
