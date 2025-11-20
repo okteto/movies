@@ -8,8 +8,8 @@ Okteto's Divert feature allows developers to work on individual microservices wi
 
 ### Key Benefits
 
-- **Massive Resource Savings**: Deploy only the services you're working on (~85% reduction in resources)
-- **Faster Setup**: Environment ready in 30 seconds instead of 5-10 minutes
+- **Massive Resource Savings**: Deploy only the services you're working on
+- **Faster Setup**: Environment ready in seconds instead of waiting for all services to deploy
 - **Isolation**: Your changes don't affect other developers
 - **Production-like**: Test against real shared services
 - **Cost Efficient**: Share expensive infrastructure (databases, message queues)
@@ -237,22 +237,6 @@ kubectl get endpoints -n alice-movies
 3. Verify your service changes appear
 4. Check that other services work normally (shared from staging)
 
-## Resource Savings Comparison
-
-| Scenario | Full Stack | With Divert | Savings |
-|----------|-----------|-------------|---------|
-| **Services Deployed** | 5 services | 1 service | 80% |
-| **Databases** | 3 databases | 0 (shared) | 100% |
-| **Memory Usage** | ~8 GB | ~1.2 GB | 85% |
-| **CPU Usage** | ~4 cores | ~0.5 cores | 87.5% |
-| **Setup Time** | 5-10 minutes | 30 seconds | 90% |
-| **Cost per Developer** | $$$$ | $ | ~85% |
-
-### Real-World Impact
-
-- **Team of 10 developers**: Save ~$40,000/year in infrastructure costs
-- **100 daily deployments**: Save 15+ hours of deployment time
-- **Shared resources**: MongoDB, PostgreSQL, Kafka only deployed once
 
 ## Troubleshooting
 
