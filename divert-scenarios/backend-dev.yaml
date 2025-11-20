@@ -1,0 +1,27 @@
+# Scenario: Backend developer working on rent service
+build:
+  rent:
+    context: rent
+
+deploy:
+  - name: Deploy Rent Service
+    command: |
+      helm upgrade --install movies-rent rent/chart \
+        --set image=${OKTETO_BUILD_RENT_REGISTRY}:${OKTETO_BUILD_RENT_SHA}
+
+divert:
+  namespace: staging
+  hosts:
+    - rent
+
+dev:
+  rent:
+    image: maven:3-openjdk-11
+    command: mvn spring-boot:run
+    workdir: /app
+    sync:
+      - rent:/app
+    forward:
+      - 8080:8080
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092

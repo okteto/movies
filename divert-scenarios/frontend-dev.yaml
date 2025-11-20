@@ -1,0 +1,27 @@
+# Scenario: Frontend developer working on UI
+build:
+  frontend:
+    context: frontend
+
+deploy:
+  - name: Deploy Frontend Only
+    command: |
+      helm upgrade --install movies-frontend frontend/chart \
+        --set image=${OKTETO_BUILD_FRONTEND_REGISTRY}:${OKTETO_BUILD_FRONTEND_SHA}
+
+divert:
+  namespace: staging
+
+dev:
+  frontend:
+    image: node:20
+    command: yarn start
+    workdir: /app
+    sync:
+      - frontend:/app
+    forward:
+      - 3000:3000
+    environment:
+      REACT_APP_CATALOG_URL: http://catalog:8080
+      REACT_APP_API_URL: http://api:8080
+      REACT_APP_RENT_URL: http://rent:8080

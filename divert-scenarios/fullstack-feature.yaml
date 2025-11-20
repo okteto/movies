@@ -1,0 +1,20 @@
+# Scenario: Full-stack developer working on new feature
+build:
+  frontend:
+    context: frontend
+  api:
+    context: api
+
+deploy:
+  - name: Deploy Frontend and API
+    command: |
+      helm upgrade --install movies-frontend frontend/chart \
+        --set image=${OKTETO_BUILD_FRONTEND_REGISTRY}:${OKTETO_BUILD_FRONTEND_SHA}
+      helm upgrade --install movies-api api/chart \
+        --set image=${OKTETO_BUILD_API_REGISTRY}:${OKTETO_BUILD_API_SHA}
+
+divert:
+  namespace: staging
+  hosts:
+    - frontend
+    - api

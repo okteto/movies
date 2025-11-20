@@ -3,6 +3,12 @@ const mongo = require("mongodb").MongoClient;
 
 const app = express();
 
+// Add baggage header middleware
+app.use((req, res, next) => {
+  req.baggageHeader = req.headers['baggage'];
+  next();
+});
+
 const url = `mongodb://${process.env.MONGODB_USERNAME}:${encodeURIComponent(process.env.MONGODB_PASSWORD)}@${process.env.MONGODB_HOST}:27017/${process.env.MONGODB_DATABASE}?authSource=admin`;
 
 async function startWithRetry() {

@@ -19,6 +19,14 @@ class App extends Component {
   constructor(props) {
     super(props);
 
+    // Add baggage header detection
+    const params = new URLSearchParams(window.location.search);
+    const baggageHeader = params.get('baggage') || sessionStorage.getItem('baggage-header');
+    if (baggageHeader) {
+      sessionStorage.setItem('baggage-header', baggageHeader);
+      window.baggageHeader = baggageHeader;
+    }
+
     this.state = {
       catalog: {
         data: [],
@@ -44,12 +52,22 @@ class App extends Component {
     this.refreshData();
   }
 
+  async fetchWithBaggage(url, options = {}) {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...options.headers
+    };
+
+    if (window.baggageHeader) {
+      headers['baggage'] = window.baggageHeader;
+    }
+
+    return fetch(url, { ...options, headers });
+  }
+
   handleRent = async (item) => {
-    await fetch('/rent', {
+    await this.fetchWithBaggage('/rent', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify({
         catalog_id: item.id,
         price: item.price
@@ -59,11 +77,8 @@ class App extends Component {
   }
 
   handleReturn = async (item) =>{
-    await fetch('/rent/return', {
+    await this.fetchWithBaggage('/rent/return', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify({
         catalog_id: item.id
       })
@@ -74,11 +89,11 @@ class App extends Component {
   
 
   refreshData = async () => {
-    const catalogPromise = fetch('/catalog')
+    const catalogPromise = this.fetchWithBaggage('/catalog')
       .then(res => res.json())
       .then(result => compact(result));
 
-    const rentalsPromise = fetch('/rentals')
+    const rentalsPromise = this.fetchWithBaggage('/rentals')
       .then(res => res.json())
       .then(result => compact(result));
 

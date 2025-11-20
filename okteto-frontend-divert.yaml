@@ -1,0 +1,30 @@
+# Okteto Divert Configuration - Frontend Service
+# Driver: nginx (uses Nginx ingress + Linkerd for routing)
+# To use Istio instead, change driver to "istio" below
+
+icon: https://apps.okteto.com/movies/icon.png
+
+build:
+  frontend:
+    context: frontend
+
+deploy:
+  commands:
+    - helm upgrade --install movies-frontend frontend/chart --set image=${OKTETO_BUILD_FRONTEND_IMAGE}
+  divert:
+    driver: nginx
+    namespace: ${SHARED_NAMESPACE:-staging}
+
+dev:
+  frontend:
+    image: node:14
+    command: yarn start
+    workdir: /src
+    sync:
+      - frontend:/src
+    forward:
+      - 8080:8080
+    environment:
+      REACT_APP_CATALOG_URL: http://catalog:8080
+      REACT_APP_API_URL: http://api:8080
+      REACT_APP_RENT_URL: http://rent:8080

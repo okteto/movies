@@ -1,0 +1,29 @@
+# Okteto Divert Configuration - API Service
+# Driver: nginx (uses Nginx ingress + Linkerd for routing)
+# To use Istio instead, change driver to "istio" below
+
+icon: https://apps.okteto.com/movies/icon.png
+
+build:
+  api:
+    context: api
+
+deploy:
+  commands:
+    - helm upgrade --install movies-api api/chart --set image=${OKTETO_BUILD_API_IMAGE} --set load=${API_LOAD_DATA:-false}
+  divert:
+    driver: nginx
+    namespace: ${SHARED_NAMESPACE:-staging}
+
+dev:
+  api:
+    image: golang:1.18
+    command: go run cmd/api/main.go
+    workdir: /app
+    sync:
+      - api:/app
+    forward:
+      - 8080:8080
+    environment:
+      POSTGRES_HOST: postgresql
+      POSTGRES_PASSWORD: postgres

@@ -94,12 +94,21 @@ func loadData() {
 	return
 }
 
+// Add middleware for baggage header
+func baggageMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		baggage := r.Header.Get("baggage")
+		r.Header.Set("X-Baggage", baggage) // Store for later use
+		next(w, r)
+	}
+}
+
 func handleRequests() {
 	muxRouter := mux.NewRouter().StrictSlash(true)
 
-	muxRouter.HandleFunc("/rentals", rentals)
-	muxRouter.HandleFunc("/users", allUsers)
-	muxRouter.HandleFunc("/users/{userid}", singleUser)
+	muxRouter.HandleFunc("/rentals", baggageMiddleware(rentals))
+	muxRouter.HandleFunc("/users", baggageMiddleware(allUsers))
+	muxRouter.HandleFunc("/users/{userid}", baggageMiddleware(singleUser))
 
 	log.Fatal(http.ListenAndServe(":8080", muxRouter))
 }
@@ -130,7 +139,21 @@ func rentals(w http.ResponseWriter, r *http.Request) {
 		os.Exit(1)
 	}
 
-	resp, err := http.Get("http://catalog:8080/catalog")
+	// Create request with baggage header propagation
+	req, err := http.NewRequest("GET", "http://catalog:8080/catalog", nil)
+	if err != nil {
+		fmt.Println("error creating catalog request", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	// Propagate baggage header
+	if baggage := r.Header.Get("X-Baggage"); baggage != "" {
+		req.Header.Set("baggage", baggage)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("error listing catalog", err)
 		w.WriteHeader(500)

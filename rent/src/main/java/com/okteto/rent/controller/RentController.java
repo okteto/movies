@@ -6,10 +6,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.header.internals.RecordHeader;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +24,7 @@ import java.util.Collections;
 public class RentController {
     private static final String KAFKA_TOPIC_RENTALS = "rentals";
     private static final String KAFKA_TOPIC_RETURNS = "returns";
+    private static final ThreadLocal<String> baggageHeader = new ThreadLocal<>();
 
     private final Logger logger = LoggerFactory.getLogger(RentController.class);
 
@@ -32,23 +37,35 @@ public class RentController {
     }
     
     @PostMapping(path= "/rent", consumes = "application/json", produces = "application/json")
-    List<String> rent(@RequestBody Rent rentInput) {
-        String catalogID = rentInput.getMovieID();
-        Double price = rentInput.getPrice();
+    List<String> rent(@RequestBody Rent rentInput, @RequestHeader(value = "baggage", required = false) String baggage) {
+        baggageHeader.set(baggage);
 
-        logger.info("Rent [{},{}] received", catalogID, price);
+        try {
+            String catalogID = rentInput.getMovieID();
+            Double price = rentInput.getPrice();
 
-        kafkaTemplate.send(KAFKA_TOPIC_RENTALS, catalogID, price.toString())
-        .thenAccept(result -> logger.info("Message [{}] delivered with offset {}",
-                        catalogID,
-                        result.getRecordMetadata().offset()))
-        .exceptionally(ex -> {
-            logger.warn("Unable to deliver message [{}]. {}", catalogID, ex.getMessage());
-            return null;
-        });
-        
+            logger.info("Rent [{},{}] received", catalogID, price);
 
-        return new LinkedList<>();
+            ProducerRecord<String, String> record = new ProducerRecord<>(KAFKA_TOPIC_RENTALS, catalogID, price.toString());
+
+            if (baggage != null) {
+                record.headers().add(new RecordHeader("baggage", baggage.getBytes()));
+            }
+
+            kafkaTemplate.send(record)
+            .thenAccept(result -> logger.info("Message [{}] delivered with offset {}",
+                            catalogID,
+                            result.getRecordMetadata().offset()))
+            .exceptionally(ex -> {
+                logger.warn("Unable to deliver message [{}]. {}", catalogID, ex.getMessage());
+                return null;
+            });
+
+
+            return new LinkedList<>();
+        } finally {
+            baggageHeader.remove();
+        }
     }
 
     @PostMapping(path= "/rent/return", consumes = "application/json", produces = "application/json")
