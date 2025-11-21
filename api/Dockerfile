@@ -1,4 +1,4 @@
-FROM golang:buster as dev
+FROM golang:1.24-bookworm as dev
 
 WORKDIR /usr/src/app
 
