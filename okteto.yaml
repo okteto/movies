@@ -52,7 +52,7 @@ dev:
       - 5005:5005
       - 5432:postgresql:5432
   api:
-    image: okteto/golang:1.22
+    image: okteto/golang:1.24
     workdir: /usr/src/app
     command: bash
     securityContext:
@@ -64,7 +64,7 @@ dev:
     forward:
       - 2346:2345
   worker:
-    image: okteto/golang:1.22
+    image: okteto/golang:1.24
     workdir: /usr/src/app
     command: bash
     securityContext:
