@@ -57,11 +57,11 @@ spec:
               mountPath: /opt/kafka/logs
           resources:
             limits:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 1
+              memory: 1024Mi
             requests:
-              cpu: 100m
-              memory: 256Mi
+              cpu: 250m
+              memory: 512Mi
           livenessProbe:
             tcpSocket:
               port: 9092
