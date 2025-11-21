@@ -18,10 +18,11 @@ echo -e "${BLUE}Step 1: Creating shared namespace: ${SHARED_NS}${NC}"
 
 okteto preview deploy \
   --repository https://github.com/okteto/movies \
-  --branch divert-demo \
+  --branch movies-divert-example \
   --label okteto-shared \
-  --name ${SHARED_NS} \
-  --wait
+  --wait \
+  ${SHARED_NS}
+  
 
 echo -e "${GREEN}✅ Shared namespace ready at: https://movies-${SHARED_NS}.okteto.dev${NC}"
 
@@ -69,5 +70,5 @@ okteto deploy \
 echo -e "${GREEN}✅ Deployment complete!${NC}"
 echo ""
 echo "Access your environment:"
-echo -e "${BLUE}Direct URL:${NC} https://movies-${DIVERT_NS}.okteto.dev"
-echo -e "${BLUE}With header:${NC} curl -H \"baggage: okteto-divert=${DIVERT_NS}\" https://movies-${SHARED_NS}.okteto.dev"
+echo -e "${BLUE}Direct URL:${NC} https://movies-${DIVERT_NS}.demo.okteto.dev"
+echo -e "${BLUE}With header:${NC} curl -H \"baggage: okteto-divert=${DIVERT_NS}\" https://movies-${SHARED_NS}.demo.okteto.dev"

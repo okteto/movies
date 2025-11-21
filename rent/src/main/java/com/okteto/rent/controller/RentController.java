@@ -15,9 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.internals.RecordHeader;
 
+
+import java.io.IOException; 
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Collections;
 
 @RestController
@@ -25,15 +32,28 @@ public class RentController {
     private static final String KAFKA_TOPIC_RENTALS = "rentals";
     private static final String KAFKA_TOPIC_RETURNS = "returns";
     private static final ThreadLocal<String> baggageHeader = new ThreadLocal<>();
+    private String kubernetesNamespace;
 
     private final Logger logger = LoggerFactory.getLogger(RentController.class);
 
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
+    @Autowired
+    public RentController(){
+        try{
+            this.kubernetesNamespace = Files.readString(Path.of("/var/run/secrets/kubernetes.io/serviceaccount/namespace")).trim();
+        }catch(IOException ioe) {
+            this.kubernetesNamespace = "n/a";
+        }
+    }
+
     @GetMapping(path= "/rent", produces = "application/json")
     Map<String, String> healthz() {
-            return Collections.singletonMap("status", "ok");
+            Map<String, String> m = new HashMap<String, String>();
+            m.put("status", "ok");
+            m.put("namespace", this.kubernetesNamespace);
+            return m;
     }
     
     @PostMapping(path= "/rent", consumes = "application/json", produces = "application/json")
