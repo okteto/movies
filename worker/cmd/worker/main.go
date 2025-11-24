@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"sync"
-
-	"fmt"
 
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 
@@ -26,6 +26,7 @@ var (
 // ConsumerGroupHandler implements sarama.ConsumerGroupHandler
 type ConsumerGroupHandler struct {
 	messageCount *int
+	divertKey string
 }
 
 func main() {
@@ -36,6 +37,13 @@ func main() {
 	if namespace == "" {
 		namespace = "default"
 		log.Printf("KUBERNETES_NAMESPACE not set, using default: %s", namespace)
+	}
+
+	// Get Kubernetes namespace from environment variable
+	divertKey := os.Getenv("OKTETO_DIVERTED_ENVIRONMENT")
+	if divertKey == "" {
+		divertKey = ""
+		log.Printf("OKTETO_DIVERTED_ENVIRONMENT not set, using default: %s", divertKey)
 	}
 
 	// Create consumer group ID with namespace suffix
@@ -57,6 +65,7 @@ func main() {
 
 	handler := &ConsumerGroupHandler{
 		messageCount: messageCountStart,
+		divertKey: divertKey, 
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -98,20 +107,74 @@ func (h *ConsumerGroupHandler) Cleanup(sarama.ConsumerGroupSession) error {
 	return nil
 }
 
+func (c *ConsumerGroupHandler) shouldProcessMessage(baggage string) bool {
+	// Extract okteto-divert value from baggage
+	divertValue := extractOktetoDivertFromBaggage(baggage)
+
+	// Rule 1: If message has okteto-divert key, process only if value matches environment variable
+	if divertValue != "" {
+		return divertValue == c.divertKey
+	}
+
+	// Rule 2: If message doesn't have okteto-divert key, process only if environment variable is empty
+	return c.divertKey == ""
+}
+
+// extractOktetoDivertFromBaggage parses baggage string and extracts okteto-divert value
+func extractOktetoDivertFromBaggage(baggage string) string {
+	if baggage == "" {
+		return ""
+	}
+
+	// Parse baggage format: "key1=value1,key2=value2,..."
+	pairs := strings.Split(baggage, ",")
+	for _, pair := range pairs {
+		kv := strings.SplitN(strings.TrimSpace(pair), "=", 2)
+		if len(kv) == 2 && strings.TrimSpace(kv[0]) == "okteto-divert" {
+			return strings.TrimSpace(kv[1])
+		}
+	}
+
+	return ""
+}
+
+// extractBaggageHeader extracts the baggage header value from Kafka message headers
+func extractBaggageHeader(headers []*sarama.RecordHeader) string {
+	for _, header := range headers {
+		if string(header.Key) == "baggage" {
+			baggageValue := string(header.Value)
+			if baggageValue != "" {
+				fmt.Printf("Baggage header found in Kafka message: %s\n", baggageValue)
+			}
+			return baggageValue
+		}
+	}
+	return ""
+}
+
 // ConsumeClaim must start a consumer loop of ConsumerGroupClaim's Messages()
 func (h *ConsumerGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for message := range claim.Messages() {
+		// Extract baggage header once for the message
+		baggageHeader := extractBaggageHeader(message.Headers)
+
+		// Check if we should process this message based on divert logic
+		if !h.shouldProcessMessage(baggageHeader) {
+			log.Printf("Not processing message, it belongs to a diverted worker")
+			continue
+		}
+
 		*h.messageCount++
 
 		// Determine message type based on topic
 		if message.Topic == "rentals" {
-			if !h.processRentalMessage(session, message) {
+			if !h.processRentalMessage(string(message.Key), string(message.Value), baggageHeader) {
 				// Don't commit if processing failed
 				log.Printf("Failed to process rental message, will retry on next poll")
 				continue
 			}
 		} else if message.Topic == "returns" {
-			if !h.processReturnMessage(session, message) {
+			if !h.processReturnMessage(string(message.Value), baggageHeader) {
 				// Don't commit if processing failed
 				log.Printf("Failed to process return message, will retry on next poll")
 				continue
@@ -127,23 +190,13 @@ func (h *ConsumerGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession,
 }
 
 // processRentalMessage handles rental messages and returns true if successful
-func (h *ConsumerGroupHandler) processRentalMessage(session sarama.ConsumerGroupSession, message *sarama.ConsumerMessage) bool {
-	fmt.Printf("Received message: movies %s price %s\n", string(message.Key), string(message.Value))
-	price, _ := strconv.ParseFloat(string(message.Value), 64)
-
-	// Extract baggage header from Kafka message
-	var baggageHeader string
-	for _, header := range message.Headers {
-		if string(header.Key) == "baggage" {
-			baggageHeader = string(header.Value)
-			fmt.Printf("Baggage header found in Kafka message: %s\n", baggageHeader)
-			break
-		}
-	}
+func (h *ConsumerGroupHandler) processRentalMessage(movieID string, priceStr string, baggageHeader string) bool {
+	fmt.Printf("Received message: movies %s price %s\n", movieID, priceStr)
+	price, _ := strconv.ParseFloat(priceStr, 64)
 
 	// Call API to create/update rental
 	rentalData := map[string]string{
-		"id":    string(message.Key),
+		"id":    movieID,
 		"price": fmt.Sprintf("%f", price),
 	}
 	jsonData, err := json.Marshal(rentalData)
@@ -179,24 +232,13 @@ func (h *ConsumerGroupHandler) processRentalMessage(session sarama.ConsumerGroup
 		return false
 	}
 
-	fmt.Printf("Successfully created/updated rental: %s - message committed\n", string(message.Key))
+	fmt.Printf("Successfully created/updated rental: %s - message committed\n", movieID)
 	return true
 }
 
 // processReturnMessage handles return messages and returns true if successful
-func (h *ConsumerGroupHandler) processReturnMessage(session sarama.ConsumerGroupSession, message *sarama.ConsumerMessage) bool {
-	catalogID := string(message.Value)
+func (h *ConsumerGroupHandler) processReturnMessage(catalogID string, baggageHeader string) bool {
 	fmt.Printf("Received return message: catalogID %s\n", catalogID)
-
-	// Extract baggage header from Kafka message
-	var baggageHeader string
-	for _, header := range message.Headers {
-		if string(header.Key) == "baggage" {
-			baggageHeader = string(header.Value)
-			fmt.Printf("Baggage header found in Kafka message: %s\n", baggageHeader)
-			break
-		}
-	}
 
 	// Call API to delete rental
 	req, err := http.NewRequest("DELETE", fmt.Sprintf("http://api:8080/internal/rentals/%s", catalogID), nil)
