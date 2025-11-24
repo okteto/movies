@@ -63,24 +63,25 @@ type User struct {
 }
 
 func loadData() {
-	
-	dropTableStmt := `DROP TABLE IF EXISTS rentals`
-	if _, err := db.Exec(dropTableStmt); err != nil {
+	// Create rentals table
+	dropRentalsStmt := `DROP TABLE IF EXISTS rentals`
+	if _, err := db.Exec(dropRentalsStmt); err != nil {
 		log.Panic(err)
 	}
 
-	createTableStmt := `CREATE TABLE IF NOT EXISTS rentals (id VARCHAR(255) NOT NULL UNIQUE, price VARCHAR(255) NOT NULL)`
-	if _, err := db.Exec(createTableStmt); err != nil {
-		log.Panic(err)
-	}
-	
-	dropTableStmt := `DROP TABLE IF EXISTS users`
-	if _, err := db.Exec(dropTableStmt); err != nil {
+	createRentalsStmt := `CREATE TABLE IF NOT EXISTS rentals (id VARCHAR(255) NOT NULL UNIQUE, price VARCHAR(255) NOT NULL)`
+	if _, err := db.Exec(createRentalsStmt); err != nil {
 		log.Panic(err)
 	}
 
-	createTableStmt := `CREATE TABLE IF NOT EXISTS users (user_id int NOT NULL UNIQUE, first_name varchar(255), last_name varchar(255), phone varchar(15), city varchar(255), state varchar(30), zip varchar(12), age int, gender varchar(10))`
-	if _, err := db.Exec(createTableStmt); err != nil {
+	// Create users table
+	dropUsersStmt := `DROP TABLE IF EXISTS users`
+	if _, err := db.Exec(dropUsersStmt); err != nil {
+		log.Panic(err)
+	}
+
+	createUsersStmt := `CREATE TABLE IF NOT EXISTS users (user_id int NOT NULL UNIQUE, first_name varchar(255), last_name varchar(255), phone varchar(15), city varchar(255), state varchar(30), zip varchar(12), age int, gender varchar(10))`
+	if _, err := db.Exec(createUsersStmt); err != nil {
 		log.Panic(err)
 	}
 
