@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -100,6 +102,9 @@ func handleRequests() {
 	muxRouter.HandleFunc("/rentals", rentals)
 	muxRouter.HandleFunc("/users", allUsers)
 	muxRouter.HandleFunc("/users/{userid}", singleUser)
+	muxRouter.HandleFunc("/catalog", catalogProxy).Methods("GET")
+	muxRouter.HandleFunc("/rent", rentProxy).Methods("POST")
+	muxRouter.HandleFunc("/rent/return", returnProxy).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", muxRouter))
 }
@@ -130,23 +135,10 @@ func rentals(w http.ResponseWriter, r *http.Request) {
 		os.Exit(1)
 	}
 
-	resp, err := http.Get("http://catalog:8080/catalog")
+	// Fetch catalog using the helper function with header propagation
+	movies, err := fetchCatalog(r.Header)
 	if err != nil {
-		fmt.Println("error listing catalog", err)
-		w.WriteHeader(500)
-		return
-	}
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("error reading catalog", err)
-		w.WriteHeader(500)
-		return
-	}
-
-	movies := []Movie{}
-	if err := json.Unmarshal(body, &movies); err != nil {
-		fmt.Println("error unmarshaling catalog", err)
+		fmt.Println(err)
 		w.WriteHeader(500)
 		return
 	}
@@ -219,4 +211,172 @@ func singleUser(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Returned", user)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(user)
+}
+
+// Helper function to copy headers including baggage
+func copyHeaders(dst http.Header, src http.Header) {
+	for key, values := range src {
+		for _, value := range values {
+			dst.Add(key, value)
+		}
+	}
+}
+
+// fetchCatalog makes an internal request to the catalog service with header propagation
+func fetchCatalog(headers http.Header) ([]Movie, error) {
+	req, err := http.NewRequest("GET", "http://catalog:8080/catalog", nil)
+	if err != nil {
+		return nil, fmt.Errorf("error creating catalog request: %w", err)
+	}
+
+	// Propagate all headers including baggage, traceparent, tracestate, etc.
+	copyHeaders(req.Header, headers)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("error calling catalog service: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("error reading catalog response: %w", err)
+	}
+
+	var movies []Movie
+	if err := json.Unmarshal(body, &movies); err != nil {
+		return nil, fmt.Errorf("error unmarshaling catalog: %w", err)
+	}
+
+	return movies, nil
+}
+
+// catalogProxy proxies requests to the catalog service
+func catalogProxy(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Proxying request to catalog service...")
+
+	// Create request to catalog service using internal Kubernetes service DNS
+	req, err := http.NewRequest("GET", "http://catalog:8080/catalog", nil)
+	if err != nil {
+		fmt.Println("error creating catalog request", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	// Propagate all headers including baggage, traceparent, tracestate, etc.
+	copyHeaders(req.Header, r.Header)
+
+	// Make the request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("error calling catalog service", err)
+		w.WriteHeader(500)
+		return
+	}
+	defer resp.Body.Close()
+
+	// Copy response headers
+	for key, values := range resp.Header {
+		for _, value := range values {
+			w.Header().Add(key, value)
+		}
+	}
+
+	// Copy response status and body
+	w.WriteHeader(resp.StatusCode)
+	io.Copy(w, resp.Body)
+}
+
+// rentProxy proxies rent requests to the rent service
+func rentProxy(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Proxying request to rent service...")
+
+	// Read the request body
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Println("error reading request body", err)
+		w.WriteHeader(500)
+		return
+	}
+	defer r.Body.Close()
+
+	// Create request to rent service using internal Kubernetes service DNS
+	req, err := http.NewRequest("POST", "http://rent:8080/rent", bytes.NewReader(body))
+	if err != nil {
+		fmt.Println("error creating rent request", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	// Propagate all headers including baggage, traceparent, tracestate, etc.
+	copyHeaders(req.Header, r.Header)
+
+	// Make the request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("error calling rent service", err)
+		w.WriteHeader(500)
+		return
+	}
+	defer resp.Body.Close()
+
+	// Copy response headers
+	for key, values := range resp.Header {
+		for _, value := range values {
+			w.Header().Add(key, value)
+		}
+	}
+
+	// Copy response status and body
+	w.WriteHeader(resp.StatusCode)
+	io.Copy(w, resp.Body)
+}
+
+// returnProxy proxies return requests to the rent service
+func returnProxy(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Proxying request to rent service for return...")
+
+	// Read the request body
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Println("error reading request body", err)
+		w.WriteHeader(500)
+		return
+	}
+	defer r.Body.Close()
+
+	// Create request to rent service using internal Kubernetes service DNS
+	req, err := http.NewRequest("POST", "http://rent:8080/rent/return", bytes.NewReader(body))
+	if err != nil {
+		fmt.Println("error creating return request", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	// Propagate all headers including baggage, traceparent, tracestate, etc.
+	copyHeaders(req.Header, r.Header)
+
+	// Make the request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("error calling rent service for return", err)
+		w.WriteHeader(500)
+		return
+	}
+	defer resp.Body.Close()
+
+	// Copy response headers
+	for key, values := range resp.Header {
+		for _, value := range values {
+			w.Header().Add(key, value)
+		}
+	}
+
+	// Copy response status and body
+	w.WriteHeader(resp.StatusCode)
+	io.Copy(w, resp.Body)
 }

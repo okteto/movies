@@ -24,3 +24,17 @@ spec:
                 name: api
                 port:
                   number: 8080
+          - path: /catalog
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 8080
+          - path: /rent
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 8080

@@ -82,9 +82,10 @@ module.exports = (_, argv) => {
       },
       webSocketServer: 'ws',
       proxy: {
-        '/rent': 'http://rentals:8080/rent',
-        '/rentals': 'http://rentals:8080/rentals',
-        '/catalog': 'http://catalog:8080'
+        '/rent': 'http://api:8080',
+        '/rentals': 'http://api:8080',
+        '/catalog': 'http://api:8080',
+        '/users': 'http://api:8080'
       },
       client: {
         webSocketURL: {
