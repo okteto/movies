@@ -31,6 +31,17 @@ type ConsumerGroupHandler struct {
 func main() {
 	kingpin.Parse()
 
+	// Get Kubernetes namespace from environment variable
+	namespace := os.Getenv("KUBERNETES_NAMESPACE")
+	if namespace == "" {
+		namespace = "default"
+		log.Printf("KUBERNETES_NAMESPACE not set, using default: %s", namespace)
+	}
+
+	// Create consumer group ID with namespace suffix
+	consumerGroupID := fmt.Sprintf("movies-worker-group-%s", namespace)
+	log.Printf("Starting worker with consumer group ID: %s", consumerGroupID)
+
 	config := sarama.NewConfig()
 	config.Version = sarama.V2_6_0_0
 	config.Consumer.Group.Rebalance.Strategy = sarama.BalanceStrategyRoundRobin
@@ -38,7 +49,7 @@ func main() {
 	// Enable manual commit - we'll commit only after successful API calls
 	config.Consumer.Offsets.AutoCommit.Enable = false
 
-	consumerGroup, err := sarama.NewConsumerGroup([]string{"kafka:9092"}, "movies-worker-group", config)
+	consumerGroup, err := sarama.NewConsumerGroup([]string{"kafka:9092"}, consumerGroupID, config)
 	if err != nil {
 		log.Panic(err)
 	}
