@@ -63,6 +63,17 @@ type User struct {
 }
 
 func loadData() {
+	
+	dropTableStmt := `DROP TABLE IF EXISTS rentals`
+	if _, err := db.Exec(dropTableStmt); err != nil {
+		log.Panic(err)
+	}
+
+	createTableStmt := `CREATE TABLE IF NOT EXISTS rentals (id VARCHAR(255) NOT NULL UNIQUE, price VARCHAR(255) NOT NULL)`
+	if _, err := db.Exec(createTableStmt); err != nil {
+		log.Panic(err)
+	}
+	
 	dropTableStmt := `DROP TABLE IF EXISTS users`
 	if _, err := db.Exec(dropTableStmt); err != nil {
 		log.Panic(err)
@@ -105,6 +116,10 @@ func handleRequests() {
 	muxRouter.HandleFunc("/catalog", catalogProxy).Methods("GET")
 	muxRouter.HandleFunc("/rent", rentProxy).Methods("POST")
 	muxRouter.HandleFunc("/rent/return", returnProxy).Methods("POST")
+
+	// Internal API endpoints for worker service
+	muxRouter.HandleFunc("/internal/rentals", createOrUpdateRental).Methods("POST")
+	muxRouter.HandleFunc("/internal/rentals/{id}", deleteRental).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":8080", muxRouter))
 }
@@ -379,4 +394,57 @@ func returnProxy(w http.ResponseWriter, r *http.Request) {
 	// Copy response status and body
 	w.WriteHeader(resp.StatusCode)
 	io.Copy(w, resp.Body)
+}
+
+// RentalRequest represents the request body for creating/updating a rental
+type RentalRequest struct {
+	ID    string `json:"id"`
+	Price string `json:"price"`
+}
+
+// createOrUpdateRental creates or updates a rental entry in the database
+func createOrUpdateRental(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Received internal request to create/update rental...")
+
+	var rentalReq RentalRequest
+	if err := json.NewDecoder(r.Body).Decode(&rentalReq); err != nil {
+		fmt.Println("error decoding request body", err)
+		w.WriteHeader(400)
+		json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	insertDynStmt := `insert into "rentals"("id", "price") values($1, $2) on conflict(id) do update set price = $2`
+	if _, err := db.Exec(insertDynStmt, rentalReq.ID, rentalReq.Price); err != nil {
+		fmt.Println("error inserting/updating rental", err)
+		w.WriteHeader(500)
+		json.NewEncoder(w).Encode(map[string]string{"error": "database error"})
+		return
+	}
+
+	fmt.Printf("Rental created/updated: ID=%s, Price=%s\n", rentalReq.ID, rentalReq.Price)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(map[string]string{"status": "success"})
+}
+
+// deleteRental deletes a rental entry from the database
+func deleteRental(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	rentalID := vars["id"]
+
+	fmt.Printf("Received internal request to delete rental: ID=%s\n", rentalID)
+
+	deleteStmt := `DELETE FROM rentals WHERE id = $1`
+	if _, err := db.Exec(deleteStmt, rentalID); err != nil {
+		fmt.Println("error deleting rental", err)
+		w.WriteHeader(500)
+		json.NewEncoder(w).Encode(map[string]string{"error": "database error"})
+		return
+	}
+
+	fmt.Printf("Rental deleted: ID=%s\n", rentalID)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(map[string]string{"status": "success"})
 }

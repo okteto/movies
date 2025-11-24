@@ -1,19 +1,19 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
 
 	"fmt"
 
-	_ "github.com/lib/pq"
-
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/Shopify/sarama"
-	"github.com/okteto/movies/pkg/database"
 	"github.com/okteto/movies/pkg/kafka"
 )
 
@@ -23,21 +23,6 @@ var (
 )
 
 func main() {
-	db := database.Open()
-	defer db.Close()
-
-	database.Ping(db)
-
-	dropTableStmt := `DROP TABLE IF EXISTS rentals`
-	if _, err := db.Exec(dropTableStmt); err != nil {
-		log.Panic(err)
-	}
-
-	createTableStmt := `CREATE TABLE IF NOT EXISTS rentals (id VARCHAR(255) NOT NULL UNIQUE, price VARCHAR(255) NOT NULL)`
-	if _, err := db.Exec(createTableStmt); err != nil {
-		log.Panic(err)
-	}
-
 	master := kafka.GetMaster()
 	defer master.Close()
 
@@ -66,16 +51,94 @@ func main() {
 				*messageCountStart++
 				fmt.Printf("Received message: movies %s price %s\n", string(msg.Key), string(msg.Value))
 				price, _ := strconv.ParseFloat(string(msg.Value), 64)
-				insertDynStmt := `insert into "rentals"("id", "price") values($1, $2) on conflict(id) do update set price = $2`
-				if _, err := db.Exec(insertDynStmt, string(msg.Key), fmt.Sprintf("%f", price)); err != nil {
-					log.Panic(err)
+
+				// Extract baggage header from Kafka message
+				var baggageHeader string
+				for _, header := range msg.Headers {
+					if string(header.Key) == "baggage" {
+						baggageHeader = string(header.Value)
+						fmt.Printf("Baggage header found in Kafka message: %s\n", baggageHeader)
+						break
+					}
+				}
+
+				// Call API to create/update rental
+				rentalData := map[string]string{
+					"id":    string(msg.Key),
+					"price": fmt.Sprintf("%f", price),
+				}
+				jsonData, err := json.Marshal(rentalData)
+				if err != nil {
+					log.Printf("error marshaling rental data: %v", err)
+					continue
+				}
+
+				// Create request with baggage header
+				req, err := http.NewRequest("POST", "http://api:8080/internal/rentals", bytes.NewBuffer(jsonData))
+				if err != nil {
+					log.Printf("error creating rental request: %v", err)
+					continue
+				}
+				req.Header.Set("Content-Type", "application/json")
+
+				// Add baggage header to API call if present
+				if baggageHeader != "" {
+					req.Header.Set("baggage", baggageHeader)
+					fmt.Printf("Propagating baggage header to API: %s\n", baggageHeader)
+				}
+
+				client := &http.Client{}
+				resp, err := client.Do(req)
+				if err != nil {
+					log.Printf("error calling API to create rental: %v", err)
+					continue
+				}
+				defer resp.Body.Close()
+
+				if resp.StatusCode != http.StatusOK {
+					log.Printf("API returned non-200 status: %d", resp.StatusCode)
+				} else {
+					fmt.Printf("Successfully created/updated rental: %s\n", string(msg.Key))
 				}
 			case msg := <-consumerReturns.Messages():
 				catalogID := string(msg.Value)
 				fmt.Printf("Received return message: catalogID %s\n", catalogID)
-				deleteStmt := `DELETE FROM rentals WHERE id = $1`
-				if _, err := db.Exec(deleteStmt, catalogID); err != nil {
-					log.Panic(err)
+
+				// Extract baggage header from Kafka message
+				var baggageHeader string
+				for _, header := range msg.Headers {
+					if string(header.Key) == "baggage" {
+						baggageHeader = string(header.Value)
+						fmt.Printf("Baggage header found in Kafka message: %s\n", baggageHeader)
+						break
+					}
+				}
+
+				// Call API to delete rental
+				req, err := http.NewRequest("DELETE", fmt.Sprintf("http://api:8080/internal/rentals/%s", catalogID), nil)
+				if err != nil {
+					log.Printf("error creating delete request: %v", err)
+					continue
+				}
+
+				// Add baggage header to API call if present
+				if baggageHeader != "" {
+					req.Header.Set("baggage", baggageHeader)
+					fmt.Printf("Propagating baggage header to API: %s\n", baggageHeader)
+				}
+
+				client := &http.Client{}
+				resp, err := client.Do(req)
+				if err != nil {
+					log.Printf("error calling API to delete rental: %v", err)
+					continue
+				}
+				defer resp.Body.Close()
+
+				if resp.StatusCode != http.StatusOK {
+					log.Printf("API returned non-200 status: %d", resp.StatusCode)
+				} else {
+					fmt.Printf("Successfully deleted rental: %s\n", catalogID)
 				}
 			case <-signals:
 				fmt.Println("Interrupt is detected")

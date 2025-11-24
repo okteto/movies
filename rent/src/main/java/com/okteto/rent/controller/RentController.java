@@ -1,6 +1,8 @@
 package com.okteto.rent.controller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.header.internals.RecordHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +11,10 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -32,13 +36,25 @@ public class RentController {
     }
     
     @PostMapping(path= "/rent", consumes = "application/json", produces = "application/json")
-    List<String> rent(@RequestBody Rent rentInput) {
+    List<String> rent(@RequestBody Rent rentInput,
+                      @RequestHeader(value = "baggage", required = false) String baggage) {
         String catalogID = rentInput.getMovieID();
         Double price = rentInput.getPrice();
 
         logger.info("Rent [{},{}] received", catalogID, price);
+        if (baggage != null) {
+            logger.info("Baggage header received: {}", baggage);
+        }
 
-        kafkaTemplate.send(KAFKA_TOPIC_RENTALS, catalogID, price.toString())
+        // Create ProducerRecord to add custom headers
+        ProducerRecord<String, String> record = new ProducerRecord<>(KAFKA_TOPIC_RENTALS, catalogID, price.toString());
+
+        // Add baggage header to Kafka message if present
+        if (baggage != null && !baggage.isEmpty()) {
+            record.headers().add(new RecordHeader("baggage", baggage.getBytes(StandardCharsets.UTF_8)));
+        }
+
+        kafkaTemplate.send(record)
         .thenAccept(result -> logger.info("Message [{}] delivered with offset {}",
                         catalogID,
                         result.getRecordMetadata().offset()))
@@ -46,18 +62,30 @@ public class RentController {
             logger.warn("Unable to deliver message [{}]. {}", catalogID, ex.getMessage());
             return null;
         });
-        
+
 
         return new LinkedList<>();
     }
 
     @PostMapping(path= "/rent/return", consumes = "application/json", produces = "application/json")
-    public Map<String, String> returnMovie(@RequestBody ReturnRequest returnRequest) {
+    public Map<String, String> returnMovie(@RequestBody ReturnRequest returnRequest,
+                                           @RequestHeader(value = "baggage", required = false) String baggage) {
         String catalogID = returnRequest.getMovieID();
 
         logger.info("Return [{}] received", catalogID);
+        if (baggage != null) {
+            logger.info("Baggage header received: {}", baggage);
+        }
 
-        kafkaTemplate.send(KAFKA_TOPIC_RETURNS, catalogID, catalogID)
+        // Create ProducerRecord to add custom headers
+        ProducerRecord<String, String> record = new ProducerRecord<>(KAFKA_TOPIC_RETURNS, catalogID, catalogID);
+
+        // Add baggage header to Kafka message if present
+        if (baggage != null && !baggage.isEmpty()) {
+            record.headers().add(new RecordHeader("baggage", baggage.getBytes(StandardCharsets.UTF_8)));
+        }
+
+        kafkaTemplate.send(record)
         .thenAccept(result -> logger.info("Return message [{}] delivered with offset {}",
                         catalogID,
                         result.getRecordMetadata().offset()))
