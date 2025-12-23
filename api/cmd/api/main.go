@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/okteto/movies/pkg/database"
@@ -24,6 +25,21 @@ import (
 )
 
 var db *sql.DB
+
+// emailCache stores cached email lookups
+type emailCache struct {
+	mu      sync.RWMutex
+	entries map[string]emailCacheEntry
+}
+
+type emailCacheEntry struct {
+	email     string
+	expiresAt time.Time
+}
+
+var cache = &emailCache{
+	entries: make(map[string]emailCacheEntry),
+}
 
 // CustomClaims contains custom data we want from the token.
 type CustomClaims struct {
@@ -44,6 +60,98 @@ const emailContextKey contextKey = "email"
 // Validate does nothing for this example.
 func (c CustomClaims) Validate(ctx context.Context) error {
 	return nil
+}
+
+type UserInfo struct {
+	Email         string `json:"email"`
+	EmailVerified bool   `json:"email_verified"`
+	Name          string `json:"name"`
+	Nickname      string `json:"nickname"`
+	Picture       string `json:"picture"`
+	Sub           string `json:"sub"`
+}
+
+// get retrieves an email from cache if it exists and hasn't expired
+func (c *emailCache) get(token string) (string, bool) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	entry, exists := c.entries[token]
+	if !exists {
+		return "", false
+	}
+
+	if time.Now().After(entry.expiresAt) {
+		return "", false
+	}
+
+	return entry.email, true
+}
+
+// set stores an email in cache with a TTL
+func (c *emailCache) set(token, email string, ttl time.Duration) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	c.entries[token] = emailCacheEntry{
+		email:     email,
+		expiresAt: time.Now().Add(ttl),
+	}
+}
+
+// cleanup removes expired entries from the cache
+func (c *emailCache) cleanup() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	now := time.Now()
+	for token, entry := range c.entries {
+		if now.After(entry.expiresAt) {
+			delete(c.entries, token)
+		}
+	}
+}
+
+// getUserEmailFromAuth0 fetches user info from Auth0's userinfo endpoint
+func getUserEmailFromAuth0(accessToken string) string {
+	// Check cache first
+	if email, found := cache.get(accessToken); found {
+		return email
+	}
+
+	req, err := http.NewRequest("GET", "https://okteto.auth0.com/userinfo", nil)
+	if err != nil {
+		log.Printf("Error creating userinfo request: %v", err)
+		return ""
+	}
+
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+
+	client := &http.Client{Timeout: 5 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("Error fetching userinfo: %v", err)
+		return ""
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("Userinfo endpoint returned status: %d", resp.StatusCode)
+		return ""
+	}
+
+	var userInfo UserInfo
+	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
+		log.Printf("Error decoding userinfo: %v", err)
+		return ""
+	}
+
+	// Cache the email for 5 minutes
+	if userInfo.Email != "" {
+		cache.set(accessToken, userInfo.Email, 5*time.Minute)
+	}
+
+	return userInfo.Email
 }
 
 // EnsureValidToken is a middleware that will check the validity of our JWT.
@@ -89,37 +197,44 @@ func EnsureValidToken() func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// First validate the JWT
 			middleware.CheckJWT(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				email := ""
+
 				// Extract claims from the validated token
 				claims, ok := r.Context().Value(jwtmiddleware.ContextKey{}).(*validator.ValidatedClaims)
 				if ok && claims != nil {
-					// Try to get email from custom claims
-					email := ""
+					// Try to get email from custom claims in the token
 					customClaims, ok := claims.CustomClaims.(*CustomClaims)
 					if ok {
-						log.Printf("Custom claims: %+v", customClaims)
 						// Try different possible email fields
 						if customClaims.Email != "" {
 							email = customClaims.Email
 						} else if customClaims.HttpsOktetoAuth0ComEmail != "" {
 							email = customClaims.HttpsOktetoAuth0ComEmail
-						} else if customClaims.Name != "" {
-							email = customClaims.Name
 						}
 					}
 
-					// Fallback to subject if no email found
+					// If email not found in token, fetch from Auth0 userinfo endpoint
+					if email == "" {
+						// Get the access token from the Authorization header
+						authHeader := r.Header.Get("Authorization")
+						if authHeader != "" && len(authHeader) > 7 && authHeader[:7] == "Bearer " {
+							token := authHeader[7:]
+							email = getUserEmailFromAuth0(token)
+						}
+					}
+
+					// Last fallback to subject if no email found
 					if email == "" && claims.RegisteredClaims.Subject != "" {
 						email = claims.RegisteredClaims.Subject
 					}
-
-					log.Printf("Extracted email/user: %s", email)
-
-					if email != "" {
-						// Add email to context
-						ctx := context.WithValue(r.Context(), emailContextKey, email)
-						r = r.WithContext(ctx)
-					}
 				}
+
+				if email != "" {
+					// Add email to context
+					ctx := context.WithValue(r.Context(), emailContextKey, email)
+					r = r.WithContext(ctx)
+				}
+
 				next.ServeHTTP(w, r)
 			})).ServeHTTP(w, r)
 		})
@@ -129,6 +244,15 @@ func EnsureValidToken() func(next http.Handler) http.Handler {
 func main() {
 	db = database.Open()
 	defer db.Close()
+
+	// Start cache cleanup goroutine
+	go func() {
+		ticker := time.NewTicker(10 * time.Minute)
+		defer ticker.Stop()
+		for range ticker.C {
+			cache.cleanup()
+		}
+	}()
 
 	if len(os.Args) > 1 && os.Args[1] == "load-data" {
 		database.Ping(db)
