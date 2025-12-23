@@ -43,10 +43,13 @@ class App extends Component {
   }
 
   handleRent = async (item) => {
+    const { getAccessToken } = this.props;
+    const token = await getAccessToken();
     await fetch('/rent', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
         catalog_id: item.id,
@@ -57,10 +60,13 @@ class App extends Component {
   }
 
   handleReturn = async (item) =>{
+    const { getAccessToken } = this.props;
+    const token = await getAccessToken();
     await fetch('/rent/return', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
         catalog_id: item.id
@@ -72,11 +78,22 @@ class App extends Component {
   
 
   refreshData = async () => {
-    const catalogPromise = fetch('/catalog')
+    const { getAccessToken } = this.props;
+    const token = await getAccessToken();
+
+    const catalogPromise = fetch('/catalog', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
       .then(res => res.json())
       .then(result => compact(result));
 
-    const rentalsPromise = fetch('/rentals')
+    const rentalsPromise = fetch('/rentals', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
       .then(res => res.json())
       .then(result => compact(result));
 
@@ -359,8 +376,8 @@ const KubeconLogo = ({ size = '21'}) => {
 }
 
 const AppWithAuth = () => {
-  const { user, isAuthenticated, isLoading } = useAuth0();
-  return <App user={user} isAuthenticated={isAuthenticated} isLoading={isLoading} />;
+  const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
+  return <App user={user} isAuthenticated={isAuthenticated} isLoading={isLoading} getAccessToken={getAccessTokenSilently} />;
 };
 
 export default AppWithAuth;
