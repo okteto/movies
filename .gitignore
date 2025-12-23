@@ -5,3 +5,7 @@ rent/.idea
 rent/target
 tests/test-results
 tests/playwright-report
+api/main
+.env
+frontend/.env
+api/.env

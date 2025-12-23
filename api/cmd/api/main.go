@@ -1,23 +1,83 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
-	"log"
+	"time"
 
 	"github.com/okteto/movies/pkg/database"
 
 	"fmt"
 
-	_ "github.com/lib/pq"
+	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
+	"github.com/auth0/go-jwt-middleware/v2/jwks"
+	"github.com/auth0/go-jwt-middleware/v2/validator"
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 )
 
 var db *sql.DB
+
+// CustomClaims contains custom data we want from the token.
+type CustomClaims struct {
+	Scope string `json:"scope"`
+}
+
+// Validate does nothing for this example.
+func (c CustomClaims) Validate(ctx context.Context) error {
+	return nil
+}
+
+// EnsureValidToken is a middleware that will check the validity of our JWT.
+func EnsureValidToken() func(next http.Handler) http.Handler {
+	issuerURL, err := url.Parse("https://okteto.auth0.com/")
+	if err != nil {
+		log.Fatalf("Failed to parse the issuer url: %v", err)
+	}
+
+	provider := jwks.NewCachingProvider(issuerURL, 5*time.Minute)
+
+	jwtValidator, err := validator.New(
+		provider.KeyFunc,
+		validator.RS256,
+		issuerURL.String(),
+		[]string{"https://okteto.auth0.com/api/v2/"},
+		validator.WithCustomClaims(
+			func() validator.CustomClaims {
+				return &CustomClaims{}
+			},
+		),
+		validator.WithAllowedClockSkew(time.Minute),
+	)
+	if err != nil {
+		log.Fatalf("Failed to set up the jwt validator")
+	}
+
+	errorHandler := func(w http.ResponseWriter, r *http.Request, err error) {
+		authHeader := r.Header.Get("Authorization")
+		log.Printf("Encountered error while validating JWT: %v", err)
+		log.Printf("Authorization header: %s", authHeader)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte(`{"message":"Failed to validate JWT."}`))
+	}
+
+	middleware := jwtmiddleware.New(
+		jwtValidator.ValidateToken,
+		jwtmiddleware.WithErrorHandler(errorHandler),
+	)
+
+	return func(next http.Handler) http.Handler {
+		return middleware.CheckJWT(next)
+	}
+}
 
 func main() {
 	db = database.Open()
@@ -49,15 +109,15 @@ type Movie struct {
 }
 
 type User struct {
-	Userid int
+	Userid    int
 	Firstname string
-	Lastname string
-	Phone string
-	City string
-	State string
-	Zip string
-	Age int
-	Gender string
+	Lastname  string
+	Phone     string
+	City      string
+	State     string
+	Zip       string
+	Age       int
+	Gender    string
 }
 
 func loadData() {
@@ -90,16 +150,17 @@ func loadData() {
 			log.Panic(err)
 		}
 	}
-
-	return
 }
 
 func handleRequests() {
 	muxRouter := mux.NewRouter().StrictSlash(true)
 
-	muxRouter.HandleFunc("/rentals", rentals)
-	muxRouter.HandleFunc("/users", allUsers)
-	muxRouter.HandleFunc("/users/{userid}", singleUser)
+	// Apply JWT middleware to all routes
+	jwtMiddleware := EnsureValidToken()
+
+	muxRouter.Handle("/rentals", jwtMiddleware(http.HandlerFunc(rentals))).Methods("GET")
+	muxRouter.Handle("/users", jwtMiddleware(http.HandlerFunc(allUsers))).Methods("GET")
+	muxRouter.Handle("/users/{userid}", jwtMiddleware(http.HandlerFunc(singleUser))).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8080", muxRouter))
 }
