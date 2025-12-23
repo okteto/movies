@@ -17,7 +17,8 @@ render(
       domain="okteto.auth0.com"
       clientId="wVnsLXd9pMC5Uu7bFpw2JaRGqoGP4Jc7"
       authorizationParams={{
-        redirect_uri: window.location.origin
+        redirect_uri: window.location.origin, 
+        audience: "https://okteto.auth0.com/api/v2/"        
       }}
     >
       <Root />
