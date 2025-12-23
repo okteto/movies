@@ -1,11 +1,14 @@
 package com.okteto.rent.controller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Collections;
 
 @RestController
@@ -26,6 +30,8 @@ public class RentController {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @GetMapping(path= "/rent", produces = "application/json")
     Map<String, String> healthz() {
             return Collections.singletonMap("status", "ok");
@@ -36,17 +42,34 @@ public class RentController {
         String catalogID = rentInput.getMovieID();
         Double price = rentInput.getPrice();
 
-        logger.info("Rent [{},{}] received", catalogID, price);
+        // Get email from JWT authentication context (server-side, secure)
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication != null ? authentication.getName() : null;
 
-        kafkaTemplate.send(KAFKA_TOPIC_RENTALS, catalogID, price.toString())
-        .thenAccept(result -> logger.info("Message [{}] delivered with offset {}",
-                        catalogID,
-                        result.getRecordMetadata().offset()))
-        .exceptionally(ex -> {
-            logger.warn("Unable to deliver message [{}]. {}", catalogID, ex.getMessage());
-            return null;
-        });
-        
+        if (email == null || email.isEmpty()) {
+            logger.error("No authenticated user found");
+            return new LinkedList<>();
+        }
+
+        logger.info("Rent [{},{},{}] received", catalogID, price, email);
+
+        try {
+            Map<String, Object> rentalData = new HashMap<>();
+            rentalData.put("email", email);
+            rentalData.put("price", price);
+            String messageValue = objectMapper.writeValueAsString(rentalData);
+
+            kafkaTemplate.send(KAFKA_TOPIC_RENTALS, catalogID, messageValue)
+            .thenAccept(result -> logger.info("Message [{}] delivered with offset {}",
+                            catalogID,
+                            result.getRecordMetadata().offset()))
+            .exceptionally(ex -> {
+                logger.warn("Unable to deliver message [{}]. {}", catalogID, ex.getMessage());
+                return null;
+            });
+        } catch (Exception ex) {
+            logger.error("Error serializing rental message", ex);
+        }
 
         return new LinkedList<>();
     }
@@ -55,9 +78,18 @@ public class RentController {
     public Map<String, String> returnMovie(@RequestBody ReturnRequest returnRequest) {
         String catalogID = returnRequest.getMovieID();
 
-        logger.info("Return [{}] received", catalogID);
+        // Get email from JWT authentication context (server-side, secure)
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication != null ? authentication.getName() : null;
 
-        kafkaTemplate.send(KAFKA_TOPIC_RETURNS, catalogID, catalogID)
+        if (email == null || email.isEmpty()) {
+            logger.error("No authenticated user found");
+            return Collections.singletonMap("status", "error: no authenticated user");
+        }
+
+        logger.info("Return [{},{}] received", catalogID, email);
+
+        kafkaTemplate.send(KAFKA_TOPIC_RETURNS, catalogID, email)
         .thenAccept(result -> logger.info("Return message [{}] delivered with offset {}",
                         catalogID,
                         result.getRecordMetadata().offset()))

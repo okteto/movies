@@ -340,7 +340,7 @@ func rentals(w http.ResponseWriter, r *http.Request) {
 	email, _ := r.Context().Value(emailContextKey).(string)
 	log.Printf("Received rentals request from user: %s", email)
 
-	rows, err := db.Query("SELECT * FROM rentals")
+	rows, err := db.Query("SELECT id, price FROM rentals WHERE email = $1", email)
 	if err != nil {
 		fmt.Println("error listing rentals", err)
 		w.WriteHeader(500)

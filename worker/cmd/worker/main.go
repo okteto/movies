@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 	"os/signal"
@@ -22,6 +23,11 @@ var (
 	messageCountStart = kingpin.Flag("messageCountStart", "Message counter start from:").Int()
 )
 
+type RentalMessage struct {
+	Email string  `json:"email"`
+	Price float64 `json:"price"`
+}
+
 func main() {
 	db := database.Open()
 	defer db.Close()
@@ -33,7 +39,7 @@ func main() {
 		log.Panic(err)
 	}
 
-	createTableStmt := `CREATE TABLE IF NOT EXISTS rentals (id VARCHAR(255) NOT NULL UNIQUE, price VARCHAR(255) NOT NULL)`
+	createTableStmt := `CREATE TABLE IF NOT EXISTS rentals (id VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, price VARCHAR(255) NOT NULL, PRIMARY KEY (id, email))`
 	if _, err := db.Exec(createTableStmt); err != nil {
 		log.Panic(err)
 	}
@@ -64,17 +70,27 @@ func main() {
 				fmt.Println(err)
 			case msg := <-consumerRentals.Messages():
 				*messageCountStart++
-				fmt.Printf("Received message: movies %s price %s\n", string(msg.Key), string(msg.Value))
-				price, _ := strconv.ParseFloat(string(msg.Value), 64)
-				insertDynStmt := `insert into "rentals"("id", "price") values($1, $2) on conflict(id) do update set price = $2`
-				if _, err := db.Exec(insertDynStmt, string(msg.Key), fmt.Sprintf("%f", price)); err != nil {
+				catalogID := string(msg.Key)
+
+				var rental RentalMessage
+				if err := json.Unmarshal(msg.Value, &rental); err != nil {
+					// Fallback for old message format (backwards compatibility)
+					price, _ := strconv.ParseFloat(string(msg.Value), 64)
+					rental.Price = price
+					rental.Email = "unknown@example.com"
+				}
+
+				fmt.Printf("Received message: catalog_id %s email %s price %f\n", catalogID, rental.Email, rental.Price)
+				insertDynStmt := `insert into "rentals"("id", "email", "price") values($1, $2, $3) on conflict(id, email) do update set price = $3`
+				if _, err := db.Exec(insertDynStmt, catalogID, rental.Email, fmt.Sprintf("%f", rental.Price)); err != nil {
 					log.Panic(err)
 				}
 			case msg := <-consumerReturns.Messages():
-				catalogID := string(msg.Value)
-				fmt.Printf("Received return message: catalogID %s\n", catalogID)
-				deleteStmt := `DELETE FROM rentals WHERE id = $1`
-				if _, err := db.Exec(deleteStmt, catalogID); err != nil {
+				catalogID := string(msg.Key)
+				email := string(msg.Value)
+				fmt.Printf("Received return message: catalogID %s email %s\n", catalogID, email)
+				deleteStmt := `DELETE FROM rentals WHERE id = $1 AND email = $2`
+				if _, err := db.Exec(deleteStmt, catalogID, email); err != nil {
 					log.Panic(err)
 				}
 			case <-signals:
