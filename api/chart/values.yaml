@@ -1,3 +1,6 @@
 replicaCount: 1
 image: ""
 load: ""
+auth:
+  domain: "your-auth-domain"
+  audience: "your-auth-audicence"

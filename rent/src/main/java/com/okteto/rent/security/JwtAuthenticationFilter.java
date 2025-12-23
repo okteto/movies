@@ -34,9 +34,12 @@ import java.util.concurrent.TimeUnit;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
-    private static final String ISSUER = "https://okteto.auth0.com/";
-    private static final String AUDIENCE = "https://okteto.auth0.com/api/v2/";
-    private static final String USERINFO_ENDPOINT = "https://okteto.auth0.com/userinfo";
+
+    // Get Auth0 configuration from environment variables
+    private final String auth0Domain;
+    private final String issuer;
+    private final String audience;
+    private final String userinfoEndpoint;
 
     private final JwkProvider jwkProvider;
     private final HttpClient httpClient;
@@ -58,7 +61,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     public JwtAuthenticationFilter() throws Exception {
-        this.jwkProvider = new JwkProviderBuilder(new URL(ISSUER + ".well-known/jwks.json"))
+        // Read Auth0 configuration from environment variables with defaults
+        this.auth0Domain = System.getenv().getOrDefault("AUTH0_DOMAIN", "okteto.auth0.com");
+        this.issuer = "https://" + this.auth0Domain + "/";
+        this.audience = System.getenv().getOrDefault("AUTH0_AUDIENCE", "https://okteto.auth0.com/api/v2/");
+        this.userinfoEndpoint = "https://" + this.auth0Domain + "/userinfo";
+
+        logger.info("Initializing JWT filter with domain: {}, audience: {}", this.auth0Domain, this.audience);
+
+        this.jwkProvider = new JwkProviderBuilder(new URL(this.issuer + ".well-known/jwks.json"))
                 .cached(10, 24, TimeUnit.HOURS)
                 .rateLimited(10, 1, TimeUnit.MINUTES)
                 .build();
@@ -78,7 +89,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(USERINFO_ENDPOINT))
+                    .uri(URI.create(this.userinfoEndpoint))
                     .header("Authorization", "Bearer " + accessToken)
                     .GET()
                     .build();
@@ -132,12 +143,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             algorithm.verify(jwt);
 
             // Verify issuer and audience
-            if (!ISSUER.equals(jwt.getIssuer())) {
-                throw new SecurityException("Invalid issuer");
+            if (!this.issuer.equals(jwt.getIssuer())) {
+                throw new SecurityException("Invalid issuer: expected " + this.issuer + " but got " + jwt.getIssuer());
             }
 
-            if (!jwt.getAudience().contains(AUDIENCE)) {
-                throw new SecurityException("Invalid audience");
+            if (!jwt.getAudience().contains(this.audience)) {
+                throw new SecurityException("Invalid audience: expected " + this.audience);
             }
 
             // Check expiration

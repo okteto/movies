@@ -21,6 +21,13 @@ spec:
       containers:
         - name: frontend
           image: {{ .Values.image }}
+          env:
+          - name: AUTH0_CLIENT_ID
+            value: {{ .Values.auth.clientId | quote }}
+          - name: AUTH0_DOMAIN
+            value: {{ .Values.auth.domain | quote }}
+          - name: AUTH0_AUDIENCE
+            value: {{ .Values.auth.audience | quote }}
           ports:
             - name: http
               containerPort: 80
@@ -35,3 +42,4 @@ spec:
             httpGet:
               path: /
               port: http
+

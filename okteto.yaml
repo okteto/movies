@@ -3,6 +3,10 @@ icon: https://apps.okteto.com/movies/icon.png
 build:
   frontend:
     context: frontend
+    args:
+      AUTH0_AUDIENCE: $AUTH0_AUDIENCE
+      AUTH0_DOMAIN: $AUTH0_DOMAIN
+      AUTH0_CLIENT_ID: $AUTH0_CLIENT_ID
   catalog:
     context: catalog
   rent:
@@ -18,15 +22,15 @@ deploy:
   - name: Deploy Infrastructure (PostgreSQL, Kafka, MongoDB)
     command: helm upgrade --install infrastructure infrastructure/chart
   - name: Deploy Frontend
-    command: helm upgrade --install frontend frontend/chart --set image=${OKTETO_BUILD_FRONTEND_IMAGE}
+    command: helm upgrade --install frontend frontend/chart --set image=${OKTETO_BUILD_FRONTEND_IMAGE} --set auth.clientId=$AUTH0_CLIENT_ID --set auth.domain=$AUTH0_DOMAIN --set auth.audience=$AUTH0_AUDIENCE
   - name: Deploy Catalog
     command: helm upgrade --install catalog catalog/chart --set image=${OKTETO_BUILD_CATALOG_IMAGE}
   - name: Deploy Rent
-    command: helm upgrade --install rent rent/chart --set image=${OKTETO_BUILD_RENT_IMAGE}
+    command: helm upgrade --install rent rent/chart --set image=${OKTETO_BUILD_RENT_IMAGE}  --set auth.domain=$AUTH0_DOMAIN --set auth.audience=$AUTH0_AUDIENCE
   - name: Deploy Worker
     command: helm upgrade --install worker worker/chart --set image=${OKTETO_BUILD_WORKER_IMAGE}
   - name: Deploy API
-    command: helm upgrade --install api api/chart --set image=${OKTETO_BUILD_API_IMAGE} --set load=${API_LOAD_DATA:-true}
+    command: helm upgrade --install api api/chart --set image=${OKTETO_BUILD_API_IMAGE} --set load=${API_LOAD_DATA:-true}  --set auth.domain=$AUTH0_DOMAIN --set auth.audience=$AUTH0_AUDIENCE
 
 dev:
   frontend:

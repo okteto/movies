@@ -20,3 +20,8 @@ spec:
         ports:
         - containerPort: 8080
           name: rent
+        env:
+          - name: AUTH0_DOMAIN
+            value: {{ .Values.auth.domain | quote }}
+          - name: AUTH0_AUDIENCE
+            value: {{ .Values.auth.audience | quote }}

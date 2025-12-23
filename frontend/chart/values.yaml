@@ -1,2 +1,6 @@
 replicaCount: 1
 image: ""
+auth:
+  domain: "your-auth-domain"
+  audience: "your-auth-audicence"
+  clientId: "your-client-id"

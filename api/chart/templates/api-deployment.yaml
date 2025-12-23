@@ -33,3 +33,8 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+          env:
+          - name: AUTH0_DOMAIN
+            value: {{ .Values.auth.domain | quote }}
+          - name: AUTH0_AUDIENCE
+            value: {{ .Values.auth.audience | quote }}

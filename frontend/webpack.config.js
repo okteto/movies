@@ -1,5 +1,5 @@
 const path = require('path');
-const { DefinePlugin } = require('webpack');
+const { DefinePlugin, EnvironmentPlugin } = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 
@@ -69,7 +69,8 @@ module.exports = (_, argv) => {
       }),
       new DefinePlugin({
         MODE: JSON.stringify(mode),
-      })
+      }),
+      new EnvironmentPlugin(['AUTH0_DOMAIN', 'AUTH0_AUDIENCE', 'AUTH0_CLIENT_ID']),
     ],
     devServer: {
       historyApiFallback: true,

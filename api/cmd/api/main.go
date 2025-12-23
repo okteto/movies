@@ -112,6 +112,15 @@ func (c *emailCache) cleanup() {
 	}
 }
 
+// getEnv gets an environment variable with a default value
+func getEnv(key, defaultValue string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+	return value
+}
+
 // getUserEmailFromAuth0 fetches user info from Auth0's userinfo endpoint
 func getUserEmailFromAuth0(accessToken string) string {
 	// Check cache first
@@ -119,7 +128,10 @@ func getUserEmailFromAuth0(accessToken string) string {
 		return email
 	}
 
-	req, err := http.NewRequest("GET", "https://okteto.auth0.com/userinfo", nil)
+	auth0Domain := getEnv("AUTH0_DOMAIN", "okteto.auth0.com")
+	userinfoURL := fmt.Sprintf("https://%s/userinfo", auth0Domain)
+
+	req, err := http.NewRequest("GET", userinfoURL, nil)
 	if err != nil {
 		log.Printf("Error creating userinfo request: %v", err)
 		return ""
@@ -156,10 +168,16 @@ func getUserEmailFromAuth0(accessToken string) string {
 
 // EnsureValidToken is a middleware that will check the validity of our JWT.
 func EnsureValidToken() func(next http.Handler) http.Handler {
-	issuerURL, err := url.Parse("https://okteto.auth0.com/")
+	// Get Auth0 configuration from environment variables
+	auth0Domain := getEnv("AUTH0_DOMAIN", "okteto.auth0.com")
+	auth0Audience := getEnv("AUTH0_AUDIENCE", "https://okteto.auth0.com/api/v2/")
+
+	issuerURL, err := url.Parse(fmt.Sprintf("https://%s/", auth0Domain))
 	if err != nil {
 		log.Fatalf("Failed to parse the issuer url: %v", err)
 	}
+
+	log.Printf("Initializing JWT validator with domain: %s, audience: %s", auth0Domain, auth0Audience)
 
 	provider := jwks.NewCachingProvider(issuerURL, 5*time.Minute)
 
@@ -167,7 +185,7 @@ func EnsureValidToken() func(next http.Handler) http.Handler {
 		provider.KeyFunc,
 		validator.RS256,
 		issuerURL.String(),
-		[]string{"https://okteto.auth0.com/api/v2/"},
+		[]string{auth0Audience},
 		validator.WithCustomClaims(
 			func() validator.CustomClaims {
 				return &CustomClaims{}
