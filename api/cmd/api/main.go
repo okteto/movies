@@ -27,8 +27,19 @@ var db *sql.DB
 
 // CustomClaims contains custom data we want from the token.
 type CustomClaims struct {
-	Scope string `json:"scope"`
+	Scope                   string `json:"scope"`
+	Email                   string `json:"email"`
+	EmailVerified           bool   `json:"email_verified"`
+	Name                    string `json:"name"`
+	Nickname                string `json:"nickname"`
+	Picture                 string `json:"picture"`
+	UpdatedAt               string `json:"updated_at"`
+	HttpsOktetoAuth0ComEmail string `json:"https://okteto.auth0.com/email"`
 }
+
+type contextKey string
+
+const emailContextKey contextKey = "email"
 
 // Validate does nothing for this example.
 func (c CustomClaims) Validate(ctx context.Context) error {
@@ -75,7 +86,43 @@ func EnsureValidToken() func(next http.Handler) http.Handler {
 	)
 
 	return func(next http.Handler) http.Handler {
-		return middleware.CheckJWT(next)
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// First validate the JWT
+			middleware.CheckJWT(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// Extract claims from the validated token
+				claims, ok := r.Context().Value(jwtmiddleware.ContextKey{}).(*validator.ValidatedClaims)
+				if ok && claims != nil {
+					// Try to get email from custom claims
+					email := ""
+					customClaims, ok := claims.CustomClaims.(*CustomClaims)
+					if ok {
+						log.Printf("Custom claims: %+v", customClaims)
+						// Try different possible email fields
+						if customClaims.Email != "" {
+							email = customClaims.Email
+						} else if customClaims.HttpsOktetoAuth0ComEmail != "" {
+							email = customClaims.HttpsOktetoAuth0ComEmail
+						} else if customClaims.Name != "" {
+							email = customClaims.Name
+						}
+					}
+
+					// Fallback to subject if no email found
+					if email == "" && claims.RegisteredClaims.Subject != "" {
+						email = claims.RegisteredClaims.Subject
+					}
+
+					log.Printf("Extracted email/user: %s", email)
+
+					if email != "" {
+						// Add email to context
+						ctx := context.WithValue(r.Context(), emailContextKey, email)
+						r = r.WithContext(ctx)
+					}
+				}
+				next.ServeHTTP(w, r)
+			})).ServeHTTP(w, r)
+		})
 	}
 }
 
@@ -166,7 +213,8 @@ func handleRequests() {
 }
 
 func rentals(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Received request...")
+	email, _ := r.Context().Value(emailContextKey).(string)
+	log.Printf("Received rentals request from user: %s", email)
 
 	rows, err := db.Query("SELECT * FROM rentals")
 	if err != nil {
