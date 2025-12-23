@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
+import LoginButton from './LoginButton';
+import LogoutButton from './LogoutButton';
 import Loader from './Loader';
 import Users from './Users';
 
@@ -29,11 +32,6 @@ class App extends Component {
         loaded: false
       },
       cost: 0,
-      session: {
-        name: 'Cindy',
-        lastName: 'Lopez',
-        username: 'cindy'
-      },
       fixHeader: false
     };
 
@@ -106,7 +104,9 @@ class App extends Component {
   }
 
   render() {
-    const { catalog, rental, session, cost } = this.state;
+    const { catalog, rental, cost } = this.state;
+    const { user, isAuthenticated, isLoading } = this.props;
+
     return (
       <Router>
         <div className="App" ref={this.appRef} onScroll={this.handleScroll}>
@@ -117,7 +117,12 @@ class App extends Component {
                 Movies
               </div>
             </Link>
-            <Logo size="24" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              {!isLoading && (
+                isAuthenticated ? <LogoutButton /> : <LoginButton />
+              )}
+              <Logo size="24" />
+            </div>
           </div>
 
           {MODE === 'development' &&
@@ -125,53 +130,62 @@ class App extends Component {
           }
 
           <div className="App__content">
-            <Switch>
-              <Route exact path="/">
-                <div>
-                  <div className='App__nav'>
-
-                    {/* <div className="App__promo">
-                      <KubeconLogo size="22" />
-                      Kubecon 2023 special offer! Get a <strong>50% discount</strong> on all movies today!
-                    </div> */}
-
-                    <Link className="button" role="button" to="/admin/users">
-                      <svg height="20" width="20" viewBox="0 0 48 48">
-                        <path fill="#fff" d="M27.3 44h-6.6q-.55 0-.975-.35-.425-.35-.525-.9l-.8-5.05q-.95-.35-2-.95t-1.85-1.25L9.9 37.65q-.55.25-1.1.075T7.95 37l-3.3-5.85q-.3-.5-.15-1.05t.6-.9l4.3-3.15q-.1-.45-.125-1.025Q9.25 24.45 9.25 24q0-.45.025-1.025T9.4 21.95L5.1 18.8q-.45-.35-.6-.9-.15-.55.15-1.05L7.95 11q.3-.55.85-.725.55-.175 1.1.075l4.65 2.15q.8-.65 1.85-1.25t2-.9l.8-5.1q.1-.55.525-.9Q20.15 4 20.7 4h6.6q.55 0 .975.35.425.35.525.9l.8 5.05q.95.35 2.025.925Q32.7 11.8 33.45 12.5l4.65-2.15q.55-.25 1.1-.075t.85.725l3.3 5.8q.3.5.175 1.075t-.625.925l-4.3 3.05q.1.5.125 1.075.025.575.025 1.075t-.025 1.05q-.025.55-.125 1.05l4.3 3.1q.45.35.6.9.15.55-.15 1.05L40.05 37q-.3.55-.85.725-.55.175-1.1-.075l-4.65-2.15q-.8.65-1.825 1.275-1.025.625-2.025.925l-.8 5.05q-.1.55-.525.9-.425.35-.975.35ZM24 30.5q2.7 0 4.6-1.9 1.9-1.9 1.9-4.6 0-2.7-1.9-4.6-1.9-1.9-4.6-1.9-2.7 0-4.6 1.9-1.9 1.9-1.9 4.6 0 2.7 1.9 4.6 1.9 1.9 4.6 1.9Z"/>
-                      </svg>
-                      Admin
-                    </Link>
-                  </div>
-                  <TitleList
-                    title={`${session.name}'s movies`}
-                    cost={cost}
-                    titles={rental.data}
-                    loaded={rental.loaded}
-                    onReturn={this.handleReturn}
-                  />
-                  <TitleList
-                    title="Store"
-                    titles={catalog.data}
-                    loaded={catalog.loaded}
-                    onRent={this.handleRent}
-
-                  />
-                </div>
-              </Route>
-            </Switch>
-            <Switch>
-              <Route path="/admin/users">
-              <div className='App__nav'>
-                <Link className="button" role="button" to="/">
-                  <svg height="20" width="20" viewBox="0 0 48 48">
-                    <path fill="#fff" d="m22.35 38.95-13.9-13.9q-.25-.25-.35-.5Q8 24.3 8 24q0-.3.1-.55.1-.25.35-.5L22.4 9q.4-.4 1-.4t1.05.45q.45.45.45 1.05 0 .6-.45 1.05L13.1 22.5h24.8q.65 0 1.075.425.425.425.425 1.075 0 .65-.425 1.075-.425.425-1.075.425H13.1l11.4 11.4q.4.4.4 1t-.45 1.05q-.45.45-1.05.45-.6 0-1.05-.45Z"/>
-                  </svg>
-                  Back to Movies
-                </Link>
+            {isLoading ? (
+              <Loader />
+            ) : !isAuthenticated ? (
+              <div style={{ textAlign: 'center', padding: '50px' }}>
+                <h2>Welcome to Movies</h2>
+                <p>Please log in to access the movie catalog.</p>
               </div>
-                <Users />
-              </Route>
-            </Switch>
+            ) : (
+              <>
+                <Switch>
+                  <Route exact path="/">
+                    <div>
+                      <div className='App__nav'>
+
+                        {/* <div className="App__promo">
+                          <KubeconLogo size="22" />
+                          Kubecon 2023 special offer! Get a <strong>50% discount</strong> on all movies today!
+                        </div> */}
+
+                        <Link className="button" role="button" to="/admin/users">
+                          <svg height="20" width="20" viewBox="0 0 48 48">
+                            <path fill="#fff" d="M27.3 44h-6.6q-.55 0-.975-.35-.425-.35-.525-.9l-.8-5.05q-.95-.35-2-.95t-1.85-1.25L9.9 37.65q-.55.25-1.1.075T7.95 37l-3.3-5.85q-.3-.5-.15-1.05t.6-.9l4.3-3.15q-.1-.45-.125-1.025Q9.25 24.45 9.25 24q0-.45.025-1.025T9.4 21.95L5.1 18.8q-.45-.35-.6-.9-.15-.55.15-1.05L7.95 11q.3-.55.85-.725.55-.175 1.1.075l4.65 2.15q.8-.65 1.85-1.25t2-.9l.8-5.1q.1-.55.525-.9Q20.15 4 20.7 4h6.6q.55 0 .975.35.425.35.525.9l.8 5.05q.95.35 2.025.925Q32.7 11.8 33.45 12.5l4.65-2.15q.55-.25 1.1-.075t.85.725l3.3 5.8q.3.5.175 1.075t-.625.925l-4.3 3.05q.1.5.125 1.075.025.575.025 1.075t-.025 1.05q-.025.55-.125 1.05l4.3 3.1q.45.35.6.9.15.55-.15 1.05L40.05 37q-.3.55-.85.725-.55.175-1.1-.075l-4.65-2.15q-.8.65-1.825 1.275-1.025.625-2.025.925l-.8 5.05q-.1.55-.525.9-.425.35-.975.35ZM24 30.5q2.7 0 4.6-1.9 1.9-1.9 1.9-4.6 0-2.7-1.9-4.6-1.9-1.9-4.6-1.9-2.7 0-4.6 1.9-1.9 1.9-1.9 4.6 0 2.7 1.9 4.6 1.9 1.9 4.6 1.9Z"/>
+                          </svg>
+                          Admin
+                        </Link>
+                      </div>
+                      <TitleList
+                        title={`${user?.name || user?.nickname || 'Your'}'s movies`}
+                        cost={cost}
+                        titles={rental.data}
+                        loaded={rental.loaded}
+                        onReturn={this.handleReturn}
+                      />
+                      <TitleList
+                        title="Store"
+                        titles={catalog.data}
+                        loaded={catalog.loaded}
+                        onRent={this.handleRent}
+
+                      />
+                    </div>
+                  </Route>
+                  <Route path="/admin/users">
+                    <div className='App__nav'>
+                      <Link className="button" role="button" to="/">
+                        <svg height="20" width="20" viewBox="0 0 48 48">
+                          <path fill="#fff" d="m22.35 38.95-13.9-13.9q-.25-.25-.35-.5Q8 24.3 8 24q0-.3.1-.55.1-.25.35-.5L22.4 9q.4-.4 1-.4t1.05.45q.45.45.45 1.05 0 .6-.45 1.05L13.1 22.5h24.8q.65 0 1.075.425.425.425.425 1.075 0 .65-.425 1.075-.425.425-1.075.425H13.1l11.4 11.4q.4.4.4 1t-.45 1.05q-.45.45-1.05.45-.6 0-1.05-.45Z"/>
+                        </svg>
+                        Back to Movies
+                      </Link>
+                    </div>
+                    <Users />
+                  </Route>
+                </Switch>
+              </>
+            )}
           </div>
         </div>
       </Router>
@@ -343,4 +357,10 @@ const KubeconLogo = ({ size = '21'}) => {
     </svg>
   );
 }
-export default App;
+
+const AppWithAuth = () => {
+  const { user, isAuthenticated, isLoading } = useAuth0();
+  return <App user={user} isAuthenticated={isAuthenticated} isLoading={isLoading} />;
+};
+
+export default AppWithAuth;
