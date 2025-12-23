@@ -15,7 +15,11 @@ FROM nginx:alpine
 
 # overwrite default.conf
 RUN rm /etc/nginx/conf.d/default.conf
-COPY default.conf /etc/nginx/conf.d
+COPY nginx/default.conf /etc/nginx/conf.d
+COPY nginx/entrypoint.sh /entrypoint.sh
+COPY nginx/config.js.template /usr/share/nginx/html
 
 COPY --from=dev /usr/src/app/dist /usr/share/nginx/html
+
 EXPOSE 80
+ENTRYPOINT ["/entrypoint.sh"]

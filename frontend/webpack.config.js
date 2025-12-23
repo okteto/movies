@@ -70,7 +70,11 @@ module.exports = (_, argv) => {
       new DefinePlugin({
         MODE: JSON.stringify(mode),
       }),
-      new EnvironmentPlugin(['AUTH0_DOMAIN', 'AUTH0_AUDIENCE', 'AUTH0_CLIENT_ID']),
+      new EnvironmentPlugin({
+        AUTH0_DOMAIN: 'auth0-domain', 
+        AUTH0_AUDIENCE: 'auth0-audience', 
+        AUTH0_CLIENT_ID: 'auth0-client-id', 
+      }),
     ],
     devServer: {
       historyApiFallback: true,

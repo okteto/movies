@@ -14,11 +14,11 @@ const Root = hot(App);
 render(
   <StrictMode>
      <Auth0Provider
-      domain="okteto.auth0.com"
-      clientId="wVnsLXd9pMC5Uu7bFpw2JaRGqoGP4Jc7"
+      domain={window.__APP_CONFIG__?.AUTH0_DOMAIN || process.env.AUTH0_DOMAIN}
+      clientId={window.__APP_CONFIG__?.AUTH0_CLIENT_ID || process.env.AUTH0_CLIENT_ID}
       authorizationParams={{
         redirect_uri: window.location.origin, 
-        audience: "https://okteto.auth0.com/api/v2/"        
+        audience: window.__APP_CONFIG__?.AUTH0_AUDIENCE || process.env.AUTH0_AUDIENCE
       }}
     >
       <Root />

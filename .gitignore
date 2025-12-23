@@ -9,3 +9,4 @@ api/main
 .env
 frontend/.env
 api/.env
+frontend/dist

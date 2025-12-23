@@ -13,6 +13,27 @@ This example shows how to leverage [Okteto](https://github.com/okteto/okteto) to
 
 ![Architecture diagram](docs/architecture-diagram.png)
 
+
+## Setup Auth0 Auth
+
+1. Create an Auth0 account (or login into your existing account)
+1. Create an application in Auth0. Set the following values, replacing `okteto.example.com` with your Okteto Instance's domain.
+
+    - `Allowed Call Back URLs`: `https://*.okteto.example.com`
+    - `Allowed Logout URLs`: `https://*.okteto.example.com`
+    - `Allowed Web Origins`: `https://*.okteto.example.com`
+
+1. Create the following admin variables in Okteto:
+
+    - `AUTH0_CLIENT_ID`: The client ID of your 
+    - `AUTHO_DOMAIN`: Your auth0 domain e.g. example.auth0.com
+    - `AUTHO_AUDIENCE`: The audience of the token, since we are calling Auth0 API it should be https://<your auth0 domain>/api/v2/
+
+## Deploy the Application
+
+Execute `okteto deploy` to deploy it from the terminal. You can also deploy it from the UI. 
+
+
 ## Development container demo script
 
 - Deploy the repo from UI
