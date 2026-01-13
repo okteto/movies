@@ -54,3 +54,5 @@ jspm_packages
 # Serverless directories
 .serverless
 
+# yarn cache
+.yarn
