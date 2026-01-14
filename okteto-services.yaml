@@ -1,0 +1,33 @@
+
+dev:
+  frontend:
+    priorityClassName: okteto-up
+    image: okteto/node:20
+    workdir: /usr/src/app
+    command: bash
+    sync:
+      - frontend:/usr/src/app
+    services:
+      - name: catalog
+        command: yarn start
+        sync:
+          - catalog:/src
+      - name: rent
+        command: mvn spring-boot:run
+        workdir: /app
+        sync:
+          - rent:/app
+        volumes:
+          - /root/.m2
+      - name: api
+        image: okteto/golang:1.24
+        workdir: /usr/src/app
+        command: go run cmd/api/main.go
+        sync:
+          - api:/usr/src/app
+      - name: worker
+        image: okteto/golang:1.24
+        workdir: /usr/src/app
+        command: go run cmd/worker/main.go
+        sync:
+          - worker:/usr/src/app
