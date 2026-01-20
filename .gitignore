@@ -10,3 +10,4 @@ api/main
 frontend/.env
 api/.env
 frontend/dist
+api/api

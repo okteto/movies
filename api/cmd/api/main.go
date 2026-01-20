@@ -43,13 +43,13 @@ var cache = &emailCache{
 
 // CustomClaims contains custom data we want from the token.
 type CustomClaims struct {
-	Scope                   string `json:"scope"`
-	Email                   string `json:"email"`
-	EmailVerified           bool   `json:"email_verified"`
-	Name                    string `json:"name"`
-	Nickname                string `json:"nickname"`
-	Picture                 string `json:"picture"`
-	UpdatedAt               string `json:"updated_at"`
+	Scope                    string `json:"scope"`
+	Email                    string `json:"email"`
+	EmailVerified            bool   `json:"email_verified"`
+	Name                     string `json:"name"`
+	Nickname                 string `json:"nickname"`
+	Picture                  string `json:"picture"`
+	UpdatedAt                string `json:"updated_at"`
 	HttpsOktetoAuth0ComEmail string `json:"https://okteto.auth0.com/email"`
 }
 
@@ -350,6 +350,7 @@ func handleRequests() {
 	muxRouter.Handle("/rentals", jwtMiddleware(http.HandlerFunc(rentals))).Methods("GET")
 	muxRouter.Handle("/users", jwtMiddleware(http.HandlerFunc(allUsers))).Methods("GET")
 	muxRouter.Handle("/users/{userid}", jwtMiddleware(http.HandlerFunc(singleUser))).Methods("GET")
+	muxRouter.Handle("/can-access", http.HandlerFunc(canAccess)).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", muxRouter))
 }
@@ -470,4 +471,35 @@ func singleUser(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Returned", user)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(user)
+}
+
+// Hardcoded allow list of emails that can access
+var allowedEmails = map[string]bool{
+	"admin@example.com":     true,
+	"user@example.com":      true,
+	"developer@okteto.com":  true,
+	"rberrelleza@gmail.com": true,
+}
+
+type CanAccessRequest struct {
+	Email string `json:"email"`
+}
+
+type CanAccessResponse struct {
+	Allowed bool `json:"allowed"`
+}
+
+func canAccess(w http.ResponseWriter, r *http.Request) {
+	var req CanAccessRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid request body"})
+		return
+	}
+
+	allowed := allowedEmails[req.Email]
+	fmt.Println(req.Email, "is", allowed)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(CanAccessResponse{Allowed: allowed})
 }

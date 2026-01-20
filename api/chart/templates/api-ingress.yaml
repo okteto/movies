@@ -24,3 +24,10 @@ spec:
                 name: api
                 port:
                   number: 8080
+          - path: /can-access
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 8080

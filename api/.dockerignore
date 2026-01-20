@@ -1,0 +1,6 @@
+chart
+
+#ignore api binary
+/api
+
+.stignore
