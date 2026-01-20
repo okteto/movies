@@ -50,7 +50,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - pg_isready -U {{ .Values.postgresql.auth.username }} -h localhost
+                - pg_isready -U {{ .Values.postgresql.auth.username }} -d {{ .Values.postgresql.auth.database }} -h localhost
             initialDelaySeconds: 30
             periodSeconds: 10
           readinessProbe:
@@ -58,7 +58,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - pg_isready -U {{ .Values.postgresql.auth.username }} -h localhost
+                - pg_isready -U {{ .Values.postgresql.auth.username }} -d {{ .Values.postgresql.auth.database }} -h localhost
             initialDelaySeconds: 5
             periodSeconds: 5
       volumes:
