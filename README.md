@@ -20,4 +20,5 @@ This example shows how to leverage [Okteto](https://github.com/okteto/okteto) to
 - `okteto up worker` + `make build` + `make start`
 - Uncomment line 61 in `rentals/cmd/worker/main.go`
 - `make build` + `make start`
-- Show how the change is applied
+- Show how the change is applied.
+
