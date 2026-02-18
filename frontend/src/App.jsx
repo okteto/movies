@@ -30,9 +30,9 @@ class App extends Component {
       },
       cost: 0,
       session: {
-        name: 'Cindy',
-        lastName: 'Lopez',
-        username: 'cindy'
+        name: 'Jonathan',
+        lastName: 'Caballero',
+        username: 'jona'
       },
       fixHeader: false
     };
@@ -150,7 +150,7 @@ class App extends Component {
                     onReturn={this.handleReturn}
                   />
                   <TitleList
-                    title="Store"
+                    title="My Catalog of available movies"
                     titles={catalog.data}
                     loaded={catalog.loaded}
                     onRent={this.handleRent}
