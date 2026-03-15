@@ -49,7 +49,7 @@ Once the user has `okteto up <service>` running in their terminal:
 - **Read synced files**: Use the Read tool to examine code that's syncing to the cluster
 - **Analyze pasted output**: When the user hits an error, they can paste terminal output for analysis
 - **Check logs**: `okteto logs <service>` shows container logs (separate from the interactive session)
-- **Run e2e tests**: Use `okteto test` to run the Playwright test suite against the live environment in the cluster
+- **Run e2e tests**: Use `okteto test e2e` to run the Playwright test suite against the live environment in the cluster
 
 You're facilitating their development workflow, not trying to observe their terminal session.
 
@@ -65,7 +65,7 @@ Agent actions:
   4. Identifies the bug and suggests a fix
 
 Developer applies the fix (auto-syncs to container), agent re-runs tests to confirm.
-Agent runs: okteto test                  → runs e2e tests to verify nothing else broke.
+Agent runs: okteto test e2e              → runs e2e tests to verify nothing else broke.
 ```
 
 ### Debugging Patterns
@@ -74,7 +74,7 @@ Agent runs: okteto test                  → runs e2e tests to verify nothing el
 - **User pastes an error**: Read relevant code files, analyze, suggest fix
 - **User asks "why is this failing?"**: Run diagnostic commands via `okteto exec`
 - **User makes code changes**: Changes auto-sync; help them understand what to run next
-- **User asks to run e2e tests**: `okteto test` runs the Playwright suite in the cluster
+- **User asks to run e2e tests**: `okteto test e2e` runs the Playwright suite in the cluster
 
 ## Service-Specific Dev Commands
 
@@ -99,7 +99,7 @@ Once inside a development container (`okteto up <service>`):
 | `okteto exec -- <cmd>` | Agent | Run a command in the dev container |
 | `okteto logs <service>` | Agent | View container logs |
 | `okteto endpoints` | Agent | List public URLs |
-| `okteto test` | Agent | Run e2e tests in the cluster |
+| `okteto test e2e` | Agent | Run e2e tests in the cluster |
 | `okteto destroy` | User | Tear down all resources |
 
 ## Common Mistakes
