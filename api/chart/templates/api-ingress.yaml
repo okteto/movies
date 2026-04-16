@@ -10,6 +10,13 @@ spec:
   rules:
     - http:
         paths:
+          - path: /health
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 8080
           - path: /rentals
             pathType: Prefix
             backend:
