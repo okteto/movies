@@ -45,3 +45,14 @@ mongodb:
     storageClass: ""
   service:
     port: 27017
+
+# Jaeger Configuration
+jaeger:
+  enabled: true
+  image:
+    repository: jaegertracing/all-in-one
+    tag: "1.58"
+  service:
+    otlpGrpcPort: 4317
+    otlpHttpPort: 4318
+    uiPort: 16686

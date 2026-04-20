@@ -45,6 +45,10 @@ spec:
               value: okteto
             - name: MONGODB_HOST
               value: mongodb
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://jaeger:4318/v1/traces"
+            - name: OTEL_SERVICE_NAME
+              value: "catalog"
           ports:
             - name: http
               containerPort: 8080

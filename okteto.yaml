@@ -15,7 +15,7 @@ build:
     context: tests
 
 deploy:
-  - name: Deploy Infrastructure (PostgreSQL, Kafka, MongoDB)
+  - name: Deploy Infrastructure (PostgreSQL, Kafka, MongoDB, Jaeger)
     command: helm upgrade --install infrastructure infrastructure/chart
   - name: Deploy Frontend
     command: helm upgrade --install frontend frontend/chart --set image=${OKTETO_BUILD_FRONTEND_IMAGE}
