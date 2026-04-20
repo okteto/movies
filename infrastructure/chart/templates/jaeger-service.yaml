@@ -30,7 +30,7 @@ metadata:
   labels:
     app: jaeger
   annotations:
-    dev.okteto.com/generate-host: "true"
+    dev.okteto.com/generate-host: "jaeger"
 spec:
   rules:
     - http:
