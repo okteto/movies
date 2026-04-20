@@ -438,3 +438,37 @@ a:hover {
 .Loader svg rect {
   fill: var(--color-green);
 }
+
+.ToastContainer {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 200;
+}
+
+.RentalToast {
+  --toast-width: 280px;
+
+  background-color: var(--color-green);
+  color: var(--color-navy);
+  letter-spacing: -.03rem;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  width: var(--toast-width);
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-level-1);
+  animation: toastSlideIn 0.3s ease;
+}
+
+@keyframes toastSlideIn {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}

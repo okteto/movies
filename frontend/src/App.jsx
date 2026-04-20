@@ -34,14 +34,49 @@ class App extends Component {
         lastName: 'Lopez',
         username: 'cindy'
       },
-      fixHeader: false
+      fixHeader: false,
+      toasts: []
     };
 
     this.appRef = React.createRef();
+    this.ws = null;
   }
 
   componentDidMount() {
     this.refreshData();
+    this.connectWebSocket();
+  }
+
+  componentWillUnmount() {
+    if (this.ws) this.ws.close();
+  }
+
+  connectWebSocket = () => {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const ws = new WebSocket(`${protocol}//${window.location.host}/api/ws`);
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      const movie = this.state.catalog.data.find(m => String(m.id) === data.movie_id);
+      const title = movie?.original_title ?? 'A movie';
+      const id = Date.now();
+
+      this.setState(state => ({
+        toasts: [...state.toasts, { id, message: `"${title}" rented successfully!` }]
+      }));
+
+      setTimeout(() => {
+        this.setState(state => ({
+          toasts: state.toasts.filter(t => t.id !== id)
+        }));
+      }, 4000);
+    };
+
+    ws.onclose = () => {
+      setTimeout(this.connectWebSocket, 3000);
+    };
+
+    this.ws = ws;
   }
 
   handleRent = async (item) => {
@@ -106,10 +141,15 @@ class App extends Component {
   }
 
   render() {
-    const { catalog, rental, session, cost } = this.state;
+    const { catalog, rental, session, cost, toasts } = this.state;
     return (
       <Router>
         <div className="App" ref={this.appRef} onScroll={this.handleScroll}>
+          <div className="ToastContainer">
+            {toasts.map(toast => (
+              <RentalToast key={toast.id} message={toast.message} />
+            ))}
+          </div>
           <div className={`App__header ${this.state.fixHeader ? 'fixed' : ''}`}>
             <Link to="/">
               <div className="App__logo">
@@ -332,6 +372,15 @@ const Symbol = ({ size = '18'}) => {
       <path fill="#00D1CA" d="M6.85 10.5c0-2 1.65-3.65 3.73-3.65 1.19 0 2.24.54 2.92 1.38a1.17 1.17 0 0 0 1.82-1.48A6.1 6.1 0 0 0 4.5 10.5a6.1 6.1 0 0 0 10.82 3.75 1.17 1.17 0 1 0-1.82-1.48 3.75 3.75 0 0 1-2.92 1.38 3.7 3.7 0 0 1-3.73-3.65Z"/>
       <path fill="#00D1CA" d="M15.33 11.67a1.17 1.17 0 1 0 0-2.34 1.17 1.17 0 0 0 0 2.34Z"/>
     </svg>
+  );
+};
+
+const RentalToast = ({ message }) => {
+  return (
+    <div className="RentalToast">
+      <MoviesIcon size="16" />
+      {message}
+    </div>
   );
 };
 

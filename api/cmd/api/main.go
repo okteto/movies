@@ -3,21 +3,110 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
+	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
-	"log"
+	"sync"
+	"time"
 
+	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 	"github.com/okteto/movies/pkg/database"
 
-	"fmt"
-
 	_ "github.com/lib/pq"
-	"github.com/gorilla/mux"
 )
 
 var db *sql.DB
+
+type hub struct {
+	clients   map[*websocket.Conn]bool
+	broadcast chan []byte
+	mu        sync.Mutex
+}
+
+var wsHub = &hub{
+	clients:   make(map[*websocket.Conn]bool),
+	broadcast: make(chan []byte, 256),
+}
+
+func (h *hub) run() {
+	for msg := range h.broadcast {
+		h.mu.Lock()
+		log.Printf("Broadcasting to %d WebSocket clients: %s", len(h.clients), string(msg))
+		for client := range h.clients {
+			if err := client.WriteMessage(websocket.TextMessage, msg); err != nil {
+				log.Println("WebSocket write error:", err)
+				client.Close()
+				delete(h.clients, client)
+			}
+		}
+		h.mu.Unlock()
+	}
+}
+
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool { return true },
+}
+
+func wsHandler(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("WebSocket upgrade error:", err)
+		return
+	}
+	conn.SetReadDeadline(time.Now().Add(70 * time.Second))
+	conn.SetPongHandler(func(string) error {
+		conn.SetReadDeadline(time.Now().Add(70 * time.Second))
+		return nil
+	})
+	wsHub.mu.Lock()
+	wsHub.clients[conn] = true
+	wsHub.mu.Unlock()
+	log.Printf("WebSocket client connected, total: %d", len(wsHub.clients))
+
+	// Send periodic pings to keep connection alive through nginx
+	go func() {
+		ticker := time.NewTicker(30 * time.Second)
+		defer ticker.Stop()
+		for range ticker.C {
+			wsHub.mu.Lock()
+			_, ok := wsHub.clients[conn]
+			wsHub.mu.Unlock()
+			if !ok {
+				return
+			}
+			if err := conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+				return
+			}
+		}
+	}()
+
+	for {
+		if _, _, err := conn.ReadMessage(); err != nil {
+			wsHub.mu.Lock()
+			delete(wsHub.clients, conn)
+			wsHub.mu.Unlock()
+			conn.Close()
+			log.Printf("WebSocket client disconnected, total: %d", len(wsHub.clients))
+			break
+		}
+	}
+}
+
+func notifyHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+	log.Printf("Notify received: %s (clients: %d)", string(body), len(wsHub.clients))
+	wsHub.broadcast <- body
+	w.WriteHeader(204)
+}
 
 func main() {
 	db = database.Open()
@@ -29,6 +118,8 @@ func main() {
 		loadData()
 		return
 	}
+
+	go wsHub.run()
 
 	fmt.Println("Running server on port 8080...")
 	handleRequests()
@@ -49,15 +140,15 @@ type Movie struct {
 }
 
 type User struct {
-	Userid int
+	Userid    int
 	Firstname string
-	Lastname string
-	Phone string
-	City string
-	State string
-	Zip string
-	Age int
-	Gender string
+	Lastname  string
+	Phone     string
+	City      string
+	State     string
+	Zip       string
+	Age       int
+	Gender    string
 }
 
 func loadData() {
@@ -100,6 +191,8 @@ func handleRequests() {
 	muxRouter.HandleFunc("/rentals", rentals)
 	muxRouter.HandleFunc("/users", allUsers)
 	muxRouter.HandleFunc("/users/{userid}", singleUser)
+	muxRouter.HandleFunc("/api/ws", wsHandler)
+	muxRouter.HandleFunc("/internal/notify", notifyHandler)
 
 	log.Fatal(http.ListenAndServe(":8080", muxRouter))
 }
