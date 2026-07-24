@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 	"os/signal"
@@ -22,6 +23,28 @@ var (
 	messageCountStart = kingpin.Flag("messageCountStart", "Message counter start from:").Int()
 )
 
+// rentalMessage is the shared contract for the "rentals" Kafka topic value,
+// produced by the rent (Java) service. It carries the price and the selected
+// video quality tier.
+type rentalMessage struct {
+	Price string `json:"price"`
+	Tier  string `json:"tier"`
+}
+
+// parseRentalMessage decodes the JSON payload. For robustness against any
+// legacy plain-price messages still on the topic, it falls back to treating
+// the whole value as the price with the default SD tier.
+func parseRentalMessage(value []byte) rentalMessage {
+	var msg rentalMessage
+	if err := json.Unmarshal(value, &msg); err != nil || msg.Price == "" {
+		return rentalMessage{Price: string(value), Tier: "SD"}
+	}
+	if msg.Tier == "" {
+		msg.Tier = "SD"
+	}
+	return msg
+}
+
 func main() {
 	db := database.Open()
 	defer db.Close()
@@ -33,7 +56,7 @@ func main() {
 		log.Panic(err)
 	}
 
-	createTableStmt := `CREATE TABLE IF NOT EXISTS rentals (id VARCHAR(255) NOT NULL UNIQUE, price VARCHAR(255) NOT NULL)`
+	createTableStmt := `CREATE TABLE IF NOT EXISTS rentals (id VARCHAR(255) NOT NULL UNIQUE, price VARCHAR(255) NOT NULL, tier VARCHAR(255) NOT NULL DEFAULT 'SD')`
 	if _, err := db.Exec(createTableStmt); err != nil {
 		log.Panic(err)
 	}
@@ -64,10 +87,11 @@ func main() {
 				fmt.Println(err)
 			case msg := <-consumerRentals.Messages():
 				*messageCountStart++
-				fmt.Printf("Received message: movies %s price %s\n", string(msg.Key), string(msg.Value))
-				price, _ := strconv.ParseFloat(string(msg.Value), 64)
-				insertDynStmt := `insert into "rentals"("id", "price") values($1, $2) on conflict(id) do update set price = $2`
-				if _, err := db.Exec(insertDynStmt, string(msg.Key), fmt.Sprintf("%f", price)); err != nil {
+				fmt.Printf("Received message: movies %s value %s\n", string(msg.Key), string(msg.Value))
+				rental := parseRentalMessage(msg.Value)
+				price, _ := strconv.ParseFloat(rental.Price, 64)
+				insertDynStmt := `insert into "rentals"("id", "price", "tier") values($1, $2, $3) on conflict(id) do update set price = $2, tier = $3`
+				if _, err := db.Exec(insertDynStmt, string(msg.Key), fmt.Sprintf("%f", price), rental.Tier); err != nil {
 					log.Panic(err)
 				}
 			case msg := <-consumerReturns.Messages():

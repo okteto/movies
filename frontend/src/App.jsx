@@ -44,7 +44,7 @@ class App extends Component {
     this.refreshData();
   }
 
-  handleRent = async (item) => {
+  handleRent = async (item, tier = 'SD') => {
     await fetch('/rent', {
       method: 'POST',
       headers: {
@@ -52,7 +52,8 @@ class App extends Component {
       },
       body: JSON.stringify({
         catalog_id: item.id,
-        price: item.price
+        price: item.price,
+        tier
       })
     });
     this.refreshData();
@@ -238,7 +239,11 @@ class TitleList extends Component {
   }
 }
 
+const TIERS = ['SD', 'HD'];
+
 const Item = ({ item, onRent, onReturn, backdrop }) => {
+  const [tier, setTier] = React.useState('SD');
+
   return (
     <div className="Item">
       <div className="Item__container" style={{ backgroundImage: `url(./${backdrop})` }}>
@@ -251,12 +256,27 @@ const Item = ({ item, onRent, onReturn, backdrop }) => {
               {!!item?.price &&
                 <div className='Item__price'>${item.price}</div>
               }
+              <div className="Item__tier">
+                {TIERS.map(t => (
+                  <button
+                    key={t}
+                    type="button"
+                    className={`Item__tier-option ${tier === t ? 'Item__tier-option--active' : ''}`}
+                    onClick={() => setTier(t)}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
               <div className="spring" />
-              <div className="Item__button button" onClick={() => onRent(item)}>
+              <div className="Item__button button" onClick={() => onRent(item, tier)}>
                 Rent
               </div>
             </> :
             <>
+              {!!item?.tier &&
+                <div className="Item__badge">{item.tier}</div>
+              }
               <div className="Item__button Item__button--rented button">
                 Watch Now
               </div>
