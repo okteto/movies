@@ -1,25 +1,42 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
-	"log"
 
-	"github.com/okteto/movies/pkg/database"
-
-	"fmt"
-
-	_ "github.com/lib/pq"
 	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
+	"github.com/okteto/movies/pkg/database"
+	"github.com/okteto/movies/pkg/tracing"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 )
 
-var db *sql.DB
+var (
+	db         *sql.DB
+	httpClient = &http.Client{
+		Transport: otelhttp.NewTransport(http.DefaultTransport),
+	}
+)
 
 func main() {
+	ctx := context.Background()
+	shutdown, err := tracing.Init(ctx, "api")
+	if err != nil {
+		log.Printf("tracing init failed: %v", err)
+	} else {
+		defer shutdown(ctx)
+	}
+
 	db = database.Open()
 	defer db.Close()
 
@@ -49,15 +66,15 @@ type Movie struct {
 }
 
 type User struct {
-	Userid int
+	Userid    int
 	Firstname string
-	Lastname string
-	Phone string
-	City string
-	State string
-	Zip string
-	Age int
-	Gender string
+	Lastname  string
+	Phone     string
+	City      string
+	State     string
+	Zip       string
+	Age       int
+	Gender    string
 }
 
 func loadData() {
@@ -90,47 +107,50 @@ func loadData() {
 			log.Panic(err)
 		}
 	}
-
-	return
 }
 
 func handleRequests() {
 	muxRouter := mux.NewRouter().StrictSlash(true)
 
-	muxRouter.HandleFunc("/rentals", rentals)
-	muxRouter.HandleFunc("/users", allUsers)
-	muxRouter.HandleFunc("/users/{userid}", singleUser)
+	muxRouter.Handle("/rentals", otelhttp.NewHandler(http.HandlerFunc(rentals), "GET /rentals"))
+	muxRouter.Handle("/users", otelhttp.NewHandler(http.HandlerFunc(allUsers), "GET /users"))
+	muxRouter.Handle("/users/{userid}", otelhttp.NewHandler(http.HandlerFunc(singleUser), "GET /users/{userid}"))
 
 	log.Fatal(http.ListenAndServe(":8080", muxRouter))
 }
 
 func rentals(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Received request...")
+	ctx := r.Context()
+	tracer := otel.Tracer("api")
 
-	rows, err := db.Query("SELECT * FROM rentals")
+	ctx, dbSpan := tracer.Start(ctx, "db.query.rentals")
+	rows, err := db.QueryContext(ctx, "SELECT * FROM rentals")
 	if err != nil {
+		dbSpan.RecordError(err)
+		dbSpan.SetStatus(codes.Error, err.Error())
+		dbSpan.End()
 		fmt.Println("error listing rentals", err)
 		w.WriteHeader(500)
 		return
 	}
 	defer rows.Close()
 
-	var rentals []Rental
-
+	var rentalList []Rental
 	for rows.Next() {
-		var r Rental
-		if err := rows.Scan(&r.Movie, &r.Price); err != nil {
+		var ren Rental
+		if err := rows.Scan(&ren.Movie, &ren.Price); err != nil {
+			dbSpan.RecordError(err)
+			dbSpan.End()
 			fmt.Println("error scanning row", err)
 			os.Exit(1)
 		}
-		rentals = append(rentals, r)
+		rentalList = append(rentalList, ren)
 	}
-	if err = rows.Err(); err != nil {
-		fmt.Println("error in rows", err)
-		os.Exit(1)
-	}
+	dbSpan.SetAttributes(attribute.Int("db.rows_returned", len(rentalList)))
+	dbSpan.End()
 
-	resp, err := http.Get("http://catalog:8080/catalog")
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, "http://catalog:8080/catalog", nil)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		fmt.Println("error listing catalog", err)
 		w.WriteHeader(500)
@@ -152,7 +172,7 @@ func rentals(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result := []Movie{}
-	for _, rental := range rentals {
+	for _, rental := range rentalList {
 		for _, m := range movies {
 			if rental.Movie == strconv.Itoa(m.ID) {
 				price, _ := strconv.ParseFloat(rental.Price, 64)
@@ -168,10 +188,15 @@ func rentals(w http.ResponseWriter, r *http.Request) {
 }
 
 func allUsers(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Received request...")
+	ctx := r.Context()
+	tracer := otel.Tracer("api")
 
-	rows, err := db.Query("SELECT * FROM users")
+	ctx, span := tracer.Start(ctx, "db.query.users")
+	rows, err := db.QueryContext(ctx, "SELECT * FROM users")
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		span.End()
 		fmt.Println("error listing users", err)
 		w.WriteHeader(500)
 		return
@@ -179,7 +204,6 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 
 	var users []User
-
 	for rows.Next() {
 		var u User
 		if err := rows.Scan(&u.Userid, &u.Firstname, &u.Lastname, &u.Phone, &u.City, &u.State, &u.Zip, &u.Age, &u.Gender); err != nil {
@@ -187,9 +211,8 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 		}
 		users = append(users, u)
 	}
-	if err = rows.Err(); err != nil {
-		log.Panic("error in rows", err)
-	}
+	span.SetAttributes(attribute.Int("db.rows_returned", len(users)))
+	span.End()
 
 	fmt.Println("Returned", len(users), "user records.")
 	w.Header().Set("Content-Type", "application/json")
@@ -200,21 +223,24 @@ func singleUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userid := vars["userid"]
 
-	fmt.Println("Received request...")
+	ctx := r.Context()
+	tracer := otel.Tracer("api")
 
-	row := db.QueryRow("SELECT * FROM users WHERE user_id = $1", userid)
+	ctx, span := tracer.Start(ctx, "db.query.user")
+	span.SetAttributes(attribute.String("user.id", userid))
+	row := db.QueryRowContext(ctx, "SELECT * FROM users WHERE user_id = $1", userid)
 
 	var user User
-
 	if err := row.Scan(&user.Userid, &user.Firstname, &user.Lastname, &user.Phone, &user.City, &user.State, &user.Zip, &user.Age, &user.Gender); err != nil {
+		span.End()
 		if err == sql.ErrNoRows {
 			fmt.Println("No user was found")
 			w.WriteHeader(404)
 			return
-		} else {
-			log.Panic("error scanning returned user", err)
 		}
+		log.Panic("error scanning returned user", err)
 	}
+	span.End()
 
 	fmt.Println("Returned", user)
 	w.Header().Set("Content-Type", "application/json")

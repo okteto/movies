@@ -17,6 +17,11 @@ spec:
       containers:
       - image: {{ .Values.image }}
         name: rent
+        env:
+        - name: MANAGEMENT_OTLP_TRACING_ENDPOINT
+          value: "http://jaeger:4318/v1/traces"
+        - name: OTEL_SERVICE_NAME
+          value: "rent"
         ports:
         - containerPort: 8080
           name: rent

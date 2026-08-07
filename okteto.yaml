@@ -15,7 +15,7 @@ build:
     context: tests
 
 deploy:
-  - name: Deploy Infrastructure (PostgreSQL, Kafka, MongoDB)
+  - name: Deploy Infrastructure (PostgreSQL, Kafka, MongoDB, Jaeger)
     command: helm upgrade --install infrastructure infrastructure/chart
   - name: Deploy Frontend
     command: helm upgrade --install frontend frontend/chart --set image=${OKTETO_BUILD_FRONTEND_IMAGE}
@@ -52,7 +52,7 @@ dev:
       - 5005:5005
       - 5432:postgresql:5432
   api:
-    image: okteto/golang:1.24
+    image: okteto/golang:1.25
     workdir: /usr/src/app
     command: bash
     securityContext:
@@ -64,7 +64,7 @@ dev:
     forward:
       - 2346:2345
   worker:
-    image: okteto/golang:1.24
+    image: okteto/golang:1.25
     workdir: /usr/src/app
     command: bash
     securityContext:

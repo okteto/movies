@@ -29,6 +29,11 @@ spec:
       containers:
         - name: api
           image: {{ .Values.image }}
+          env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "jaeger:4317"
+            - name: OTEL_SERVICE_NAME
+              value: "api"
           ports:
             - name: http
               containerPort: 8080

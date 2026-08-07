@@ -17,6 +17,11 @@ spec:
       containers:
       - image: {{ .Values.image }}
         name: worker
+        env:
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "jaeger:4317"
+        - name: OTEL_SERVICE_NAME
+          value: "worker"
         command:
           - /usr/local/bin/worker
 
