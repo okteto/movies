@@ -1,7 +1,7 @@
-FROM node:20
+FROM node:24
 
-# Enable Corepack and prepare Yarn 4.9.4
-RUN corepack enable && corepack prepare yarn@4.9.4 --activate
+# Enable Corepack and prepare Yarn 4.18.0
+RUN corepack enable && corepack prepare yarn@4.18.0 --activate
 
 # Copy dependencies
 WORKDIR /src
