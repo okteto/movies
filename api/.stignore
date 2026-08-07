@@ -1,18 +1,13 @@
-.git
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
+// allow-list: first match wins, so negations must come first
+!/cmd
+!/cmd/**
+!/data
+!/data/**
+!/pkg
+!/pkg/**
+!/go.mod
+!/go.sum
+!/Makefile
 
-# vendor folders
-vendor
-
-# Test binary, built with go test -c
-*.test
-
-# Output of the go coverage tool, specifically when used with LiteIDE
-*.out
-
-# dlv binary
-__debug_bin
+// deny everything else
+**
