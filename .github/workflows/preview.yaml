@@ -1,7 +1,13 @@
-on: 
+on:
   pull_request:
     branches:
       - main
+
+# A rebase cascade in a stack sends more than one synchronize event per layer,
+# so without this two deploys can race into the same preview namespace.
+concurrency:
+  group: preview-${{ github.event.number }}
+  cancel-in-progress: true
 
 jobs:
   preview:
@@ -29,7 +35,7 @@ jobs:
       with:
         tests: e2e
         namespace: pr-${{ github.event.number }}-cindylopez
-        
+
     - name: Save playwright report
       uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
@@ -37,7 +43,7 @@ jobs:
         name: playwright-report
         path: tests/playwright-report/
         retention-days: 30
-        
+
     - name: Save test results
       uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
@@ -46,3 +52,72 @@ jobs:
           path: tests/test-results/
           retention-days: 30
           include-hidden-files: true
+
+  # When a stack is first submitted, GitHub only sends pull_request events for the
+  # bottom and the top layer. Every layer in between opens with no run at all, so
+  # it gets no preview and no failing check. The top layer always fires, so it is
+  # the one place we can reliably notice and backfill the layers GitHub skipped.
+  find-skipped-layers:
+    if: ${{ github.event.pull_request.stack && github.event.pull_request.stack.position == github.event.pull_request.stack.size }}
+    runs-on: ubuntu-latest
+    outputs:
+      layers: ${{ steps.find.outputs.layers }}
+    steps:
+    - name: Find layers between the bottom and the top of this stack
+      id: find
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        STACK: ${{ github.event.pull_request.stack.number }}
+      run: |
+        layers=$(gh api "repos/${{ github.repository }}/pulls?state=open&per_page=100" \
+          --jq "[ .[]
+                  | select(.stack.number == $STACK)
+                  | select(.stack.position > 1 and .stack.position < .stack.size)
+                  | {number: .number, branch: .head.ref} ]")
+        echo "$layers"
+        echo "layers=$(echo "$layers" | jq -c .)" >> "$GITHUB_OUTPUT"
+
+  preview-skipped-layer:
+    needs: find-skipped-layers
+    if: ${{ needs.find-skipped-layers.outputs.layers != '' && needs.find-skipped-layers.outputs.layers != '[]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        layer: ${{ fromJSON(needs.find-skipped-layers.outputs.layers) }}
+    steps:
+    - name: Context
+      uses: okteto/context@latest
+      with:
+        token: ${{ secrets.OKTETO_TOKEN }}
+        url: ${{ secrets.OKTETO_URL }}
+
+    # GITHUB_TOKEN is deliberately not passed here. deploy-preview reads the PR
+    # number from the event payload, so it would post the layer's preview URL as
+    # a comment on this PR instead of the layer's own PR.
+    - name: Deploy preview environment for skipped layer
+      uses: okteto/deploy-preview@latest
+      with:
+        name: pr-${{ matrix.layer.number }}-cindylopez
+        branch: ${{ matrix.layer.branch }}
+        scope: global
+
+    - name: Checkout the layer's code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ matrix.layer.branch }}
+
+    - name: Run end to end tests
+      uses: okteto/test@latest
+      with:
+        tests: e2e
+        namespace: pr-${{ matrix.layer.number }}-cindylopez
+
+    - name: Post the preview URL on the layer's own PR
+      if: ${{ !cancelled() }}
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh pr comment "${{ matrix.layer.number }}" \
+          --repo "${{ github.repository }}" \
+          --body "Your preview environment [pr-${{ matrix.layer.number }}-cindylopez](${{ secrets.OKTETO_URL }}/previews/pr-${{ matrix.layer.number }}-cindylopez) has been deployed by the stack backfill in #${{ github.event.number }}, because GitHub does not run checks on intermediate layers of a stack."
