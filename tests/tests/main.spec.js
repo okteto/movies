@@ -73,33 +73,42 @@ test('users share the catalog and are limited by the number of copies', async ()
   const one = await session(`one-${stamp}@example.com`);
   const two = await session(`two-${stamp}@example.com`);
 
-  // "Crash Loop Backoff" only has one copy
-  const target = await movie(one, 3);
+  // a movie of its own, so the test does not depend on what the rest of the namespace rented
+  const admin = await adminSession();
+  const created = await admin.post('/catalog', {
+    data: { original_title: `Single Copy ${stamp}`, overview: 'only one copy', price: 1, vote_average: 5, copies: 1 }
+  });
+  expect(created.status()).toBe(201);
+  const { id } = await created.json();
+
+  const target = await movie(one, id);
   expect(target.copies).toBe(1);
   expect(target.available).toBe(1);
 
-  expect((await one.post('/rent', { data: { catalog_id: '3' } })).status()).toBe(200);
-  await waitForRental(one, 3, true);
+  expect((await one.post('/rent', { data: { catalog_id: String(id) } })).status()).toBe(202);
+  await waitForRental(one, id, true);
 
-  const denied = await two.post('/rent', { data: { catalog_id: '3' } });
+  const denied = await two.post('/rent', { data: { catalog_id: String(id) } });
   expect(denied.status()).toBe(409);
   expect(await denied.text()).toContain('copies');
-  expect((await movie(two, 3)).available).toBe(0);
+  expect((await movie(two, id)).available).toBe(0);
 
-  expect((await one.post('/rent/return', { data: { catalog_id: '3' } })).status()).toBe(200);
-  await waitForRental(one, 3, false);
+  expect((await one.post('/rent/return', { data: { catalog_id: String(id) } })).status()).toBe(202);
+  await waitForRental(one, id, false);
 
-  expect((await two.post('/rent', { data: { catalog_id: '3' } })).status()).toBe(200);
-  await waitForRental(two, 3, true);
-  expect((await one.post('/rent', { data: { catalog_id: '3' } })).status()).toBe(409);
+  expect((await two.post('/rent', { data: { catalog_id: String(id) } })).status()).toBe(202);
+  await waitForRental(two, id, true);
+  expect((await one.post('/rent', { data: { catalog_id: String(id) } })).status()).toBe(409);
 
   // the returned movie stays in the history of the first user
   const history = await (await one.get('/rentals/history')).json();
-  const returned = history.filter(rental => rental.movie_id === '3' && rental.returned_at);
+  const returned = history.filter(rental => rental.movie_id === String(id) && rental.returned_at);
   expect(returned.length).toBe(1);
 
-  expect((await two.post('/rent/return', { data: { catalog_id: '3' } })).status()).toBe(200);
-  await waitForRental(two, 3, false);
+  expect((await two.post('/rent/return', { data: { catalog_id: String(id) } })).status()).toBe(202);
+  await waitForRental(two, id, false);
+
+  expect((await admin.delete(`/catalog/${id}`)).status()).toBe(200);
 });
 
 test('anonymous users cannot rent', async ({ request }) => {
@@ -110,7 +119,7 @@ test('anonymous users cannot rent', async ({ request }) => {
 test('an admin can see the history of a user, ban them and forgive them', async ({ page }) => {
   const email = `banned-${Date.now()}@example.com`;
   const user = await session(email);
-  expect((await user.post('/rent', { data: { catalog_id: '6' } })).status()).toBe(200);
+  expect((await user.post('/rent', { data: { catalog_id: '6' } })).status()).toBe(202);
   await waitForRental(user, 6, true);
 
   const admin = await adminSession();
@@ -138,7 +147,7 @@ test('an admin can see the history of a user, ban them and forgive them', async 
   expect((await admin.post(`/adminapi/redemptions/${redemption.id}/resolve`, { data: { status: 'approved' } })).status()).toBe(200);
   expect((await (await user.get('/me')).json()).banned).toBe(false);
 
-  expect((await user.post('/rent/return', { data: { catalog_id: '6' } })).status()).toBe(200);
+  expect((await user.post('/rent/return', { data: { catalog_id: '6' } })).status()).toBe(202);
   await waitForRental(user, 6, false);
 });
 
