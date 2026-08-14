@@ -4,4 +4,5 @@ bin
 rent/.idea
 rent/target
 tests/test-results
-tests/playwright-reportfrontend/dist
+tests/playwright-report
+frontend/dist
