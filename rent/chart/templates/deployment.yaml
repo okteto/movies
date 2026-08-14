@@ -17,6 +17,11 @@ spec:
       containers:
       - image: {{ .Values.image }}
         name: rent
+        env:
+        - name: SESSION_SECRET
+          value: {{ .Values.sessionSecret | quote }}
+        - name: API_URL
+          value: "http://api:8080"
         ports:
         - containerPort: 8080
           name: rent

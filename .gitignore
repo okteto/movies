@@ -5,3 +5,4 @@ rent/.idea
 rent/target
 tests/test-results
 tests/playwright-report
+frontend/dist

@@ -107,3 +107,62 @@
   z-index: -1;
 }
 
+
+.Admin__tabs {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0 32px;
+}
+
+.Users h1 {
+  margin-top: 40px;
+}
+
+.Users > *:first-child {
+  margin-top: 0;
+}
+
+.Users .Table__table {
+  margin-top: 16px;
+}
+
+.Table__data .Table__table {
+  margin: 0;
+}
+
+.Admin__tab--active {
+  background-color: var(--color-red);
+}
+
+.Admin__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.Admin__banned {
+  color: var(--color-red);
+}
+
+.Admin__form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.Admin__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.Admin__field--wide {
+  flex: 1 1 100%;
+}
+
+.Admin .button {
+  border: none;
+  cursor: pointer;
+}

@@ -10,12 +10,12 @@ Microservices-based Movies rental application demonstrating Okteto development o
 - **catalog**: Node.js service serving movies from MongoDB
 - **rent**: Java service handling rent requests → Kafka
 - **worker**: Go service processing Kafka messages → PostgreSQL
-- **api**: Go service retrieving rentals from PostgreSQL
+- **api**: Go service handling auth (email login, `admin`/`admin123` panel), rentals, history, availability, bans and good-deed requests in PostgreSQL
 
 ### Data Stores
 - MongoDB: Movie catalog
 - Kafka: Message queue for rent requests
-- PostgreSQL: Rental records
+- PostgreSQL: Users, rental records (kept after a return, as history) and ban redemption requests
 
 ## Key Files
 - `okteto.yaml`: Okteto manifest (source of truth for build/deploy/dev)
