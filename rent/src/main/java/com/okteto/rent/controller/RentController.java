@@ -47,16 +47,15 @@ public class RentController {
         }
 
         String catalogID = rentInput.getMovieID();
-        Double price = rentInput.getPrice() == null ? 0d : rentInput.getPrice();
 
-        logger.info("Rent [{},{},{}] received", email, catalogID, price);
+        logger.info("Rent [{},{}] received", email, catalogID);
 
         RentCheckClient.Result check = rentCheck.check(email, catalogID, "rent");
         if (!check.allowed()) {
             return error(HttpStatus.CONFLICT, check.reason());
         }
 
-        publish(KAFKA_TOPIC_RENTALS, catalogID, payload(email, catalogID, price));
+        publish(KAFKA_TOPIC_RENTALS, catalogID, payload(email, catalogID));
         return ResponseEntity.accepted().body(Collections.singletonMap("status", "rental requested"));
     }
 
@@ -76,7 +75,7 @@ public class RentController {
             return error(HttpStatus.CONFLICT, check.reason());
         }
 
-        publish(KAFKA_TOPIC_RETURNS, catalogID, payload(email, catalogID, null));
+        publish(KAFKA_TOPIC_RETURNS, catalogID, payload(email, catalogID));
         return ResponseEntity.accepted().body(Collections.singletonMap("status", "return requested"));
     }
 
@@ -92,13 +91,11 @@ public class RentController {
                 });
     }
 
-    private String payload(String email, String catalogID, Double price) {
+    // the price is not part of the message: the worker charges what the catalog says
+    private String payload(String email, String catalogID) {
         Map<String, Object> message = new LinkedHashMap<>();
         message.put("user_email", email);
         message.put("movie_id", catalogID);
-        if (price != null) {
-            message.put("price", price);
-        }
 
         try {
             return mapper.writeValueAsString(message);
@@ -114,7 +111,6 @@ public class RentController {
     public static class Rent {
         @JsonProperty("catalog_id")
         private String movieID;
-        private Double price;
 
         public void setMovieID(String movieID) {
             this.movieID = movieID;
@@ -122,14 +118,6 @@ public class RentController {
 
         public String getMovieID() {
             return movieID;
-        }
-
-        public void setPrice(Double price) {
-            this.price = price;
-        }
-
-        public Double getPrice() {
-            return price;
         }
     }
 

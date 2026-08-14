@@ -15,6 +15,7 @@ const DefaultCopies = 3
 type Movie struct {
 	ID     json.Number `json:"id"`
 	Copies *int        `json:"copies"`
+	Price  float64     `json:"price"`
 }
 
 var client = &http.Client{Timeout: 5 * time.Second}
@@ -26,21 +27,22 @@ func url() string {
 	return "http://catalog:8080/catalog"
 }
 
-// Copies returns how many copies of a movie the catalog holds.
-func Copies(movieID string) (int, error) {
+// Lookup returns how many copies of a movie the catalog holds and what it charges
+// for it. The price comes from the catalog, never from the client.
+func Lookup(movieID string) (copies int, price float64, err error) {
 	resp, err := client.Get(url())
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return 0, fmt.Errorf("catalog returned %d", resp.StatusCode)
+		return 0, 0, fmt.Errorf("catalog returned %d", resp.StatusCode)
 	}
 
 	movies := []Movie{}
 	if err := json.NewDecoder(resp.Body).Decode(&movies); err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 
 	for _, m := range movies {
@@ -48,12 +50,12 @@ func Copies(movieID string) (int, error) {
 			continue
 		}
 		if m.Copies == nil || *m.Copies < 0 {
-			return DefaultCopies, nil
+			return DefaultCopies, m.Price, nil
 		}
-		return *m.Copies, nil
+		return *m.Copies, m.Price, nil
 	}
 
-	return 0, fmt.Errorf("movie %s is not in the catalog", movieID)
+	return 0, 0, fmt.Errorf("movie %s is not in the catalog", movieID)
 }
 
 // FormatPrice renders a price the way the rentals table stores it.

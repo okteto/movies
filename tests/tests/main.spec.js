@@ -100,10 +100,11 @@ test('users share the catalog and are limited by the number of copies', async ()
   await waitForRental(two, id, true);
   expect((await one.post('/rent', { data: { catalog_id: String(id) } })).status()).toBe(409);
 
-  // the returned movie stays in the history of the first user
+  // the returned movie stays in the history of the first user, charged at the catalog price
   const history = await (await one.get('/rentals/history')).json();
   const returned = history.filter(rental => rental.movie_id === String(id) && rental.returned_at);
   expect(returned.length).toBe(1);
+  expect(returned[0].price).toBe(1);
 
   expect((await two.post('/rent/return', { data: { catalog_id: String(id) } })).status()).toBe(202);
   await waitForRental(two, id, false);

@@ -25,9 +25,8 @@ var (
 
 // RentMessage is the payload published by the rent service.
 type RentMessage struct {
-	UserEmail string  `json:"user_email"`
-	MovieID   string  `json:"movie_id"`
-	Price     float64 `json:"price"`
+	UserEmail string `json:"user_email"`
+	MovieID   string `json:"movie_id"`
 }
 
 func main() {
@@ -89,13 +88,13 @@ func rent(db *sql.DB, payload []byte) error {
 		return fmt.Errorf("invalid rent message %q: %w", string(payload), err)
 	}
 
-	fmt.Printf("Received message: user %s movie %s price %f\n", m.UserEmail, m.MovieID, m.Price)
+	fmt.Printf("Received message: user %s movie %s\n", m.UserEmail, m.MovieID)
 
 	if m.UserEmail == "" || m.MovieID == "" {
 		return fmt.Errorf("rent message is missing the user or the movie")
 	}
 
-	copies, err := catalog.Copies(m.MovieID)
+	copies, price, err := catalog.Lookup(m.MovieID)
 	if err != nil {
 		return err
 	}
@@ -141,7 +140,7 @@ func rent(db *sql.DB, payload []byte) error {
 
 	if _, err := tx.Exec(
 		`INSERT INTO rentals (user_email, movie_id, price) VALUES ($1, $2, $3)`,
-		m.UserEmail, m.MovieID, catalog.FormatPrice(m.Price),
+		m.UserEmail, m.MovieID, catalog.FormatPrice(price),
 	); err != nil {
 		return err
 	}

@@ -54,7 +54,12 @@ const App = () => {
               <Admin />
             </Route>
             <Route exact path="/">
-              <Store session={session} onLogin={(user) => setSession({ user, loaded: true })} onLogout={logout} />
+              <Store
+                session={session}
+                onLogin={(user) => setSession({ user, loaded: true })}
+                onLogout={logout}
+                onRefreshSession={loadSession}
+              />
             </Route>
           </Switch>
         </div>
@@ -63,23 +68,30 @@ const App = () => {
   );
 };
 
-const Store = ({ session, onLogin, onLogout }) => {
+const Store = ({ session, onLogin, onLogout, onRefreshSession }) => {
   const [catalog, setCatalog] = useState({ data: [], loaded: false });
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [error, setError] = useState('');
 
   const { user, loaded } = session;
+  const email = user?.email;
+  const banned = user?.banned;
 
   const refreshData = useCallback(async () => {
-    if (!user || user.banned) {
+    if (!email || banned) {
       return;
     }
 
     const [movies, rentalHistory] = await Promise.all([get('/availability'), get('/rentals/history')]);
     setCatalog({ data: movies, loaded: true });
     setHistory(rentalHistory);
-  }, [user]);
+  }, [email, banned]);
+
+  // an admin may have banned the user while the app was on another screen
+  useEffect(() => {
+    onRefreshSession();
+  }, []);
 
   useEffect(() => {
     refreshData();
@@ -103,7 +115,7 @@ const Store = ({ session, onLogin, onLogout }) => {
       await post(path, { catalog_id: String(item.id) });
       // the rent service publishes to kafka, give the worker a moment to catch up
       await new Promise((resolve) => setTimeout(resolve, 700));
-      await refreshData();
+      await Promise.all([onRefreshSession(), refreshData()]);
     } catch (err) {
       setError(err.message);
     }
