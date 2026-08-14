@@ -136,7 +136,7 @@ test('an admin can see the history of a user, ban them and forgive them', async 
   await page.getByPlaceholder('you@example.com').fill(email);
   await page.getByRole('button', { name: 'Sign in' }).click();
   await expect(page.getByRole('heading', { name: 'You have been banned' })).toBeVisible();
-  await expect(page.getByAltText('Banned from the video store')).toBeVisible();
+  await expect(page.locator('.Banned__meme')).toBeVisible();
   await page.locator('.Banned__input').fill('I helped a friend fix their cluster');
   await page.getByRole('button', { name: 'Request forgiveness' }).click();
   await expect(page.locator('.Banned__thanks')).toBeVisible();
