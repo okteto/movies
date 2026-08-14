@@ -29,6 +29,13 @@ spec:
       containers:
         - name: api
           image: {{ .Values.image }}
+          env:
+            - name: SESSION_SECRET
+              value: {{ .Values.sessionSecret | quote }}
+            - name: ADMIN_USERNAME
+              value: {{ .Values.admin.username | quote }}
+            - name: ADMIN_PASSWORD
+              value: {{ .Values.admin.password | quote }}
           ports:
             - name: http
               containerPort: 8080

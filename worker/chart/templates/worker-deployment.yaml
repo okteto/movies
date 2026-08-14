@@ -19,4 +19,7 @@ spec:
         name: worker
         command:
           - /usr/local/bin/worker
+        env:
+        - name: CATALOG_URL
+          value: "http://catalog:8080/catalog"
 

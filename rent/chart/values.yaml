@@ -1,2 +1,3 @@
 replicaCount: 1
 image: ""
+sessionSecret: "okteto-movies-demo"

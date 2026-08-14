@@ -1,4 +1,32 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, request as playwrightRequest } from '@playwright/test';
+
+const baseURL = () => `https://movies-${process.env.OKTETO_NAMESPACE}.${process.env.OKTETO_DOMAIN}`;
+
+const session = async (email) => {
+  const context = await playwrightRequest.newContext({ baseURL: baseURL() });
+  const response = await context.post('/auth/login', { data: { email } });
+  expect(response.status()).toBe(200);
+  return context;
+};
+
+const adminSession = async () => {
+  const context = await playwrightRequest.newContext({ baseURL: baseURL() });
+  const response = await context.post('/auth/admin-login', { data: { username: 'admin', password: 'admin123' } });
+  expect(response.status()).toBe(200);
+  return context;
+};
+
+const movie = async (context, id) => {
+  const response = await context.get('/availability');
+  expect(response.status()).toBe(200);
+  const movies = await response.json();
+  return movies.find(item => String(item.id) === String(id));
+};
+
+// rentals go through kafka, so the worker applies them asynchronously
+const waitForRental = async (context, id, rented) => {
+  await expect.poll(async () => (await movie(context, id)).rented, { timeout: 30000 }).toBe(rented);
+};
 
 test('environment variables are set', async () => {
   expect(process.env.OKTETO_NAMESPACE).toBeDefined();
@@ -9,18 +37,17 @@ test('environment variables are set', async () => {
 
 
 test('movies has title', async ({ page }) => {
-  await page.goto(`https://movies-${process.env.OKTETO_NAMESPACE}.${process.env.OKTETO_DOMAIN}`);
+  await page.goto(baseURL());
 
   // The page title
   await expect(page).toHaveTitle('Movies');
 });
 
 test('catalog has entries', async ({ request }) => {
-    const apiUrl = `https://movies-${process.env.OKTETO_NAMESPACE}.${process.env.OKTETO_DOMAIN}/catalog`;
-    const response = await request.get(apiUrl);
+    const response = await request.get(`${baseURL()}/catalog`);
     expect(response.status()).toBe(200);
     const data = await response.json();
-    expect(data.length).toBe(6);
+    expect(data.length).toBeGreaterThanOrEqual(6);
 
     const expectedTitles = [
     'Moby Dock',
@@ -32,5 +59,108 @@ test('catalog has entries', async ({ request }) => {
   ];
 
   const actualTitles = data.map(item => item.original_title);
-  expect(actualTitles).toEqual(expectedTitles);  
+  expect(actualTitles).toEqual(expect.arrayContaining(expectedTitles));
+});
+
+test('every movie in the catalog has a number of copies', async ({ request }) => {
+  const response = await request.get(`${baseURL()}/catalog`);
+  const data = await response.json();
+  data.forEach(item => expect(item.copies).toBeGreaterThan(0));
+});
+
+test('users share the catalog and are limited by the number of copies', async () => {
+  const stamp = Date.now();
+  const one = await session(`one-${stamp}@example.com`);
+  const two = await session(`two-${stamp}@example.com`);
+
+  // "Crash Loop Backoff" only has one copy
+  const target = await movie(one, 3);
+  expect(target.copies).toBe(1);
+  expect(target.available).toBe(1);
+
+  expect((await one.post('/rent', { data: { catalog_id: '3' } })).status()).toBe(200);
+  await waitForRental(one, 3, true);
+
+  const denied = await two.post('/rent', { data: { catalog_id: '3' } });
+  expect(denied.status()).toBe(409);
+  expect(await denied.text()).toContain('copies');
+  expect((await movie(two, 3)).available).toBe(0);
+
+  expect((await one.post('/rent/return', { data: { catalog_id: '3' } })).status()).toBe(200);
+  await waitForRental(one, 3, false);
+
+  expect((await two.post('/rent', { data: { catalog_id: '3' } })).status()).toBe(200);
+  await waitForRental(two, 3, true);
+  expect((await one.post('/rent', { data: { catalog_id: '3' } })).status()).toBe(409);
+
+  // the returned movie stays in the history of the first user
+  const history = await (await one.get('/rentals/history')).json();
+  const returned = history.filter(rental => rental.movie_id === '3' && rental.returned_at);
+  expect(returned.length).toBe(1);
+
+  expect((await two.post('/rent/return', { data: { catalog_id: '3' } })).status()).toBe(200);
+  await waitForRental(two, 3, false);
+});
+
+test('anonymous users cannot rent', async ({ request }) => {
+  const response = await request.post(`${baseURL()}/rent`, { data: { catalog_id: '1' } });
+  expect(response.status()).toBe(401);
+});
+
+test('an admin can see the history of a user, ban them and forgive them', async ({ page }) => {
+  const email = `banned-${Date.now()}@example.com`;
+  const user = await session(email);
+  expect((await user.post('/rent', { data: { catalog_id: '6' } })).status()).toBe(200);
+  await waitForRental(user, 6, true);
+
+  const admin = await adminSession();
+  const rentals = await (await admin.get(`/adminapi/users/${encodeURIComponent(email)}/rentals`)).json();
+  expect(rentals.length).toBe(1);
+  expect(rentals[0].movie_id).toBe('6');
+
+  expect((await admin.post(`/adminapi/users/${encodeURIComponent(email)}/ban`, { data: { reason: 'testing' } })).status()).toBe(200);
+  expect((await user.post('/rent', { data: { catalog_id: '1' } })).status()).toBe(409);
+
+  // the banned user gets a meme and a chance to redeem themselves
+  await page.goto(baseURL());
+  await page.getByPlaceholder('you@example.com').fill(email);
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await expect(page.getByRole('heading', { name: 'You have been banned' })).toBeVisible();
+  await expect(page.getByAltText('Banned from the video store')).toBeVisible();
+  await page.locator('.Banned__input').fill('I helped a friend fix their cluster');
+  await page.getByRole('button', { name: 'Request forgiveness' }).click();
+  await expect(page.locator('.Banned__thanks')).toBeVisible();
+
+  const redemptions = await (await admin.get('/adminapi/redemptions')).json();
+  const redemption = redemptions.find(item => item.user_email === email);
+  expect(redemption.status).toBe('pending');
+
+  expect((await admin.post(`/adminapi/redemptions/${redemption.id}/resolve`, { data: { status: 'approved' } })).status()).toBe(200);
+  expect((await (await user.get('/me')).json()).banned).toBe(false);
+
+  expect((await user.post('/rent/return', { data: { catalog_id: '6' } })).status()).toBe(200);
+  await waitForRental(user, 6, false);
+});
+
+test('an admin can add, edit and remove movies from the catalog', async ({ request }) => {
+  const admin = await adminSession();
+  const title = `Test Movie ${Date.now()}`;
+
+  const anonymous = await request.post(`${baseURL()}/catalog`, { data: { original_title: title } });
+  expect(anonymous.status()).toBe(401);
+
+  const created = await admin.post('/catalog', {
+    data: { original_title: title, overview: 'a movie about testing', price: 1.5, vote_average: 7, copies: 2 }
+  });
+  expect(created.status()).toBe(201);
+  const { id } = await created.json();
+
+  const user = await session(`catalog-${Date.now()}@example.com`);
+  expect((await movie(user, id)).copies).toBe(2);
+
+  expect((await admin.put(`/catalog/${id}`, { data: { original_title: title, price: 3, copies: 5 } })).status()).toBe(200);
+  expect((await movie(user, id)).copies).toBe(5);
+
+  expect((await admin.delete(`/catalog/${id}`)).status()).toBe(200);
+  expect(await movie(user, id)).toBeUndefined();
 });

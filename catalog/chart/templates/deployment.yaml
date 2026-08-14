@@ -37,6 +37,8 @@ spec:
         - name: catalog
           image: {{ .Values.image }}
           env:
+            - name: SESSION_SECRET
+              value: {{ .Values.sessionSecret | quote }}
             - name: MONGODB_USERNAME
               value: "okteto"
             - name: MONGODB_PASSWORD
