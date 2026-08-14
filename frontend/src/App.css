@@ -112,7 +112,7 @@ a:hover {
   display: flex;
   justify-content: right;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 24px;
 }
 
 .App__header.fixed {
@@ -134,7 +134,7 @@ a:hover {
 }
 
 .App__content {
-  padding: calc(var(--app-header-height) + 12px) var(--app-horizontal-margin) 10px;
+  padding: calc(var(--app-header-height) + 12px) var(--app-horizontal-margin) 40px;
 }
 
 .App__promo {
@@ -162,6 +162,7 @@ a:hover {
   transition: opacity 3s ease;
   position: relative;
   z-index: 4;
+  margin-bottom: 40px;
 }
 
 .DevToast {
@@ -208,6 +209,7 @@ a:hover {
   display: flex;
   flex-direction: row;
   align-items: center;
+  margin-bottom: 8px;
 }
 
 .Item {
@@ -539,11 +541,16 @@ a:hover {
 }
 
 .History {
-  margin-top: 32px;
+  margin-top: 40px;
+}
+
+.History .Table__table {
+  margin-top: 16px;
 }
 
 .History__title {
   cursor: pointer;
+  margin-bottom: 0;
   font-size: 22px;
   display: flex;
   gap: 12px;
