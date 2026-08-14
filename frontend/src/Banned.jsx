@@ -22,7 +22,7 @@ const Banned = ({ user, onLogout }) => {
   return (
     <div className="Banned">
       <h1>You have been banned</h1>
-      <img className="Banned__meme" src="/banned-meme.png" alt="Banned from the video store" />
+      <img className="Banned__meme" src="/banned-meme.png" alt="A video store clerk refusing to hand over any more movies" />
       <p className="Banned__reason">
         Reason: <strong>{user.ban_reason || 'misbehaving'}</strong>
       </p>
