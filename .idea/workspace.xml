@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="56b4e5a2-af2a-4460-8dcd-89c119a8f29a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.vscode/launch.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/launch.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rent/target/classes/com/okteto/rent/RentApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/rent/target/classes/com/okteto/rent/RentApplication.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rent/target/classes/com/okteto/rent/ServletInitializer.class" beforeDir="false" afterPath="$PROJECT_DIR$/rent/target/classes/com/okteto/rent/ServletInitializer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rent/target/classes/com/okteto/rent/controller/RentController$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rent/target/classes/com/okteto/rent/controller/RentController$Rent.class" beforeDir="false" afterPath="$PROJECT_DIR$/rent/target/classes/com/okteto/rent/controller/RentController$Rent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rent/target/classes/com/okteto/rent/controller/RentController.class" beforeDir="false" afterPath="$PROJECT_DIR$/rent/target/classes/com/okteto/rent/controller/RentController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rent/target/classes/com/okteto/rent/kafka/KafkaProducerConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/rent/target/classes/com/okteto/rent/kafka/KafkaProducerConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rent/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rent/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CompilerWorkspaceConfiguration">
+    <option name="MAKE_PROJECT_ON_SAVE" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/rentals/rent/src/main/java/com/okteto/rent/controller/RentController.java" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="35xETenEXojAW5JTtF3A5atkowU" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Remote JVM Debug.debug.executor": "Debug",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Shell Script.destroy.executor": "Run",
+    "Shell Script.disconnect.executor": "Run",
+    "Shell Script.okteto.executor": "Run",
+    "Shell Script.up.executor": "Run",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/Users/ramiro/okteto/movies",
+    "settings.editor.selected.configurable": "actions.on.save"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="debug" type="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+      <option name="AUTO_RESTART" value="false" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="5005" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="56b4e5a2-af2a-4460-8dcd-89c119a8f29a" name="Changes" comment="" />
+      <created>1764043331999</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1764043331999</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-core" />
+    <option featureType="dependencySupport" implementationName="executable:docker" />
+    <option featureType="dependencySupport" implementationName="java:org.apache.kafka:kafka_2.13" />
+    <option featureType="dependencySupport" implementationName="executable:kubectl" />
+    <option featureType="dependencySupport" implementationName="java:org.thymeleaf:thymeleaf" />
+    <option featureType="dependencySupport" implementationName="executable:terraform" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-messaging" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework.boot:spring-boot" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-webmvc" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/rent/src/main/java/com/okteto/rent/controller/RentController.java</url>
+          <line>36</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
