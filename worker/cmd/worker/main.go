@@ -10,9 +10,9 @@ import (
 
 	_ "github.com/lib/pq"
 
-	kingpin "gopkg.in/alecthomas/kingpin.v2"
+	"github.com/alecthomas/kingpin/v2"
 
-	"github.com/Shopify/sarama"
+	"github.com/IBM/sarama"
 	"github.com/okteto/movies/pkg/database"
 	"github.com/okteto/movies/pkg/kafka"
 )

@@ -1,7 +1,7 @@
 module github.com/okteto/movies
 
-go 1.24
+go 1.25.0
 
-require github.com/lib/pq v1.10.5
+require github.com/lib/pq v1.12.3
 
-require github.com/gorilla/mux v1.8.0 // indirect
+require github.com/gorilla/mux v1.8.1

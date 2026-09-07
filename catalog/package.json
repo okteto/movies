@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "license": "Apache-2.0",
   "dependencies": {
-    "async": "^3.1.0",
-    "express": "^4.16.4",
-    "mongodb": "^6.18.0",
-    "nodemon": "^2.0.2",
+    "async": "^3.2.6",
+    "express": "^5.2.1",
+    "mongodb": "^7.5.0",
+    "nodemon": "^3.1.14",
     "saslprep": "^1.0.3"
   },
   "scripts": {
@@ -14,5 +14,5 @@
     "start": "nodemon server.js",
     "load": "node load.js"
   },
-  "packageManager": "yarn@4.9.4"
+  "packageManager": "yarn@4.18.0"
 }
