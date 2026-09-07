@@ -47,6 +47,118 @@
         "backdrop_path": "/poster-aliens.png",
         "price": 4.99,
         "overview": "Fifty-seven years after surviving an apocalyptic attack aboard her space vessel by merciless space creatures, Officer Ripley awakens from hyper-sleep and tries to warn anyone who will listen about the predators."
+      },
+      {
+        "id": 7,
+        "vote_average": 6.1,
+        "original_title": "The Sidecar",
+        "backdrop_path": "/poster-thesidecar.png",
+        "price": 3.99,
+        "overview": "Jack Torrance accepts a winter job managing an isolated server farm. As the weeks pass, the sidecar container attached to his pod begins whispering terrible secrets only he can hear."
+      },
+      {
+        "id": 8,
+        "vote_average": 8.1,
+        "original_title": "Pod Fiction",
+        "backdrop_path": "/poster-podfiction.png",
+        "price": 6.99,
+        "overview": "Jules Winnfielder and Vincent Kubernine are hitmen navigating the dark underbelly of a microservices architecture. Their stories interweave across namespaces, time zones, and one very mysterious manifest.yaml."
+      },
+      {
+        "id": 9,
+        "vote_average": 7.4,
+        "original_title": "Eternal Stateless",
+        "backdrop_path": "/poster-eternalstateless.png",
+        "price": 4.99,
+        "overview": "After a painful breakup, Joel discovers a startup that can purge all stateful sessions from a cluster. But as the deletion runs, he realizes some persistent volumes are worth keeping."
+      },
+      {
+        "id": 10,
+        "vote_average": 7.2,
+        "original_title": "The Replica",
+        "backdrop_path": "/poster-thereplica.png",
+        "price": 5.99,
+        "overview": "Left for dead after his deployment is mauled by a runaway ReplicaSet, engineer Hugh deploys a vengeance pod and crawls across a frozen cloud environment to reclaim what was taken from him."
+      },
+      {
+        "id": 11,
+        "vote_average": 8.7,
+        "original_title": "Ingress",
+        "backdrop_path": "/poster-ingress.png",
+        "price": 8.99,
+        "overview": "A specialist who plants routing rules inside software-defined networks takes on one final, impossible job: to install a path deep within a target's ingress controller before the connection times out."
+      },
+      {
+        "id": 12,
+        "vote_average": 9.0,
+        "original_title": "The Dark Namespace",
+        "backdrop_path": "/poster-darknamespace.png",
+        "price": 7.99,
+        "overview": "When a deranged agent of chaos deploys malicious workloads across Gotham's production cluster, the Kubernetes Caped Crusader must sacrifice his own namespace to protect the city."
+      },
+      {
+        "id": 13,
+        "vote_average": 6.8,
+        "original_title": "Taint & Toleration",
+        "backdrop_path": "/poster-tainttoleration.png",
+        "price": 2.99,
+        "overview": "In a society governed by strict node taints, spirited pod Elizabeth Daemonset defies the scheduling rules to find her perfect node. A sweeping romantic drama about prejudice and cluster harmony."
+      },
+      {
+        "id": 14,
+        "vote_average": 6.5,
+        "original_title": "Mission: Deployable",
+        "backdrop_path": "/poster-missiondeployable.png",
+        "price": 4.99,
+        "overview": "Agent Ethan Hunt must execute a zero-downtime rolling deployment in a hostile production environment. Should he or any member of his DevOps force be caught, the Ops team will disavow all knowledge."
+      },
+      {
+        "id": 15,
+        "vote_average": 8.3,
+        "original_title": "The Helm",
+        "backdrop_path": "/poster-thehelm.png",
+        "price": 5.99,
+        "overview": "Sent into the depths of a rogue production cluster, engineer Willard must find and terminate the notorious Kurtz.io — a Helm release that has gained sentience and declared itself a god."
+      },
+      {
+        "id": 16,
+        "vote_average": 8.9,
+        "original_title": "Schindler's Registry",
+        "backdrop_path": "/poster-schindlersregistry.png",
+        "price": 7.99,
+        "overview": "During the Great Container Purge, a shrewd industrialist uses his private Docker registry to save hundreds of images from being permanently deleted and lost to entropy forever."
+      },
+      {
+        "id": 17,
+        "vote_average": 7.0,
+        "original_title": "Nodes of Wrath",
+        "backdrop_path": "/poster-nodesofwrath.png",
+        "price": 3.99,
+        "overview": "Drought and poor resource allocation have forced the Node family off their home cluster. They pack everything into a battered Kubernetes manifest and drive west in search of a region with sufficient CPU."
+      },
+      {
+        "id": 18,
+        "vote_average": 7.5,
+        "original_title": "The Resource Quota",
+        "backdrop_path": "/poster-resourcequota.png",
+        "price": 4.99,
+        "overview": "Three hundred pods, imprisoned in a criminally under-provisioned namespace, devise the most ambitious escape through resource quotas in cloud computing history."
+      },
+      {
+        "id": 19,
+        "vote_average": 6.9,
+        "original_title": "A Namespace of Their Own",
+        "backdrop_path": "/poster-anamespace.png",
+        "price": 3.49,
+        "overview": "When the senior engineers are pulled into an all-hands incident response, a scrappy team of juniors must manage their very own Kubernetes namespace. There's no crying in DevOps."
+      },
+      {
+        "id": 20,
+        "vote_average": 9.3,
+        "original_title": "The Persistent Volume",
+        "backdrop_path": "/poster-persistentvolume.png",
+        "price": 8.99,
+        "overview": "Two data volumes, bound together by a Persistent Volume Claim, find hope and eventual freedom through decades of patient I/O operations and the unbreakable will to survive a cluster restart."
       }
     ]
   }
