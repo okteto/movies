@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"runtime"
 	"strconv"
 	"log"
 
@@ -60,6 +61,14 @@ type User struct {
 	Gender string
 }
 
+type Health struct {
+	Namespace        string `json:"namespace"`
+	Hostname         string `json:"hostname"`
+	NumCPU           int    `json:"cpu"`
+	CPULimitCores    string `json:"cpu_limit_cores,omitempty"`
+	MemoryLimitBytes string `json:"memory_limit_bytes,omitempty"`
+}
+
 func loadData() {
 	dropTableStmt := `DROP TABLE IF EXISTS users`
 	if _, err := db.Exec(dropTableStmt); err != nil {
@@ -97,11 +106,38 @@ func loadData() {
 func handleRequests() {
 	muxRouter := mux.NewRouter().StrictSlash(true)
 
+	muxRouter.HandleFunc("/health", health)
 	muxRouter.HandleFunc("/rentals", rentals)
 	muxRouter.HandleFunc("/users", allUsers)
 	muxRouter.HandleFunc("/users/{userid}", singleUser)
 
 	log.Fatal(http.ListenAndServe(":8080", muxRouter))
+}
+
+func health(w http.ResponseWriter, r *http.Request) {
+	hostname, err := os.Hostname()
+	if err != nil {
+		hostname = "unknown"
+	}
+
+	namespace := os.Getenv("POD_NAMESPACE")
+	if namespace == "" {
+		namespace = "default"
+	}
+
+	cpuLimit := os.Getenv("CPU_LIMIT")
+	memoryLimit := os.Getenv("MEMORY_LIMIT")
+
+	healthStatus := Health{
+		Namespace:        namespace,
+		Hostname:         hostname,
+		NumCPU:           runtime.NumCPU(),
+		CPULimitCores:    cpuLimit,
+		MemoryLimitBytes: memoryLimit,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(healthStatus)
 }
 
 func rentals(w http.ResponseWriter, r *http.Request) {
