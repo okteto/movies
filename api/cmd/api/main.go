@@ -37,6 +37,7 @@ func main() {
 type Rental struct {
 	Movie string
 	Price string
+	Tier  string
 }
 
 type Movie struct {
@@ -46,6 +47,7 @@ type Movie struct {
 	BackdropPath  string  `json:"backdrop_path,omitempty"`
 	Price         float64 `json:"price,omitempty"`
 	Overview      string  `json:"overview,omitempty"`
+	Tier          string  `json:"tier,omitempty"`
 }
 
 type User struct {
@@ -119,7 +121,7 @@ func rentals(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		var r Rental
-		if err := rows.Scan(&r.Movie, &r.Price); err != nil {
+		if err := rows.Scan(&r.Movie, &r.Price, &r.Tier); err != nil {
 			fmt.Println("error scanning row", err)
 			os.Exit(1)
 		}
@@ -157,6 +159,7 @@ func rentals(w http.ResponseWriter, r *http.Request) {
 			if rental.Movie == strconv.Itoa(m.ID) {
 				price, _ := strconv.ParseFloat(rental.Price, 64)
 				m.Price = price
+				m.Tier = rental.Tier
 				result = append(result, m)
 			}
 		}

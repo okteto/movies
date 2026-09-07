@@ -285,6 +285,38 @@ a:hover {
   font-size: 26px;
 }
 
+.Item__tier {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.Item__tier-option {
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background .125s ease, border-color .125s ease;
+}
+
+.Item__tier-option--active {
+  background: var(--color-red);
+  border-color: var(--color-red);
+}
+
+.Item__badge {
+  background: var(--color-red);
+  border-radius: 12px;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
 .Item:hover .Item__overlay {
   opacity: 1;
   pointer-events: all;
