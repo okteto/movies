@@ -6,6 +6,8 @@ metadata:
     {{- include "movies.labels" . | nindent 4 }}
   annotations:
     dev.okteto.com/generate-host: "movies"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
 spec:
   rules:
     - http:
@@ -18,6 +20,13 @@ spec:
                 port:
                   number: 8080
           - path: /users
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 8080
+          - path: /api/ws
             pathType: Prefix
             backend:
               service:

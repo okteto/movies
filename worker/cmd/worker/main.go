@@ -1,12 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
-
-	"fmt"
+	"strings"
 
 	_ "github.com/lib/pq"
 
@@ -70,6 +71,17 @@ func main() {
 				if _, err := db.Exec(insertDynStmt, string(msg.Key), fmt.Sprintf("%f", price)); err != nil {
 					log.Panic(err)
 				}
+				movieID := string(msg.Key)
+				go func() {
+					payload := fmt.Sprintf(`{"movie_id":"%s"}`, movieID)
+					resp, err := http.Post("http://api:8080/internal/notify", "application/json", strings.NewReader(payload))
+					if err != nil {
+						fmt.Println("Error notifying API:", err)
+						return
+					}
+					resp.Body.Close()
+					fmt.Printf("Notified API of rental: %s (status %d)\n", movieID, resp.StatusCode)
+				}()
 			case msg := <-consumerReturns.Messages():
 				catalogID := string(msg.Value)
 				fmt.Printf("Received return message: catalogID %s\n", catalogID)
